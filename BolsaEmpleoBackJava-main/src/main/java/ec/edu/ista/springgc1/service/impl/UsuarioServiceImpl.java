@@ -38,11 +38,11 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuario.setId(usuarioDTO.getId());
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         usuario.setClave(passwordEncoder.encode(usuarioDTO.getClave()));
-       usuario.setAdmin(usuarioDTO.getAdmin());
+       /*usuario.setAdmin(usuarioDTO.getAdmin());
         usuario.setEstado(usuarioDTO.isEstado());
         usuario.setEmpresario(usuarioDTO.getEmpresario());
         usuario.setGraduado(usuarioDTO.getGraduado());
-        usuario.setSuperadmin(usuarioDTO.getSuperadmin());
+        usuario.setSuperadmin(usuarioDTO.getSuperadmin());*/
         usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
        
         usuario.setRol(rol);
@@ -56,11 +56,11 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuarioDTO.setId(usuario.getId());
         usuarioDTO.setClave(usuario.getClave());
         usuarioDTO.setNombreUsuario(usuario.getNombreUsuario());
-        usuarioDTO.setGraduado(usuario.getGraduado());
+       /* usuarioDTO.setGraduado(usuario.getGraduado());
         usuarioDTO.setEstado(usuario.getEstado());
         usuarioDTO.setAdmin(usuario.getAdmin());
         usuarioDTO.setEmpresario(usuario.getEmpresario());
-        usuarioDTO.setSuperadmin(usuario.getSuperadmin());
+        usuarioDTO.setSuperadmin(usuario.getSuperadmin());*/
         usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
         usuarioDTO.setRol(usuario.getRol().getNombre());
         return usuarioDTO;
@@ -95,15 +95,15 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         if (!usuarioDTO.getClave().isEmpty()) {
             usuario.setClave(passwordEncoder.encode(usuarioDTO.getClave()));
         }
-        usuarioDTO.setAdmin(usuario.getAdmin());
+        /*usuarioDTO.setAdmin(usuario.getAdmin());
         usuarioDTO.setEmpresario(usuario.getEmpresario());
-        usuarioDTO.setSuperadmin(usuario.getSuperadmin());
+        usuarioDTO.setSuperadmin(usuario.getSuperadmin());*/
         usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
         
-        usuario.setGraduado(usuarioDTO.getGraduado());
+        /*usuario.setGraduado(usuarioDTO.getGraduado());
         usuario.setAdmin(usuarioDTO.getAdmin());
         usuario.setEmpresario(usuarioDTO.getEmpresario());
-        usuario.setSuperadmin(usuarioDTO.getSuperadmin());
+        usuario.setSuperadmin(usuarioDTO.getSuperadmin());*/
         usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
         usuario.setEstado(usuarioDTO.isEstado());
         usuario.setRol(rol);
