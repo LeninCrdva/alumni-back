@@ -23,9 +23,6 @@ public class Usuario {
 	    private String ruta_imagen;
 		 @Transient
 		 private String url_imagen;
-	
-		
-		 
 		    @Enumerated(EnumType.STRING)
 		    private UsuarioTipo usuarioTipo;
 

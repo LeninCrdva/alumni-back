@@ -24,7 +24,6 @@ public class UsuarioDTO implements Serializable {
     private String nombreUsuario;
     @NotNull
     private String clave;
-    
     /*private Graduado graduado;
     private SuperAdmin superadmin;
     private boolean estado;

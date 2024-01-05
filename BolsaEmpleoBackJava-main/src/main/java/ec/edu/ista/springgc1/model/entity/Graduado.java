@@ -41,8 +41,4 @@ public class Graduado {
 	 private String ruta_pdf;
 	 @Transient
 	 private String url_pdf;
-	 
-	
-	 
-	    
 }
