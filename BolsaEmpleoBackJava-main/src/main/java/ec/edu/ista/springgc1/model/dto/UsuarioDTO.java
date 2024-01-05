@@ -26,11 +26,11 @@ public class UsuarioDTO implements Serializable {
     private String clave;
     /*private Graduado graduado;
     private SuperAdmin superadmin;
-    private boolean estado;
     private Administrador admin;
 	 private Empresario empresario;*/
     private Persona persona;
 	 private UsuarioTipo usuarioTipo;
     @NotEmpty
     private String rol;
+    private boolean estado;
 }
