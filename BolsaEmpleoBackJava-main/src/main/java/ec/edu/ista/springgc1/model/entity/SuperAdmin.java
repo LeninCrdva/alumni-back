@@ -22,8 +22,8 @@ public class SuperAdmin {
 	    @Column(name = "id_super_admi")
 	    private Long id;
 	 @OneToOne
-	   @JoinColumn(name = "id_persona", referencedColumnName = "cod_perso")
-	    private Persona persona;
+	    @JoinColumn(referencedColumnName = "id_usuario")
+	   private Usuario usuario;
 	 private boolean estado=true;
 
 }

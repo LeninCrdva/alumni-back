@@ -20,8 +20,8 @@ public class Empresario {
 	    @Column(name = "id_empre")
 	    private Long id;
 	 @OneToOne
-	   @JoinColumn(name = "id_persona", referencedColumnName = "cod_perso")
-	    private Persona persona;
+	    @JoinColumn(referencedColumnName = "id_usuario")
+	   private Usuario usuario;
 	 private boolean estado=true;
 	 private String puesto;
 	 private int anios;

@@ -3,10 +3,13 @@ package ec.edu.ista.springgc1.service.impl;
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.UsuarioDTO;
+import ec.edu.ista.springgc1.model.entity.Persona;
 import ec.edu.ista.springgc1.model.entity.Rol;
 import ec.edu.ista.springgc1.model.entity.Usuario;
+import ec.edu.ista.springgc1.repository.PersonaRepository;
 import ec.edu.ista.springgc1.repository.RolRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
+import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +23,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements Mapper<Usuario, UsuarioDTO> {
-
+	  @Autowired
+	 private PersonaRepository personaRepository;
+	  
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -29,6 +34,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+    @Autowired
+    private S3Service s3Service;
 
     @Override
     public Usuario mapToEntity(UsuarioDTO usuarioDTO) {
@@ -38,13 +45,13 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuario.setId(usuarioDTO.getId());
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         usuario.setClave(passwordEncoder.encode(usuarioDTO.getClave()));
-       /*usuario.setAdmin(usuarioDTO.getAdmin());
-        usuario.setEstado(usuarioDTO.isEstado());
-        usuario.setEmpresario(usuarioDTO.getEmpresario());
-        usuario.setGraduado(usuarioDTO.getGraduado());
-        usuario.setSuperadmin(usuarioDTO.getSuperadmin());*/
+        Persona p = personaRepository.findBycedula(usuarioDTO.getCedula())
+                .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));;
         usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
-       
+        usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
+        usuario.setUrl_imagen(usuarioDTO.getUrl_imagen() == null ? null : s3Service.getObjectUrl(usuarioDTO.getRuta_imagen()));
+
+       usuario.setPersona(p);
         usuario.setRol(rol);
 
         return usuario;
@@ -56,12 +63,10 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuarioDTO.setId(usuario.getId());
         usuarioDTO.setClave(usuario.getClave());
         usuarioDTO.setNombreUsuario(usuario.getNombreUsuario());
-       /* usuarioDTO.setGraduado(usuario.getGraduado());
-        usuarioDTO.setEstado(usuario.getEstado());
-        usuarioDTO.setAdmin(usuario.getAdmin());
-        usuarioDTO.setEmpresario(usuario.getEmpresario());
-        usuarioDTO.setSuperadmin(usuario.getSuperadmin());*/
+        usuarioDTO.setRuta_imagen(usuario.getRuta_imagen());
+       usuarioDTO.setUrl_imagen(usuario.getUrl_imagen()); 
         usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
+        usuarioDTO.setCedula(usuario.getPersona().getCedula());
         usuarioDTO.setRol(usuario.getRol().getNombre());
         return usuarioDTO;
     }
@@ -69,8 +74,9 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     @Override
     public List findAll() {
         return usuarioRepository.findAll().stream()
-                .map(u -> mapToDTO(u))
-                .collect(Collectors.toList());
+        		  .peek(u -> u.setUrl_imagen(u.getRuta_imagen() == null ? null : s3Service.getObjectUrl(u.getRuta_imagen())))
+                  .map(e -> mapToDTO(e))
+                  .collect(Collectors.toList());
     }
 
     public UsuarioDTO findByIdToDTO(long id) {
@@ -90,22 +96,23 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         }
         Rol rol = rolRepository.findByNombre(usuarioDTO.getRol())
                 .orElseThrow(() -> new ResourceNotFoundException("nombre", usuarioDTO.getRol()));
+        Persona p = personaRepository.findBycedula(usuarioDTO.getCedula())
+                .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));;
 
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         if (!usuarioDTO.getClave().isEmpty()) {
             usuario.setClave(passwordEncoder.encode(usuarioDTO.getClave()));
         }
-        /*usuarioDTO.setAdmin(usuario.getAdmin());
-        usuarioDTO.setEmpresario(usuario.getEmpresario());
-        usuarioDTO.setSuperadmin(usuario.getSuperadmin());*/
+      
+      
+        
         usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
         
-        /*usuario.setGraduado(usuarioDTO.getGraduado());
-        usuario.setAdmin(usuarioDTO.getAdmin());
-        usuario.setEmpresario(usuarioDTO.getEmpresario());
-        usuario.setSuperadmin(usuarioDTO.getSuperadmin());*/
+       usuario.setUrl_imagen(usuarioDTO.getUrl_imagen());
+       usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
         usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
         usuario.setEstado(usuarioDTO.isEstado());
+        usuario.setPersona(p);
         usuario.setRol(rol);
 
         return usuarioRepository.save(usuario);

@@ -19,9 +19,9 @@ public class Administrador {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @Column(name = "id_admi")
 	    private Long id;
-	    @OneToOne
-	    @JoinColumn(name = "id_persona", referencedColumnName = "cod_perso")
-	    private Persona persona;
+	  @OneToOne
+	    @JoinColumn(referencedColumnName = "id_usuario")
+	   private Usuario usuario;
 	    private boolean estado=true;
 	    private String cargo;
 	    private String email;

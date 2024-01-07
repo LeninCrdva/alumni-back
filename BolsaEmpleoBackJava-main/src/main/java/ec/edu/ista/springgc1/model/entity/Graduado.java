@@ -2,11 +2,9 @@ package ec.edu.ista.springgc1.model.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import java.time.LocalDate;
-import java.util.Date;
 
 import java.time.LocalDate;
+
 
 
 import javax.persistence.Column;
@@ -20,8 +18,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import lombok.Data;
-
 @Data
 @Entity
 @Table(name="graduado")
@@ -31,8 +27,8 @@ public class Graduado {
 	    @Column(name = "graduado_id")
 	    private Long id;
 	 @OneToOne
-	    @JoinColumn(name = "id_persona", referencedColumnName = "cod_perso")
-	   private Persona persona;
+	    @JoinColumn(referencedColumnName = "id_usuario")
+	   private Usuario usuario;
 	 @ManyToOne
 	 @JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
 	 private Ciudad ciudad;

@@ -7,19 +7,24 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.http.MediaType;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin
+@CrossOrigin({"*"})
 @RestController
 @RequestMapping("/assets")
 public class AssetController {
 
     @Autowired
     private S3Service s3Service;
-
-    @PostMapping("/upload")
+   @Operation(summary = "Subir archivo")
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  //@PostMapping("/upload")
+    
+    
     Map<String, String> upload(@RequestParam MultipartFile multipartFile) {
         String key = s3Service.putObject(multipartFile);
 

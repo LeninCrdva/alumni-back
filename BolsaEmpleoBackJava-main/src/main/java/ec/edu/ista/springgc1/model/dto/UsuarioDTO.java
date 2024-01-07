@@ -6,11 +6,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import ec.edu.ista.springgc1.model.entity.Administrador;
-import ec.edu.ista.springgc1.model.entity.Empresario;
-import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.Persona;
-import ec.edu.ista.springgc1.model.entity.SuperAdmin;
 import ec.edu.ista.springgc1.model.entity.UsuarioTipo;
 
 import java.io.Serializable;
@@ -28,9 +24,12 @@ public class UsuarioDTO implements Serializable {
     private SuperAdmin superadmin;
     private Administrador admin;
 	 private Empresario empresario;*/
-    private Persona persona;
+    @NotNull
+    private String cedula;
 	 private UsuarioTipo usuarioTipo;
     @NotEmpty
     private String rol;
     private boolean estado;
+    private String ruta_imagen;
+    private String url_imagen;
 }
