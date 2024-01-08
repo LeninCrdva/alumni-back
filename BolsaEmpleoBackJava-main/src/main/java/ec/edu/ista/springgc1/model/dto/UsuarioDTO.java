@@ -25,7 +25,7 @@ public class UsuarioDTO implements Serializable {
 	 private UsuarioTipo usuarioTipo;
     @NotEmpty
     private String rol;
-    @NotEmpty
+    @NotNull
     private boolean estado;
     private String ruta_imagen;
     private String url_imagen;

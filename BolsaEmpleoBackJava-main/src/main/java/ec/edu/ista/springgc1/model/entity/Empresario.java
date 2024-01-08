@@ -24,7 +24,7 @@ public class Empresario {
 	 @OneToOne
 	    @JoinColumn(referencedColumnName = "id_usuario")
 	   private Usuario usuario;
-	 private boolean estado=true;
+	 private boolean estado;
 	  @ColumnTransformer(write = "UPPER(?)")
 	 private String puesto;
 	 private int anios;
