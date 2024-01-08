@@ -20,15 +20,12 @@ public class UsuarioDTO implements Serializable {
     private String nombreUsuario;
     @NotNull
     private String clave;
-    /*private Graduado graduado;
-    private SuperAdmin superadmin;
-    private Administrador admin;
-	 private Empresario empresario;*/
     @NotNull
     private String cedula;
 	 private UsuarioTipo usuarioTipo;
     @NotEmpty
     private String rol;
+    @NotEmpty
     private boolean estado;
     private String ruta_imagen;
     private String url_imagen;

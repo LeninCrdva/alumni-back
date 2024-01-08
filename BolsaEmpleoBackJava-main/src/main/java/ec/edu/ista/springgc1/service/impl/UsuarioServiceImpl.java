@@ -49,8 +49,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
                 .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));;
         usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
         usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
+        usuario.setEstado(usuarioDTO.isEstado());
         usuario.setUrl_imagen(usuarioDTO.getUrl_imagen() == null ? null : s3Service.getObjectUrl(usuarioDTO.getRuta_imagen()));
-
        usuario.setPersona(p);
         usuario.setRol(rol);
 
@@ -67,6 +67,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
        usuarioDTO.setUrl_imagen(usuario.getUrl_imagen()); 
         usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
         usuarioDTO.setCedula(usuario.getPersona().getCedula());
+        usuarioDTO.setEstado(usuario.getEstado());
         usuarioDTO.setRol(usuario.getRol().getNombre());
         return usuarioDTO;
     }

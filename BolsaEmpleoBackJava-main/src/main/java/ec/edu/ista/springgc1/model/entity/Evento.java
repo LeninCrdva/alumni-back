@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import lombok.Data;
 @Data
 @Entity
@@ -24,7 +26,9 @@ public class Evento {
 	  private LocalTime hora_inicio;
 	  private LocalTime hora_fin;
 	  private LocalDate fecha;
+	  @ColumnTransformer(write = "UPPER(?)")
 	  private String lugar;
+	  @ColumnTransformer(write = "UPPER(?)")
 	  private String descripcion;
 	  @ManyToOne
 		 @JoinColumn(name = "id_admi", referencedColumnName = "id_admi", nullable = true)

@@ -11,6 +11,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import lombok.Data;
 
 @Data
@@ -24,7 +26,9 @@ public class OfertasLaborales {
 	    private double salario;
 	    private LocalDate fecha_cierre;
 	    private LocalDate fecha_publicacion;
+	    @ColumnTransformer(write = "UPPER(?)")
 	    private String cargo;
+	    @ColumnTransformer(write = "UPPER(?)")
 	    private String experiencia;
 	    private LocalDate fecha_apertura;
 	    private String area_conocimiento;

@@ -3,6 +3,8 @@ package ec.edu.ista.springgc1.model.entity;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import org.hibernate.annotations.ColumnTransformer;
 @Data
 @Entity
 @Table(name="experiencia")
@@ -14,9 +16,13 @@ public class Experiencia {
 	 @ManyToOne
 	 @JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
 	 private Graduado graduado;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String cargo;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String duracion;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String institucion;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String actividad;
 	 
 	 

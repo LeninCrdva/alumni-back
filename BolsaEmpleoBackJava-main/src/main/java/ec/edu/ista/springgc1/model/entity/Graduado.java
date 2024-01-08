@@ -17,6 +17,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import javax.validation.constraints.Email;
+
+import org.hibernate.annotations.ColumnTransformer;
 
 @Data
 @Entity
@@ -33,7 +36,12 @@ public class Graduado {
 	 @JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
 	 private Ciudad ciudad;
 	 private LocalDate año_graduacion;
+	
+	 @Email(message = "Debe ser una dirección de correo electrónico válida.")
+	    @Column(name = "email_personal", nullable = false, length = 255,unique = true)
 	 private String email_personal;
+	  @ColumnTransformer(write = "UPPER(?)")
+	 private String estadocivil;
 	 private String ruta_pdf;
 	 @Transient
 	 private String url_pdf;

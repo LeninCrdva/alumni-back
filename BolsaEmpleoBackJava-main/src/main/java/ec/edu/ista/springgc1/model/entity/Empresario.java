@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import lombok.Data;
 
 @Data
@@ -23,6 +25,7 @@ public class Empresario {
 	    @JoinColumn(referencedColumnName = "id_usuario")
 	   private Usuario usuario;
 	 private boolean estado=true;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String puesto;
 	 private int anios;
 

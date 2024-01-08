@@ -3,7 +3,10 @@ package ec.edu.ista.springgc1.model.entity;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.ColumnTransformer;
+import org.springframework.lang.Nullable;
 
 @Data
 @Entity
@@ -15,15 +18,19 @@ public class Usuario {
 	private Long id;
 	private String clave;
 	@Column(name = "nombre_usuario", unique = true)
+	 @ColumnTransformer(write = "UPPER(?)")
 	private String nombreUsuario;
+	@NotNull
 	private Boolean estado;
 	@OneToOne
+	@NotNull
 	@JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
 	private Rol rol;
 	private String ruta_imagen;
 	@Transient
 	private String url_imagen;
 	@Enumerated(EnumType.STRING)
+	@NotNull
 	private UsuarioTipo usuarioTipo;
 	@ManyToOne
 	@JoinColumn(referencedColumnName = "cod_perso")

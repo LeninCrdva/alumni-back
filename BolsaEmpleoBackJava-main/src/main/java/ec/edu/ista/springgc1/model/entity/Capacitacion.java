@@ -2,11 +2,8 @@ package ec.edu.ista.springgc1.model.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,7 +14,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.Data;
+import org.hibernate.annotations.ColumnTransformer;
+
 
 @Data
 @Entity
@@ -32,9 +30,12 @@ public class Capacitacion {
 	 private Graduado graduado;
 	 private LocalDate fecha_inicio;
 	 private LocalDate fecha_fin;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String nombre;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String institucion;
 	 private int horas;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String tipo_certificado;
 	 
 }

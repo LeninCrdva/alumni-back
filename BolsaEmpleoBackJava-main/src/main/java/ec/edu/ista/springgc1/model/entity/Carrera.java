@@ -8,6 +8,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import lombok.Data;
 @Data
 @Entity
@@ -17,7 +19,9 @@ public class Carrera {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @Column(name = "id_carrera")
 	    private Long id;
+	  @ColumnTransformer(write = "UPPER(?)")
 	    private String nombre;
+	  @ColumnTransformer(write = "UPPER(?)")
 	    private String descripcion;
 }
 

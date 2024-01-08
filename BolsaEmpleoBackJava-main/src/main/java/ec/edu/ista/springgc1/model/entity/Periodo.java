@@ -10,6 +10,8 @@ import javax.persistence.Id;
 
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import lombok.Data;
 @Data
 @Entity
@@ -22,5 +24,6 @@ public class Periodo {
 	 private LocalDate fecha_inicio;
 	 private LocalDate fecha_fin;
 	 private Boolean estado=true;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String nombre;
 }

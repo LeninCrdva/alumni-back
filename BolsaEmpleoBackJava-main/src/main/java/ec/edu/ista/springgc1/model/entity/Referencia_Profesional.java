@@ -7,6 +7,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+
+import org.hibernate.annotations.ColumnTransformer;
 
 import lombok.Data;
 @Data
@@ -20,8 +23,12 @@ public class Referencia_Profesional {
 	 @ManyToOne
 	 @JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
 	 private Graduado graduado;
+	 @ColumnTransformer(write = "UPPER(?)")
 	 private String nombre;
+	 @ColumnTransformer(write = "UPPER(?)")
 	 private  String institucion;
+	 @Email(message = "Debe ser una dirección de correo electrónico válida.")
+	    @Column(name = "email", nullable = false, length = 255)
 	 private String email;
 	 
 }

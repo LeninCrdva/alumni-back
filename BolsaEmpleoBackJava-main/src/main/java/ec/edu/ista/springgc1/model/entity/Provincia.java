@@ -5,6 +5,8 @@ import lombok.Data;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 @Data
 @Entity
 @Table(name = "provincia")
@@ -14,6 +16,7 @@ public class Provincia {
 	    @Column(name = "id_provincia")
 	    private Long id;
 	    @Column(unique = true)
+	    @ColumnTransformer(write = "UPPER(?)")
 	    private String nombre;
 
     @NotEmpty

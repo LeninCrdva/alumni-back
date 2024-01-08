@@ -1,13 +1,11 @@
 package ec.edu.ista.springgc1.service.impl;
 
-import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.entity.Rol;
 import ec.edu.ista.springgc1.repository.RolRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.Optional;
 
 @Service
