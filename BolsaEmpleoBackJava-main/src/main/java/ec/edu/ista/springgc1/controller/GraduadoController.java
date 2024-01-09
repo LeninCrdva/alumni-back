@@ -66,7 +66,7 @@ public class GraduadoController {
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
     	GraduadoDTO estudianteFromDb = estudianteService.findByIdToDTO(id);
         
-        estudianteFromDb.setNombreusuario(estudianteDTO.getNombreusuario());
+        estudianteFromDb.setUsuario(estudianteDTO.getUsuario());
         estudianteFromDb.setAño_graduacion(estudianteDTO.getAño_graduacion());
         estudianteFromDb.setCiudad(estudianteDTO.getCiudad());
         estudianteFromDb.setEmail_personal(estudianteDTO.getEmail_personal());

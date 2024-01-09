@@ -25,7 +25,7 @@ public class Administrador {
 	  @OneToOne
 	    @JoinColumn(referencedColumnName = "id_usuario")
 	   private Usuario usuario;
-	    private boolean estado=true;
+	    private boolean estado;
 	    @ColumnTransformer(write = "UPPER(?)")
 	    private String cargo;
 	    @Email(message = "Debe ser una dirección de correo electrónico válida.")

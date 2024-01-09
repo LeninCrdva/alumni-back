@@ -32,8 +32,8 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado > implement
 	    public Graduado mapToEntity(GraduadoDTO estudianteDTO) {
 	    	Graduado estudiante = new Graduado();
 
-	        Usuario usuario = usuarioRepository.findBynombreUsuario(estudianteDTO.getNombreusuario())
-	                .orElseThrow(() -> new ResourceNotFoundException("usuario", estudianteDTO.getNombreusuario()));
+	        Usuario usuario = usuarioRepository.findBynombreUsuario(estudianteDTO.getUsuario())
+	                .orElseThrow(() -> new ResourceNotFoundException("usuario", estudianteDTO.getUsuario()));
 
 	        Ciudad ciudad = ciudadRepository.findByNombre(estudianteDTO.getCiudad())
 	                .orElseThrow(() -> new ResourceNotFoundException("ciudad", estudianteDTO.getCiudad()));
@@ -56,7 +56,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado > implement
 	    	GraduadoDTO estudianteDTO = new GraduadoDTO();
 
 	        estudianteDTO.setId(estudiante.getId());
-	        estudianteDTO.setNombreusuario(estudiante.getUsuario().getNombreUsuario());
+	        estudianteDTO.setUsuario(estudiante.getUsuario().getNombreUsuario());
 	        estudianteDTO.setCiudad(estudiante.getCiudad().getNombre());
 	        estudianteDTO.setAño_graduacion(estudiante.getAño_graduacion());
 	        estudianteDTO.setEmail_personal(estudiante.getEmail_personal());
