@@ -4,6 +4,8 @@ package ec.edu.ista.springgc1.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityExistsException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -89,5 +91,27 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 
 		        return empresariorepository.save(mapToEntity((EmpresarioDTO) entity));
 		    }
+		    public void delete(Long id) {
+		    	empresariorepository.deleteById(id);
+		    }
+		    public EmpresarioDTO update(Long id, EmpresarioDTO updatedEmpresarioDTO) {
+		        Empresario existingEmpresario = empresariorepository.findById(id)
+		                .orElseThrow(() -> new ResourceNotFoundException("Empresario", String.valueOf(id)));
+
+		        
+		        String nuevoUsuario = updatedEmpresarioDTO.getUsuario();
+		      
+
+		       
+		        existingEmpresario.setUsuario(usuarioRepository.findBynombreUsuario(nuevoUsuario)
+		                .orElseThrow(() -> new ResourceNotFoundException("nombre de usuario", nuevoUsuario)));
+		        existingEmpresario.setEstado(updatedEmpresarioDTO.isEstado());
+		        existingEmpresario.setAnios(updatedEmpresarioDTO.getAnios());
+		        existingEmpresario.setPuesto(updatedEmpresarioDTO.getPuesto());
+
+		        return mapToDTO(empresariorepository.save(existingEmpresario));
+		    }
+		  
+
 
 }

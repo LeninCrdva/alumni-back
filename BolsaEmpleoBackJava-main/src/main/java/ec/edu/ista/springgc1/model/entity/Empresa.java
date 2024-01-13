@@ -43,8 +43,6 @@ public class Empresa {
    
     @ColumnTransformer(write = "UPPER(?)")
     private String ubicacion;
-    @ColumnTransformer(write = "UPPER(?)")
-    private String tipo;
 
     @Column(name = "sitio_web")
     @ColumnTransformer(write = "UPPER(?)")

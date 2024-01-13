@@ -53,22 +53,16 @@ public class EmpresarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody EmpresarioDTO empresarioDTO) {
-    	EmpresarioDTO empresarioFromDb = emprendimientoService.findByIdToDTO(id);
-        
-    	empresarioFromDb.setUsuario(empresarioDTO.getUsuario());
-    	empresarioFromDb.setEstado(empresarioDTO.isEstado());
-    	empresarioDTO.setAnios(empresarioDTO.getAnios());
-    	empresarioDTO.setPuesto(empresarioDTO.getPuesto());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(emprendimientoService.save(empresarioFromDb));
+    ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody EmpresarioDTO empresarioDTO) {
+        EmpresarioDTO updatedEmpresario = emprendimientoService.update(id, empresarioDTO);
+        return ResponseEntity.ok(updatedEmpresario);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable Long id) {
-    	Empresario empresarioFromDb = emprendimientoService.findById(id);
-    	emprendimientoService.delete(empresarioFromDb.getId());
-        return ResponseEntity.noContent().build();
+    ResponseEntity<?> delete(@PathVariable Long id) {
+    	emprendimientoService.delete(id);
+            return ResponseEntity.ok("Empresa eliminada exitosamente.");
+       
     }
 
 }

@@ -86,19 +86,22 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     }
 
     public Usuario findByUsername(String username) {
-        return usuarioRepository.findBynombreUsuario(username).orElseThrow(() -> new ResourceNotFoundException("username", username));
+        return usuarioRepository.findBynombreUsuario(username).orElseThrow(() -> new ResourceNotFoundException("usuario:", username));
+    }
+    public Usuario findByUsernameAndClave(String username,String clave) {
+        return usuarioRepository.findBynombreUsuarioAndClave(username, clave).orElseThrow(() -> new ResourceNotFoundException("usario:", username));
     }
 
     public Usuario update(long id, UsuarioDTO usuarioDTO) {
 
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("id", id));
         if (!usuario.getNombreUsuario().equalsIgnoreCase(usuarioDTO.getNombreUsuario()) && usuarioRepository.existsBynombreUsuario(usuarioDTO.getNombreUsuario())) {
-            throw new AppException(HttpStatus.BAD_REQUEST, "Username ya se encuentra en otro registro");
+            throw new AppException(HttpStatus.BAD_REQUEST, "El usuario ya se encuentra en otro registro");
         }
         Rol rol = rolRepository.findByNombre(usuarioDTO.getRol())
-                .orElseThrow(() -> new ResourceNotFoundException("nombre", usuarioDTO.getRol()));
+                .orElseThrow(() -> new ResourceNotFoundException("nombre:", usuarioDTO.getRol()));
         Persona p = personaRepository.findBycedula(usuarioDTO.getCedula())
-                .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));;
+                .orElseThrow(() -> new ResourceNotFoundException("cedula:", usuarioDTO.getCedula()));;
 
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         if (!usuarioDTO.getClave().isEmpty()) {

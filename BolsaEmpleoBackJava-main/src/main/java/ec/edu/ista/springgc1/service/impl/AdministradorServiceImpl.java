@@ -25,7 +25,6 @@ public class AdministradorServiceImpl  extends GenericServiceImpl<Administrador 
 	  @Autowired
 	    private UsuarioRepository usuarioRepository;
 
-	   
 
 	    @Override
 	    public Administrador mapToEntity(AdminDTO adminDTO) {
@@ -91,6 +90,8 @@ public class AdministradorServiceImpl  extends GenericServiceImpl<Administrador 
 
 	        return adminrepository.save(mapToEntity((AdminDTO) entity));
 	    }
+	 
+	 
 
 	   
 }

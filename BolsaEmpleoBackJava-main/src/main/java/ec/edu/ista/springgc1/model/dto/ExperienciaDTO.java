@@ -3,6 +3,9 @@ package ec.edu.ista.springgc1.model.dto;
 import lombok.Data;
 
 import javax.validation.constraints.NotEmpty;
+
+import ec.edu.ista.springgc1.model.entity.Graduado;
+
 import java.io.Serializable;
 
 @Data
@@ -10,8 +13,8 @@ public class ExperienciaDTO implements Serializable {
 
     private  Long id;
 
-    @NotEmpty
-    private  String cedula;
+    
+    private Graduado graduado;
     @NotEmpty
     private  String area_trabajo;
     @NotEmpty
