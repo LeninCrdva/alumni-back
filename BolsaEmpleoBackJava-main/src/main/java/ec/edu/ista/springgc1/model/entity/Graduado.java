@@ -2,7 +2,6 @@ package ec.edu.ista.springgc1.model.entity;
 
 import lombok.Data;
 
-
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +13,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
@@ -25,28 +25,35 @@ import org.hibernate.annotations.ColumnTransformer;
 
 @Data
 @Entity
-@Table(name="graduado")
+@Table(name = "graduado")
 public class Graduado {
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "graduado_id")
-	    private Long id;
-	 @OneToOne
-	    @JoinColumn(referencedColumnName = "id_usuario")
-	   private Usuario usuario;
-	 @ManyToOne
-	 @JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
-	 private Ciudad ciudad;
-	 private LocalDate año_graduacion;
-	
-	 @Email(message = "Debe ser una dirección de correo electrónico válida.")
-	    @Column(name = "email_personal", nullable = false, length = 255,unique = true)
-	 private String email_personal;
-	  @ColumnTransformer(write = "UPPER(?)")
-	 private String estadocivil;
-	 private String ruta_pdf;
-	 @Transient
-	 private String url_pdf;
-	 @ManyToMany(fetch = FetchType.LAZY, mappedBy = "graduados")
-	 private Set<OfertasLaborales> ofertas = new HashSet<>(); 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "graduado_id")
+	private Long id;
+	@OneToOne
+	@JoinColumn(referencedColumnName = "id_usuario")
+	private Usuario usuario;
+	@ManyToOne
+	@JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
+	private Ciudad ciudad;
+	private LocalDate año_graduacion;
+
+	@Email(message = "Debe ser una dirección de correo electrónico válida.")
+	@Column(name = "email_personal", nullable = false, length = 255, unique = true)
+	private String email_personal;
+	@ColumnTransformer(write = "UPPER(?)")
+	private String estadocivil;
+	private String ruta_pdf;
+	@Transient
+	private String url_pdf;
+	//@ManyToMany(fetch = FetchType.LAZY, mappedBy = "graduados")
+	//private Set<OfertasLaborales> ofertas = new HashSet<>();
+	@ManyToMany
+    @JoinTable(
+            name = "evento_registro_graduado",
+            joinColumns = @JoinColumn(name = "graduado_id"),
+            inverseJoinColumns = @JoinColumn(name = "id_evento"))
+    private Set<Evento> carreras = new HashSet<>();
+
 }

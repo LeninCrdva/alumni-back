@@ -10,4 +10,6 @@ import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 public interface AdministradorRepository extends GenericRepository<Administrador>{
 	 @Query(value = "select * from estudiante where usuario_id = :id_usuario", nativeQuery = true)
 	    Optional<Administrador> findByUsuario(long id_usuario);
+	 //Added for the service - Evento
+	 Optional<Administrador> findByUsuarioPersonaCedulaContaining(String cedula);
 }

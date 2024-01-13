@@ -14,14 +14,14 @@ import org.hibernate.annotations.ColumnTransformer;
 import lombok.Data;
 @Data
 @Entity
-@Table(name="referenca_profesional")
-public class Referencia_Profesional {
+@Table(name="referencia_profesional")
+public class ReferenciaProfesional {
 	 @Id
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "id_ref_profesional")
+	    //@Column(name = "id_ref_profesional")
 	    private Long id;
 	 @ManyToOne
-	 @JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
+	 @JoinColumn(name = "graduadoId", referencedColumnName = "graduado_id")
 	 private Graduado graduado;
 	 @ColumnTransformer(write = "UPPER(?)")
 	 private String nombre;
