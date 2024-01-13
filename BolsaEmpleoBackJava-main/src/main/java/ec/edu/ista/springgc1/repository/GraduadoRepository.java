@@ -9,8 +9,10 @@ import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 
 @Repository
-public interface GraduadoRepository  extends GenericRepository<Graduado>{
+public interface GraduadoRepository extends GenericRepository<Graduado> {
 
-	 @Query(value = "select * from estudiante where usuario_id = :id_usuario", nativeQuery = true)
-	    Optional<Graduado> findByUsuario(long id_usuario);
+	@Query(value = "select * from estudiante where usuario_id = :id_usuario", nativeQuery = true)
+	Optional<Graduado> findByUsuario(long id_usuario);
+
+	Optional<Graduado> findByUsuarioPersonaCedulaContaining(String cedula);
 }
