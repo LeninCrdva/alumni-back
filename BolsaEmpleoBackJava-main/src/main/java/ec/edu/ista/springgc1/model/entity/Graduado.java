@@ -3,9 +3,9 @@ package ec.edu.ista.springgc1.model.entity;
 import lombok.Data;
 
 import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,10 +22,14 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 
 import org.hibernate.annotations.ColumnTransformer;
+import org.springframework.lang.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @Entity
 @Table(name = "graduado")
+@JsonIgnoreProperties({ "ofertas" })
 public class Graduado {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,19 +45,17 @@ public class Graduado {
 
 	@Email(message = "Debe ser una dirección de correo electrónico válida.")
 	@Column(name = "email_personal", nullable = false, length = 255, unique = true)
-	private String email_personal;
+	private String emailPersonal;
 	@ColumnTransformer(write = "UPPER(?)")
 	private String estadocivil;
 	private String ruta_pdf;
 	@Transient
 	private String url_pdf;
-	//@ManyToMany(fetch = FetchType.LAZY, mappedBy = "graduados")
-	//private Set<OfertasLaborales> ofertas = new HashSet<>();
-	@ManyToMany
-    @JoinTable(
-            name = "evento_registro_graduado",
-            joinColumns = @JoinColumn(name = "graduado_id"),
-            inverseJoinColumns = @JoinColumn(name = "id_evento"))
-    private Set<Evento> carreras = new HashSet<>();
-
+	@Nullable
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "postulados", 
+			joinColumns = @JoinColumn(name = "graduado_id"), 
+			inverseJoinColumns = @JoinColumn(name = "oferta_id"))
+	private List<OfertasLaborales> ofertas;
 }
