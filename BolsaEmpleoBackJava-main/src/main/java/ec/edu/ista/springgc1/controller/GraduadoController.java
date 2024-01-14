@@ -64,18 +64,9 @@ public class GraduadoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
-    	GraduadoDTO estudianteFromDb = estudianteService.findByIdToDTO(id);
-        
-        estudianteFromDb.setUsuario(estudianteDTO.getUsuario());
-        estudianteFromDb.setAño_graduacion(estudianteDTO.getAño_graduacion());
-        estudianteFromDb.setCiudad(estudianteDTO.getCiudad());
-        estudianteFromDb.setEmail_personal(estudianteDTO.getEmail_personal());
-        estudianteFromDb.setEstadocivil(estudianteDTO.getEstadocivil());
-        estudianteFromDb.setRuta_pdf(estudianteDTO.getRuta_pdf());
-        estudianteFromDb.setUrl_pdf(estudianteDTO.getUrl_pdf());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(estudianteService.save(estudianteFromDb));
+    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {

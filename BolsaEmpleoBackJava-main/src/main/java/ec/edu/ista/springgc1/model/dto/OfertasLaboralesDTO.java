@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.model.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Set;
 
 import ec.edu.ista.springgc1.model.entity.Empresa;
 import lombok.Data;
@@ -17,7 +18,7 @@ public class OfertasLaboralesDTO implements Serializable {
     private LocalDate fechaApertura;
     private String areaConocimiento;
     private Boolean estado;
-    private Empresa idEmpresa;
-
+    private String nombreEmpresa;
+    private Set<String> correoGraduado;
     
 }

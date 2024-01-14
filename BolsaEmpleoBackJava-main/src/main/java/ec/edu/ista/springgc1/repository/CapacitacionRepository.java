@@ -1,5 +1,10 @@
 package ec.edu.ista.springgc1.repository;
 
-public interface CapacitacionRepository {
+import java.util.Optional;
 
+import ec.edu.ista.springgc1.model.entity.Capacitacion;
+import ec.edu.ista.springgc1.repository.generic.GenericRepository;
+
+public interface CapacitacionRepository extends GenericRepository<Capacitacion>{
+	Optional<Capacitacion> findByNombre(String nombre);
 }
