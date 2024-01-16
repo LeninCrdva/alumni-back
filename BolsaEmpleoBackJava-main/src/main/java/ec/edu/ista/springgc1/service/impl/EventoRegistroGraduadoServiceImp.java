@@ -24,23 +24,53 @@ public class EventoRegistroGraduadoServiceImp extends GenericServiceImpl<Registr
 
 	@Autowired
 	private GraduadoRepository graduadoRepository;
-	
+
 	@Autowired
 	private EventoRegistroGraduadoRepository eventoRegistroGraduadoRepository;
-	
+
 	@Transactional
-    public Registro_Evento_Grad AsignEventToGraduate(EventoDTO eventoDTO, String cedula) {
-        Evento evento = eventoRepository.findByNombreEvento(eventoDTO.getNombreEvento())
-                .orElseThrow(() -> new ResourceNotFoundException("Evento", eventoDTO.getCedulaAdmin()));
+	public Registro_Evento_Grad AsignEventToGraduate(EventoDTO eventoDTO, String cedula) {
+		Evento evento = eventoRepository.findByNombreEvento(eventoDTO.getNombreEvento())
+				.orElseThrow(() -> new ResourceNotFoundException("Evento", eventoDTO.getNombreEvento()));
 
-        Graduado graduado = graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
-                .orElseThrow(() -> new ResourceNotFoundException("Graduado", cedula));
+		Graduado graduado = graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
+				.orElseThrow(() -> new ResourceNotFoundException("Graduado", cedula));
 
-        Registro_Evento_Grad registroEventoGraduado = new Registro_Evento_Grad();
-        registroEventoGraduado.setEvento(evento);
-        registroEventoGraduado.setGraduado(graduado);
-        registroEventoGraduado.setFecha_registro(LocalDate.now());
+		if ((eventoRegistroGraduadoRepository.existsByEventoAndGraduado(evento, graduado))) {
+			throw new RuntimeException("El evento ya está asignado al graduado.");
+		}
 
-        return eventoRegistroGraduadoRepository.save(registroEventoGraduado);
-    }
+		Registro_Evento_Grad registroEventoGraduado = new Registro_Evento_Grad();
+		registroEventoGraduado.setEvento(evento);
+		registroEventoGraduado.setGraduado(graduado);
+		registroEventoGraduado.setFecha_registro(LocalDate.now());
+
+		return eventoRegistroGraduadoRepository.save(registroEventoGraduado);
+	}
+
+	@Transactional
+	public Registro_Evento_Grad updateEventGraduate(EventoDTO eventoDTO, String cedula, Long id) {
+		Evento evento = eventoRepository.findByNombreEvento(eventoDTO.getNombreEvento())
+				.orElseThrow(() -> new ResourceNotFoundException("Evento", eventoDTO.getNombreEvento()));
+/*
+		Graduado graduado = graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
+				.orElseThrow(() -> new ResourceNotFoundException("Graduado", cedula));*/
+/*
+		if ((eventoRegistroGraduadoRepository.existsByEventoAndGraduado(evento, graduado))) {
+			throw new RuntimeException("El evento ya está asignado al graduado.");
+		}*/
+
+		Registro_Evento_Grad registroEventoGraduado = eventoRegistroGraduadoRepository
+				.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("id", id));
+		registroEventoGraduado.setEvento(evento);
+		//registroEventoGraduado.setGraduado(graduado);
+		registroEventoGraduado.setFecha_registro(LocalDate.now());
+
+		return eventoRegistroGraduadoRepository.save(registroEventoGraduado);
+	}
+	/*
+	public void deleteEventGraduate(Long id) {
+		eventoRegistroGraduadoRepository.deleteById(id);
+	}*/
 }
