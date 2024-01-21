@@ -21,7 +21,7 @@ import ec.edu.ista.springgc1.model.entity.Registro_Evento_Grad;
 import ec.edu.ista.springgc1.service.impl.EventoRegistroGraduadoServiceImp;
 import ec.edu.ista.springgc1.service.impl.EventoServiceImp;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/eventos")
 public class EventoController {

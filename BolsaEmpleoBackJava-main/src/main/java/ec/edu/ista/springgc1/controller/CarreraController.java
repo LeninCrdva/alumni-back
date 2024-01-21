@@ -21,7 +21,7 @@ import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.entity.Carrera;
 import ec.edu.ista.springgc1.service.impl.CarreraServiceImp;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/carreras")
 public class CarreraController {

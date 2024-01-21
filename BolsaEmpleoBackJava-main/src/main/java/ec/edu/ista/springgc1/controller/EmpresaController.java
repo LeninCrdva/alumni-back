@@ -22,7 +22,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import ec.edu.ista.springgc1.model.dto.EmpresaDTO;
 import ec.edu.ista.springgc1.service.impl.EmpresaServiceImpl;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/empresas")
 public class EmpresaController {

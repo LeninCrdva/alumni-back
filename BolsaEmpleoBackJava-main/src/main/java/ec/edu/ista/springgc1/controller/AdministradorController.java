@@ -22,7 +22,7 @@ import ec.edu.ista.springgc1.model.entity.Administrador;
 import ec.edu.ista.springgc1.service.impl.AdministradorServiceImpl;
 import ec.edu.ista.springgc1.service.impl.SuperAdminServiceImpl;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/administradores")
 public class AdministradorController {

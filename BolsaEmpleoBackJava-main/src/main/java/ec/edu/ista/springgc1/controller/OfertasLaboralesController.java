@@ -21,7 +21,7 @@ import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/ofertas-laborales")
 public class OfertasLaboralesController {

@@ -22,7 +22,7 @@ import ec.edu.ista.springgc1.model.dto.GraduadoDTO;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/graduados")
 public class GraduadoController {

@@ -22,7 +22,7 @@ import ec.edu.ista.springgc1.model.dto.TituloDTO;
 import ec.edu.ista.springgc1.model.entity.Titulo;
 import ec.edu.ista.springgc1.service.impl.TituloServiceImpl;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/titulos")
 public class TituloController {
