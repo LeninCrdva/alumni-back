@@ -57,8 +57,8 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 	            estudianteDTO.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudianteDTO.getRuta_pdf()));
 
 	    List<OfertasLaborales> ofertas = new ArrayList<>();
-	    if (estudianteDTO.getFechaPublicacion() != null && !estudianteDTO.getFechaPublicacion().isEmpty()) {
-	        ofertas = ofertasRepository.findByFechaPublicacionIn(estudianteDTO.getFechaPublicacion());
+	    if (estudianteDTO.getIdOferta() != null) {
+	        ofertas = ofertasRepository.findOfertasByIdIn(estudianteDTO.getIdOferta());
 	        estudiante.setOfertas(ofertas);
 	    }
 
@@ -78,15 +78,15 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 		estudianteDTO.setEstadocivil(estudiante.getEstadocivil());
 		estudianteDTO.setRuta_pdf(estudiante.getRuta_pdf());
 		estudianteDTO.setUrl_pdf(estudiante.getUrl_pdf());
-		List<LocalDate> fechasPublicacion = new ArrayList<>();
+		List<Long> idOfertas = new ArrayList<>();
 	    if (estudiante.getOfertas() != null) {
 	        for (OfertasLaborales oferta : estudiante.getOfertas()) {
-	            if (oferta.getFechaPublicacion() != null) {
-	                fechasPublicacion.add(oferta.getFechaPublicacion());
+	            if (oferta.getId() != null) {
+	                idOfertas.add(oferta.getId());
 	            }
 	        }
 	    }
-	    estudianteDTO.setFechaPublicacion(fechasPublicacion);
+	    estudianteDTO.setIdOferta(idOfertas);
 
 		return estudianteDTO;
 	}
@@ -142,7 +142,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
         List<OfertasLaborales> existingOfertas = graduadoFromDb.getOfertas();
 
-        List<OfertasLaborales> nuevasOfertas = ofertasRepository.findByFechaPublicacionIn(estudianteDTO.getFechaPublicacion());
+        List<OfertasLaborales> nuevasOfertas = ofertasRepository.findOfertasByIdIn(estudianteDTO.getIdOferta());
 
         graduadoFromDb.setOfertas(nuevasOfertas);
 
