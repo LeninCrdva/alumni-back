@@ -47,6 +47,15 @@ public class OfertasLaboralesController {
 	    ResponseEntity<OfertasLaboralesDTO> update(@PathVariable Long id, @Valid @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
 	        return ResponseEntity.ok(ofertasLaboralesService.update(id, ofertaLaboralDTO));
 	    }
+	    
+	    @PutMapping("postulado/{id}")
+	    ResponseEntity<?> savePostulado(@PathVariable Long id, @RequestBody OfertasLaboralesDTO ofertaLaboralDTO){
+	    	OfertasLaboralesDTO ofer = ofertasLaboralesService.findByIdToDTO(id);
+	    	
+	    	ofer.setCorreoGraduado(ofertaLaboralDTO.getCorreoGraduado());
+	    	
+	    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.save(ofer));
+	    }
 
 	    @DeleteMapping("/{id}")
 	    ResponseEntity<?> delete(@PathVariable Long id) {

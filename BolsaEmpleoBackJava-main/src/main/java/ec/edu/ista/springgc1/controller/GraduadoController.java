@@ -66,6 +66,15 @@ public class GraduadoController {
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
     	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
     }
+    
+    @PutMapping("postulaciones/{id}")
+    public ResponseEntity<?> savePostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
+    	GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
+    	
+    	gradDTO.setIdOferta(estudianteDTO.getIdOferta());
+    	
+    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
+    }
 
 
     @DeleteMapping("/{id}")
