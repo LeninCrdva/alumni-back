@@ -40,6 +40,10 @@ public class PersonaController {
 
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody Persona p) {
+    	 if (p.getFechaNacimiento() == null) {
+    	        throw new AppException(HttpStatus.BAD_REQUEST, "La fecha de nacimiento no puede ser nula");
+    	    }
+
         if (personaService.findBycedula(p.getCedula()).isPresent()){
             throw new AppException(HttpStatus.BAD_REQUEST,"Ya se encuentra registrado esta cedula");
         }
