@@ -23,7 +23,6 @@ public class AssetController {
     private S3Service s3Service;
    @Operation(summary = "Subir archivo")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  //@PostMapping("/upload")
     
     
     Map<String, String> upload(@RequestParam MultipartFile multipartFile) {
