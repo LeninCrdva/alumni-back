@@ -34,7 +34,12 @@ public class OfertasLaboralesController {
 	    }
 
 	    @GetMapping("/{id}")
-	    ResponseEntity<OfertasLaboralesDTO> findById(@PathVariable Long id) {
+	    ResponseEntity<?> findById(@PathVariable Long id) {
+	        return ResponseEntity.ok(ofertasLaboralesService.findById(id));
+	    }
+	    
+	    @GetMapping("dto/{id}")
+	    ResponseEntity<OfertasLaboralesDTO> findByIdDTO(@PathVariable Long id) {
 	        return ResponseEntity.ok(ofertasLaboralesService.findByIdToDTO(id));
 	    }
 
