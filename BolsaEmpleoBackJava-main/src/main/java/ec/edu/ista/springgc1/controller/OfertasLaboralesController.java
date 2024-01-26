@@ -21,7 +21,7 @@ import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/ofertas-laborales")
 public class OfertasLaboralesController {
@@ -34,7 +34,12 @@ public class OfertasLaboralesController {
 	    }
 
 	    @GetMapping("/{id}")
-	    ResponseEntity<OfertasLaboralesDTO> findById(@PathVariable Long id) {
+	    ResponseEntity<?> findById(@PathVariable Long id) {
+	        return ResponseEntity.ok(ofertasLaboralesService.findById(id));
+	    }
+	    
+	    @GetMapping("dto/{id}")
+	    ResponseEntity<OfertasLaboralesDTO> findByIdDTO(@PathVariable Long id) {
 	        return ResponseEntity.ok(ofertasLaboralesService.findByIdToDTO(id));
 	    }
 
@@ -54,7 +59,7 @@ public class OfertasLaboralesController {
 	    	
 	    	ofer.setCorreoGraduado(ofertaLaboralDTO.getCorreoGraduado());
 	    	
-	    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.save(ofer));
+	    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.update(id, ofer));
 	    }
 
 	    @DeleteMapping("/{id}")

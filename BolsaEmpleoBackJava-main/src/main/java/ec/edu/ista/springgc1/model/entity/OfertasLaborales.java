@@ -19,13 +19,13 @@ import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "ofertaslaborales")
-@JsonIgnoreProperties({"graduados"})
 public class OfertasLaborales {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,5 +47,6 @@ public class OfertasLaborales {
 	private Empresa empresa;
 	@Nullable
 	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "ofertas")
+	@JsonManagedReference
 	private List<Graduado> graduados;
 }

@@ -23,7 +23,7 @@ import ec.edu.ista.springgc1.model.entity.SuperAdmin;
 import ec.edu.ista.springgc1.service.impl.SuperAdminServiceImpl;
 
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/superadmin")
 public class SuperAdminController {

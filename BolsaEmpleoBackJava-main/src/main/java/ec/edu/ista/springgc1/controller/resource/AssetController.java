@@ -14,7 +14,7 @@ import org.springframework.http.MediaType;
 import java.util.HashMap;
 import java.util.Map;
 
-@CrossOrigin({"*"})
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/assets")
 public class AssetController {
@@ -23,7 +23,6 @@ public class AssetController {
     private S3Service s3Service;
    @Operation(summary = "Subir archivo")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  //@PostMapping("/upload")
     
     
     Map<String, String> upload(@RequestParam MultipartFile multipartFile) {
