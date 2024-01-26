@@ -22,7 +22,7 @@ public class UsuarioDTO implements Serializable {
     private String clave;
     @NotNull
     private String cedula;
-	 private UsuarioTipo usuarioTipo;
+	
     @NotEmpty
     private String rol;
     @NotNull

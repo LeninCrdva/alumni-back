@@ -29,6 +29,5 @@ public class GraduadoDTO implements Serializable {
 	private String ruta_pdf;
 	private String url_pdf;
 	@ElementCollection
-	@DateTimeFormat(pattern = "yyyy-MM-dd")
-	private List<LocalDate> fechaPublicacion;
+	private List<Long> idOferta;
 }

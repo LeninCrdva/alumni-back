@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 @Data
@@ -18,7 +19,7 @@ public class PersonaDTO  implements Serializable{
 	private String primer_nombre;
     @NotEmpty
 	private String segundo_nombre;
-    @NotEmpty
+    
 	private LocalDate fechaNacimiento;
     @NotEmpty
 	private String telefono;

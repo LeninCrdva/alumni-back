@@ -24,12 +24,12 @@ import javax.validation.constraints.Email;
 import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.lang.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Data
 @Entity
 @Table(name = "graduado")
-@JsonIgnoreProperties({ "ofertas" })
 public class Graduado {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,5 +57,6 @@ public class Graduado {
 			name = "postulados", 
 			joinColumns = @JoinColumn(name = "graduado_id"), 
 			inverseJoinColumns = @JoinColumn(name = "oferta_id"))
+	@JsonBackReference
 	private List<OfertasLaborales> ofertas;
 }

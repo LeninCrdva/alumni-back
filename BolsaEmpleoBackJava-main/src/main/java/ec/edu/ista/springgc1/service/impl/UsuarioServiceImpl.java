@@ -47,7 +47,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuario.setClave(passwordEncoder.encode(usuarioDTO.getClave()));
         Persona p = personaRepository.findBycedula(usuarioDTO.getCedula())
                 .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));;
-        usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
+      
         usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
         usuario.setEstado(usuarioDTO.isEstado());
         usuario.setUrl_imagen(usuarioDTO.getUrl_imagen() == null ? null : s3Service.getObjectUrl(usuarioDTO.getRuta_imagen()));
@@ -65,7 +65,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuarioDTO.setNombreUsuario(usuario.getNombreUsuario());
         usuarioDTO.setRuta_imagen(usuario.getRuta_imagen());
        usuarioDTO.setUrl_imagen(usuario.getUrl_imagen()); 
-        usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
+       
         usuarioDTO.setCedula(usuario.getPersona().getCedula());
         usuarioDTO.setEstado(usuario.getEstado());
         usuarioDTO.setRol(usuario.getRol().getNombre());
@@ -110,11 +110,11 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
       
       
         
-        usuarioDTO.setUsuarioTipo(usuario.getUsuarioTipo());
+     
         
        usuario.setUrl_imagen(usuarioDTO.getUrl_imagen());
        usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
-        usuario.setUsuarioTipo(usuarioDTO.getUsuarioTipo());
+       
         usuario.setEstado(usuarioDTO.isEstado());
         usuario.setPersona(p);
         usuario.setRol(rol);

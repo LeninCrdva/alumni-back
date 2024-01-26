@@ -22,7 +22,7 @@ import ec.edu.ista.springgc1.model.entity.Periodo;
 import ec.edu.ista.springgc1.service.impl.PeriodosServiceImp;
 
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/peridos")
 public class PeridoController {

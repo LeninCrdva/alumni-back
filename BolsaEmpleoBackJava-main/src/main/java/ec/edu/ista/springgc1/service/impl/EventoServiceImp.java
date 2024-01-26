@@ -6,8 +6,10 @@ import java.util.stream.Collectors;
 
 import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.EventoDTO;
 import ec.edu.ista.springgc1.model.entity.Administrador;
@@ -30,19 +32,13 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 	@Autowired
 	private AdministradorRepository administradorRepository;
 
-	@Autowired
-	private GraduadoRepository graduadoRepository;
-	
-	@Autowired
-	private EventoRegistroGraduadoRepository eventoRegistroGraduadoRepository;
-	
 	@Override
 	public Evento mapToEntity(EventoDTO eventoDTO) {
-		Evento evento = new Evento();
+		Evento evento = eventoRepository.findByNombreEvento(eventoDTO.getNombreEvento()).orElse(new Evento());
 
 		Administrador administrador = administradorRepository
-				.findByUsuarioPersonaCedulaContaining(eventoDTO.getCedulaAdmin())
-				.orElseThrow(() -> new ResourceNotFoundException("De Administrador", eventoDTO.getCedulaAdmin()));
+				.findByUsuarioPersonaCedulaContaining(eventoDTO.getCedula())
+				.orElseThrow(() -> new ResourceNotFoundException("De Administrador", eventoDTO.getCedula()));
 
 		evento.setId(eventoDTO.getId());
 		evento.setAdmin(administrador);
@@ -52,6 +48,15 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 		evento.setHora_fin(LocalTime.parse(eventoDTO.getHoraInicio()));
 		evento.setFecha(eventoDTO.getFecha());
 		evento.setDescripcion(eventoDTO.getDescripcion());
+
+		if (LocalTime.parse(eventoDTO.getHoraInicio()).isAfter(LocalTime.parse(eventoDTO.getHoraFin()))) {
+			throw new RuntimeException("La hora de inicio no debe ser menor a la hora de fin");
+		}
+
+		if (eventoDTO.getFecha().isBefore(LocalDate.now())) {
+			throw new RuntimeException("La fecha debe ser de hoy en adelante");
+		}
+
 		return evento;
 	}
 
@@ -60,7 +65,7 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 		EventoDTO eventoDTO = new EventoDTO();
 
 		eventoDTO.setId(evento.getId());
-		eventoDTO.setCedulaAdmin(evento.getAdmin().getUsuario().getPersona().getCedula());
+		eventoDTO.setCedula(evento.getAdmin().getUsuario().getPersona().getCedula());
 		eventoDTO.setNombreEvento(evento.getNombreEvento());
 		eventoDTO.setFecha(evento.getFecha());
 		eventoDTO.setHoraInicio(String.valueOf(evento.getHora_inicio()));
@@ -70,21 +75,26 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 		return eventoDTO;
 	}
 
-	public Registro_Evento_Grad AsignEventToGraduate(EventoDTO eventoDTO, String cedula) {
-		Registro_Evento_Grad registroEventoGraduado = new Registro_Evento_Grad();
-
-		Evento evento = eventoRepository.findByNombreEvento(eventoDTO.getNombreEvento())
-				.orElseThrow(() -> new ResourceNotFoundException("Evento", eventoDTO.getCedulaAdmin()));
-		
-		Graduado graduado = graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
-				.orElseThrow(() -> new ResourceNotFoundException("Graduado", eventoDTO.getCedulaAdmin()));
-		
-		registroEventoGraduado.setEvento(evento);
-		registroEventoGraduado.setGraduado(graduado);
-		registroEventoGraduado.setFecha_registro(LocalDate.now());
-		return registroEventoGraduado;
-	}
-
+	/*
+	 * public Registro_Evento_Grad AsignEventToGraduate(EventoDTO eventoDTO, String
+	 * cedula) { Registro_Evento_Grad registroEventoGraduado = new
+	 * Registro_Evento_Grad();
+	 * 
+	 * Evento evento =
+	 * eventoRepository.findByNombreEvento(eventoDTO.getNombreEvento())
+	 * .orElseThrow(() -> new ResourceNotFoundException("Evento",
+	 * eventoDTO.getCedulaAdmin()));
+	 * 
+	 * Graduado graduado =
+	 * graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
+	 * .orElseThrow(() -> new ResourceNotFoundException("Graduado",
+	 * eventoDTO.getCedulaAdmin()));
+	 * 
+	 * registroEventoGraduado.setEvento(evento);
+	 * registroEventoGraduado.setGraduado(graduado);
+	 * registroEventoGraduado.setFecha_registro(LocalDate.now()); return
+	 * registroEventoGraduado; }
+	 */
 	@Override
 	public List<?> findAll() {
 		return eventoRepository.findAll().stream().map(c -> mapToDTO(c)).collect(Collectors.toList());
@@ -92,7 +102,6 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 
 	public EventoDTO findByIdToDTO(Long id) {
 		Evento evento = eventoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("id", id));
-
 		return mapToDTO(evento);
 	}
 
@@ -105,8 +114,8 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 	public Evento save(Object entity) {
 		return eventoRepository.save(mapToEntity((EventoDTO) entity));
 	}
-
-	public Registro_Evento_Grad save(Registro_Evento_Grad registro_Evento_Grad) {
-		return eventoRegistroGraduadoRepository.save(registro_Evento_Grad);
-	}
+	/*
+	 * public Registro_Evento_Grad save(Registro_Evento_Grad registro_Evento_Grad) {
+	 * return eventoRegistroGraduadoRepository.save(registro_Evento_Grad); }
+	 */
 }

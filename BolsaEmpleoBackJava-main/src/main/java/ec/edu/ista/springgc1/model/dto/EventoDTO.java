@@ -30,13 +30,13 @@ public class EventoDTO implements Serializable {
 	//@DateTimeFormat(pattern = "HH:mm:ss")
     @JsonFormat(pattern = "HH:mm:ss")
 	private String horaFin;
-	//@DateTimeFormat(pattern = "yyyy-MM-dd")
+	@DateTimeFormat(pattern = "yyyy-MM-dd")
 	private LocalDate fecha;
 	@NotEmpty
 	private String lugar;
 	
 	@NotEmpty
-	private String cedulaAdmin;
+	private String cedula;
 	@NotEmpty
 	private String descripcion;
 }

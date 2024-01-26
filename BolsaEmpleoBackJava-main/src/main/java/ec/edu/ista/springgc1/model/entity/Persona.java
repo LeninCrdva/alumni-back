@@ -28,7 +28,7 @@ public class Persona {
 	private String cedula;
 	private String primer_nombre;
 	private String segundo_nombre;
-	@Column(name = "fecha_nacimiento", nullable = false)
+	@Column(name = "fechaNacimiento", nullable = false)
 	private LocalDate fechaNacimiento;
 	@Size(min = 10, max = 10, message = "El número de celular debe tener exactamente 10 dígitos")
     @Pattern(regexp = "\\d+", message = "El número de celular debe contener solo dígitos")

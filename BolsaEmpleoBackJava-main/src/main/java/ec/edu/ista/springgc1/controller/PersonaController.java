@@ -22,7 +22,7 @@ import ec.edu.ista.springgc1.model.entity.Persona;
 import ec.edu.ista.springgc1.model.entity.Rol;
 import ec.edu.ista.springgc1.service.impl.PersonaServiceImp;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/personas")
 public class PersonaController {
@@ -40,6 +40,10 @@ public class PersonaController {
 
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody Persona p) {
+    	 if (p.getFechaNacimiento() == null) {
+    	        throw new AppException(HttpStatus.BAD_REQUEST, "La fecha de nacimiento no puede ser nula");
+    	    }
+
         if (personaService.findBycedula(p.getCedula()).isPresent()){
             throw new AppException(HttpStatus.BAD_REQUEST,"Ya se encuentra registrado esta cedula");
         }

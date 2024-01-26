@@ -18,7 +18,7 @@ import ec.edu.ista.springgc1.model.dto.ReferenciaPersonalDTO;
 import ec.edu.ista.springgc1.model.entity.Referencia_Personal;
 import ec.edu.ista.springgc1.service.impl.ReferenciaPersonalServiceImp;
 
-@CrossOrigin("*")
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/referencias-personales")
 public class ReferenciaPersonalController {

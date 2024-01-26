@@ -9,10 +9,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.amazonaws.services.sns.model.ResourceNotFoundException;
+
 import javax.validation.Valid;
 import java.util.List;
 
-@CrossOrigin
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {
@@ -46,6 +48,16 @@ public class UsuarioController {
         Usuario estudianteFromDb = usuarioService.findById(id);
         usuarioService.delete(estudianteFromDb.getId());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/by-username/{username}")
+    ResponseEntity<?> findByUsername(@PathVariable String username) {
+        try {
+            Usuario usuario = usuarioService.findByUsername(username);
+            return ResponseEntity.ok(usuario);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
 
