@@ -59,7 +59,7 @@ public class OfertasLaboralesController {
 	    	
 	    	ofer.setCorreoGraduado(ofertaLaboralDTO.getCorreoGraduado());
 	    	
-	    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.save(ofer));
+	    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.update(id, ofer));
 	    }
 
 	    @DeleteMapping("/{id}")
