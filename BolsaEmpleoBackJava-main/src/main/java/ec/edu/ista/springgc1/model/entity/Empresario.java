@@ -9,6 +9,8 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import lombok.Data;
 
 @Data
@@ -20,9 +22,10 @@ public class Empresario {
 	    @Column(name = "id_empre")
 	    private Long id;
 	 @OneToOne
-	   @JoinColumn(name = "id_persona", referencedColumnName = "cod_perso")
-	    private Persona persona;
-	 private boolean estado=true;
+	    @JoinColumn(referencedColumnName = "id_usuario")
+	   private Usuario usuario;
+	 private boolean estado;
+	  @ColumnTransformer(write = "UPPER(?)")
 	 private String puesto;
 	 private int anios;
 

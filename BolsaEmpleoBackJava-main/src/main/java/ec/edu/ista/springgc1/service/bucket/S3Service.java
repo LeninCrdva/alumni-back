@@ -15,7 +15,7 @@ import java.util.UUID;
 @Service
 public class S3Service {
 
-    private final static String BUCKET = "pespringboots3bucket";
+    private final static String BUCKET = "demosprint";
 
     @Autowired
     private AmazonS3Client s3Client; //cliente de conexión con nuestro bucket

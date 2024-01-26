@@ -1,6 +1,5 @@
 package ec.edu.ista.springgc1.security.jwt;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 

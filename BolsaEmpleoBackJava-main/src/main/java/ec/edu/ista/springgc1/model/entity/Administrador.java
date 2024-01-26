@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+
+import org.hibernate.annotations.ColumnTransformer;
 
 import lombok.Data;
 
@@ -19,11 +22,14 @@ public class Administrador {
 	    @GeneratedValue(strategy = GenerationType.IDENTITY)
 	    @Column(name = "id_admi")
 	    private Long id;
-	    @OneToOne
-	    @JoinColumn(name = "id_persona", referencedColumnName = "cod_perso")
-	    private Persona persona;
-	    private boolean estado=true;
+	  @OneToOne
+	    @JoinColumn(referencedColumnName = "id_usuario")
+	   private Usuario usuario;
+	    private boolean estado;
+	    @ColumnTransformer(write = "UPPER(?)")
 	    private String cargo;
+	    @Email(message = "Debe ser una dirección de correo electrónico válida.")
+	    @Column(name = "email", nullable = false, length = 255)
 	    private String email;
 
 }

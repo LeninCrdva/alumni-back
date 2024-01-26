@@ -13,12 +13,7 @@ public class LogroDTO implements Serializable {
     @NotEmpty
     private String cedula;
 
-
     private String tipoLogro;
 
-
     private String descripcion;
-
-
-
 }

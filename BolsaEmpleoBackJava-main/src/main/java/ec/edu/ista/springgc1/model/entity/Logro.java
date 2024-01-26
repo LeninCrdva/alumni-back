@@ -2,8 +2,7 @@ package ec.edu.ista.springgc1.model.entity;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,19 +13,26 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
-import lombok.Data;
+import org.hibernate.annotations.ColumnTransformer;
+
 @Data
 @Entity
-@Table(name="logro")
-public class Logro {
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "id_logro")
-	    private Long id;
-	 @ManyToOne
-	 @JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
-	 private Graduado graduado;
-	 private String descripcion;
-	 private String tipo_logro;
+@Table(name = "logro")
+public class Logro implements Serializable{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_logro")
+	private Long id;
+	@ManyToOne
+	@JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
+	private Graduado graduado;
+	@ColumnTransformer(write = "UPPER(?)")
+	private String descripcion;
+	@ColumnTransformer(write = "UPPER(?)")
+	private String tipo;
 }
-

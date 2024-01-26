@@ -18,7 +18,7 @@ public class JwtTokenProvider {
     private String jwtSecret;
 
     @Value("${app.jwt-expiration-milliseconds}")
-    private int jwtExpirationInMs;
+    private long jwtExpirationInMs;
 
     public String generateToken(Authentication authentication){
         String username = authentication.getName();

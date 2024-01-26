@@ -8,23 +8,23 @@ import java.io.Serializable;
 @Data
 public class ExperienciaDTO implements Serializable {
 
-    private  Long id;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8066726061344288217L;
 
-    @NotEmpty
-    private  String cedula;
-    @NotEmpty
-    private  String area_trabajo;
-    @NotEmpty
-    private String institucion;
-    @NotEmpty
-    private  String cargo;
-    @NotEmpty
-    private  String duracion;
-    @NotEmpty
-    private  String actividad;
+	private Long id;
 
-
-
-
+	private String cedulaGraduado;
+	@NotEmpty
+	private String area_trabajo;
+	@NotEmpty
+	private String institucionNombre;
+	@NotEmpty
+	private String cargo;
+	@NotEmpty
+	private String duracion;
+	@NotEmpty
+	private String actividad;
 
 }

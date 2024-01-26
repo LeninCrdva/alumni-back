@@ -4,6 +4,8 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 @Data
 @Entity
 @Table(name = "empresa")
@@ -27,22 +29,22 @@ public class Empresa {
 
     @Column(name = "RUC")
     private String ruc;
-
+    @ColumnTransformer(write = "UPPER(?)")
     private String nombre;
-
+    @ColumnTransformer(write = "UPPER(?)")
     @Column(name = "tipo_empresa")
     private String tipoEmpresa;
-
+    @ColumnTransformer(write = "UPPER(?)")
     @Column(name = "razon_social")
     private String razonSocial;
-
+    @ColumnTransformer(write = "UPPER(?)")
     private String area;
 
    
-
+    @ColumnTransformer(write = "UPPER(?)")
     private String ubicacion;
-    private String tipo;
 
     @Column(name = "sitio_web")
+    @ColumnTransformer(write = "UPPER(?)")
     private String sitioWeb;
 }
