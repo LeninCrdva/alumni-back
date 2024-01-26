@@ -5,7 +5,6 @@ import java.io.Serializable;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import ec.edu.ista.springgc1.model.entity.Usuario;
 import lombok.Data;
 @Data
 public class AdminDTO implements Serializable{

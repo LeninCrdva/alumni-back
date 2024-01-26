@@ -15,4 +15,5 @@ public class EmpresarioDTO implements Serializable{
 	  private boolean estado;
 	  private String puesto;
 	  private int anios;
+	    private String email;
 }

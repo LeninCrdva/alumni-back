@@ -2,7 +2,6 @@ package ec.edu.ista.springgc1.controller;
 
 
 import ec.edu.ista.springgc1.exception.AppException;
-import ec.edu.ista.springgc1.model.entity.Rol;
 import ec.edu.ista.springgc1.model.entity.SectorEmpresarial;
 import ec.edu.ista.springgc1.service.impl.SectorEmpresarialServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
