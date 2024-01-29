@@ -18,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.amazonaws.services.kms.model.NotFoundException;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -88,6 +90,16 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     public Usuario findByUsername(String username) {
         return usuarioRepository.findBynombreUsuario(username).orElseThrow(() -> new ResourceNotFoundException("usuario:", username));
     }
+    
+    public Usuario findByUsername2(String username) {
+        return usuarioRepository.findBynombreUsuario(username)
+            .map(u -> {
+                u.setUrl_imagen(u.getRuta_imagen() == null ? null : s3Service.getObjectUrl(u.getRuta_imagen()));
+                return u;
+            })
+            .orElseThrow(() -> new NotFoundException("Usuario no encontrado con nombre de usuario: " + username));
+    }
+
     public Usuario findByUsernameAndClave(String username,String clave) {
         return usuarioRepository.findBynombreUsuarioAndClave(username, clave).orElseThrow(() -> new ResourceNotFoundException("usario:", username));
     }

@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
 
 import org.hibernate.annotations.ColumnTransformer;
 
@@ -28,5 +29,8 @@ public class Empresario {
 	  @ColumnTransformer(write = "UPPER(?)")
 	 private String puesto;
 	 private int anios;
+	   @Email(message = "Debe ser una dirección de correo electrónico válida.")
+	    @Column(name = "email", nullable = false, length = 255)
+	    private String email;
 
 }
