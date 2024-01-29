@@ -125,7 +125,6 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 	    
 	    List<OfertasLaborales> ofertas = graduado.getOfertas();
 	    
-	    System.out.println(ofertas.get(1).getEmpresa().getNombre());
 	    return ofertas;
 	}
 
