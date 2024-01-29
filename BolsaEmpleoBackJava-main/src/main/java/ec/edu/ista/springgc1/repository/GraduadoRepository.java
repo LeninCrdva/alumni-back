@@ -8,10 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import ec.edu.ista.springgc1.model.entity.Graduado;
-import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.repository.generic.GenericRepository;
-
-import java.time.LocalDate;
 
 
 @Repository
@@ -23,4 +20,6 @@ public interface GraduadoRepository extends GenericRepository<Graduado> {
 	Optional<Graduado> findByUsuarioPersonaCedulaContaining(String cedula);
 	
 	List<Graduado> findByEmailPersonalIn(Set<String> email_personal);
+	
+	Optional<Graduado> findByUsuarioNombreUsuario(String name);
 }

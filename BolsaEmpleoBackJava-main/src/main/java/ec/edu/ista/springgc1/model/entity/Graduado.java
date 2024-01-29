@@ -4,8 +4,6 @@ import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -25,29 +23,40 @@ import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import ec.edu.ista.springgc1.view.View;
 
 @Data
 @Entity
 @Table(name = "graduado")
+@JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
 public class Graduado {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "graduado_id")
+	@JsonView(View.Base.class)
 	private Long id;
 	@OneToOne
 	@JoinColumn(referencedColumnName = "id_usuario")
+	@JsonView(View.Base.class)
 	private Usuario usuario;
 	@ManyToOne
 	@JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
+	@JsonView(View.Base.class)
 	private Ciudad ciudad;
+	@JsonView(View.Base.class)
 	private LocalDate año_graduacion;
-
+	@JsonView(View.Base.class)
 	@Email(message = "Debe ser una dirección de correo electrónico válida.")
 	@Column(name = "email_personal", nullable = false, length = 255, unique = true)
 	private String emailPersonal;
 	@ColumnTransformer(write = "UPPER(?)")
+	@JsonView(View.Base.class)
 	private String estadocivil;
+	@JsonView(View.Base.class)
 	private String ruta_pdf;
 	@Transient
 	private String url_pdf;
