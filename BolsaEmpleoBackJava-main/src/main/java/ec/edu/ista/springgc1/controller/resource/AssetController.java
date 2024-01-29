@@ -3,7 +3,6 @@ package ec.edu.ista.springgc1.controller.resource;
 import ec.edu.ista.springgc1.model.vm.Asset;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

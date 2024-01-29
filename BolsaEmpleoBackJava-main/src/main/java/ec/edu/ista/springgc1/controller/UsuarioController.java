@@ -53,7 +53,7 @@ public class UsuarioController {
     @GetMapping("/by-username/{username}")
     ResponseEntity<?> findByUsername(@PathVariable String username) {
         try {
-            Usuario usuario = usuarioService.findByUsername(username);
+            Usuario usuario = usuarioService.findByUsername2(username);
             return ResponseEntity.ok(usuario);
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());

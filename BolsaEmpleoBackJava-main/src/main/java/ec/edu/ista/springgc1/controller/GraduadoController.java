@@ -18,9 +18,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.fasterxml.jackson.annotation.JsonView;
+
 import ec.edu.ista.springgc1.model.dto.GraduadoDTO;
 import ec.edu.ista.springgc1.model.entity.Graduado;
+import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
+import ec.edu.ista.springgc1.view.View;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -50,6 +54,13 @@ public class GraduadoController {
     ResponseEntity<?> findByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findByUsuario(id));
     }
+    
+    @GetMapping("/user/{username}")
+    @JsonView(View.City.class) 
+    ResponseEntity<List<OfertasLaborales>> findByUserName(@PathVariable("username") String username){
+        return ResponseEntity.ok(estudianteService.findByUsuarioNombreUsuario(username));
+    }
+
 
     @GetMapping("/total")
     ResponseEntity<?> countEstudiantes() {

@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.entity.Persona;
-import ec.edu.ista.springgc1.model.entity.Rol;
 import ec.edu.ista.springgc1.service.impl.PersonaServiceImp;
 
 @CrossOrigin(origins = "http://localhost:4200")

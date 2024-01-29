@@ -118,6 +118,17 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 		return graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
 				.orElseThrow(() -> new ResourceNotFoundException("cedula", cedula));
 	}
+	
+	public List<OfertasLaborales> findByUsuarioNombreUsuario(String username) {
+	    Graduado graduado = graduadoRepository.findByUsuarioNombreUsuario(username)
+	            .orElseThrow(() -> new ResourceNotFoundException("usuario", username));
+	    
+	    List<OfertasLaborales> ofertas = graduado.getOfertas();
+	    
+	    System.out.println(ofertas.get(1).getEmpresa().getNombre());
+	    return ofertas;
+	}
+
 
 	@Override
 	public Graduado save(Object entity) {
