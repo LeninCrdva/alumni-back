@@ -1,14 +1,19 @@
 package ec.edu.ista.springgc1.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import ec.edu.ista.springgc1.model.entity.Empresario;
 import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 
 public interface EmpresarioRepository  extends GenericRepository<Empresario> {
-	 @Query(value = "select * from estudiante where usuario_id = :id_usuario", nativeQuery = true)
-	    Optional<Empresario> findByUsuario(long id_usuario);
+	@Query(value = "SELECT * FROM empresario e INNER JOIN usuario u ON e.id_usuario = u.id_usuario WHERE u.nombre_usuario = :username", nativeQuery = true)
+	List<Empresario> findByUsuario(@Param("username") String username);
+
+
+
 
 }

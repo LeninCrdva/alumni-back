@@ -2,9 +2,11 @@ package ec.edu.ista.springgc1.service.impl;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.NonUniqueResultException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -77,14 +79,19 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 
 
 
-		    public EmpresarioDTO findByUsuario(long id_usuario) {
+		    public Optional<Empresario> findByUsuario(String username) {
+		        List<Empresario> empresarios = empresariorepository.findByUsuario(username);
 
-		    	Empresario empresario = empresariorepository.findByUsuario(id_usuario)
-		    			   .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
-
-		                
-		        return mapToDTO(empresario);
+		        if (empresarios.size() == 1) {
+		            return Optional.of(empresarios.get(0));
+		        } else if (empresarios.isEmpty()) {
+		            return Optional.empty();
+		        } else {
+		            
+		            throw new NonUniqueResultException("La consulta devolvió más de un resultado.");
+		        }
 		    }
+
 
 		  
 

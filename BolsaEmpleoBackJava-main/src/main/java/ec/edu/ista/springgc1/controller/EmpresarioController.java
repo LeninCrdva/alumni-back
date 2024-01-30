@@ -39,10 +39,11 @@ public class EmpresarioController {
     }
 
 
-    @GetMapping("/usuario/{id}")
-    ResponseEntity<?> findByUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(emprendimientoService.findByUsuario(id));
+    @GetMapping("/usuario/{usuario}")
+    ResponseEntity<?> findByUserUsername(@PathVariable String usuario) {
+        return ResponseEntity.ok(emprendimientoService.findByUsuario(usuario));
     }
+
 
    
     @PostMapping
