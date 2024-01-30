@@ -43,8 +43,8 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa > implements 
 	SectorEmpresarial emp=sectorrepository.findByNombre(d.getSectorEmpresarial().getNombre())
 			   .orElseThrow(() -> new ResourceNotFoundException("Sector empresarial", d.getCiudad().getNombre()));
 	
-	Empresario empresario = empresariorepository.findById(d.getEmpresario().getId())
-             .orElseThrow(() -> new ResourceNotFoundException("Empresario", String.valueOf(d.getEmpresario().getId())));
+	Empresario empresario = empresariorepository.findByUsuarioNombreUsuarioIgnoreCase(d.getEmpresario())
+             .orElseThrow(() -> new ResourceNotFoundException("Empresario", String.valueOf(d.getEmpresario())));
      em.setId(d.getId());
      em.setCiudad(ci);
      em.setSectorEmpresarial(emp);
@@ -66,7 +66,7 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa > implements 
 			em1.setId(e.getId());
 			em1.setArea(e.getArea());
 			em1.setCiudad(e.getCiudad());
-			em1.setEmpresario(e.getEmpresario());
+			em1.setEmpresario(e.getEmpresario().getUsuario().getNombreUsuario());
 			em1.setNombre(e.getNombre());
 			em1.setRazonSocial(e.getRazonSocial());
 			em1.setRuc(e.getRuc());
