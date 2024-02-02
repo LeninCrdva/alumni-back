@@ -32,5 +32,7 @@ public class Empresario {
 	   @Email(message = "Debe ser una dirección de correo electrónico válida.")
 	    @Column(name = "email", nullable = false, length = 255)
 	    private String email;
+	   @ColumnTransformer(write = "UPPER(?)")
+		 private String descripcion;
 
 }

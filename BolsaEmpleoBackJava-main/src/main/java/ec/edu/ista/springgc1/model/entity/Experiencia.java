@@ -24,6 +24,9 @@ public class Experiencia {
 	 private String institucion;
 	  @ColumnTransformer(write = "UPPER(?)")
 	 private String actividad;
+	  @ColumnTransformer(write = "UPPER(?)")
+		 private String areatrabajo;
+		 
 	 
 	 
 }

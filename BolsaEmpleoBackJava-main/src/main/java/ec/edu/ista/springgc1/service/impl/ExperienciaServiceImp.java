@@ -36,7 +36,7 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 		experiencia.setActividad(experienciaDTO.getActividad());
 		experiencia.setCargo(experienciaDTO.getCargo());
 		experiencia.setDuracion(experienciaDTO.getDuracion());
-
+        experiencia.setAreatrabajo(experienciaDTO.getArea_trabajo());
 		return experiencia;
 	}
 
@@ -49,6 +49,7 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 		experienciaDTO.setActividad(experiencia.getActividad());
 		experienciaDTO.setCargo(experiencia.getCargo());
 		experienciaDTO.setDuracion(experiencia.getDuracion());
+		experienciaDTO.setArea_trabajo(experiencia.getAreatrabajo());
 		return experienciaDTO;
 	}
 

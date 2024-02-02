@@ -62,5 +62,11 @@ public class ReferenciaProfesionalController {
 		referenciaProfesionalService.delete(referenciaProfesional.getId());
 		return ResponseEntity.noContent().build();
 	}
+	@GetMapping("/usuario/{nombreUsuario}")
+	ResponseEntity<List<ReferenciaProfesionalDTO>> findByNombreUsuario(@PathVariable("nombreUsuario") String nombreUsuario) {
+	    List<ReferenciaProfesionalDTO> referencias = referenciaProfesionalService.findByNombreUsuario(nombreUsuario);
+	    return ResponseEntity.ok(referencias);
+	}
+
 
 }

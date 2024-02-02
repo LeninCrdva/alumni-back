@@ -19,6 +19,7 @@ import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
@@ -117,6 +118,10 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa > implements 
 	    
 	    public void delete(Long id) {
 	        empresarepository.deleteById(id);
+	    }
+	    public Set<EmpresaDTO> findByNombreUsuario(String nombreUsuario) {
+	        Set<Empresa> empresas = empresarepository.findByNombreUsuario(nombreUsuario);
+	        return empresas.stream().map(this::mapToDTO).collect(Collectors.toSet());
 	    }
 	  
 

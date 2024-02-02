@@ -1,6 +1,7 @@
 package ec.edu.ista.springgc1.controller;
 
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -62,5 +63,10 @@ public class EmpresaController {
 	            empresaService.delete(id);
 	            return ResponseEntity.ok("Empresa eliminada exitosamente.");
 	       
+	    }
+	 @GetMapping("/by-usuario/{nombreUsuario}")
+	    ResponseEntity<?> findByNombreUsuario(@PathVariable String nombreUsuario) {
+	        Set<EmpresaDTO> empresas = empresaService.findByNombreUsuario(nombreUsuario);
+	        return ResponseEntity.ok(empresas);
 	    }
 }

@@ -42,6 +42,7 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 		        empresario.setAnios(empresarioDTO.getAnios());
 		        empresario.setPuesto(empresarioDTO.getPuesto());
 		        empresario.setEmail(empresarioDTO.getEmail());
+		        empresario.setDescripcion(empresarioDTO.getDescripcion());
 		       
 		       
 		       
@@ -57,7 +58,8 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 		    	empresarioDTO.setPuesto(empresario.getPuesto());
 		    	empresarioDTO.setEstado(empresario.isEstado());
 		    	empresarioDTO.setAnios(empresario.getAnios());
-		       empresarioDTO.setEmail(empresario.getEmail());	
+		       empresarioDTO.setEmail(empresario.getEmail());
+		       empresarioDTO.setDescripcion(empresario.getDescripcion());
 		        return empresarioDTO;
 		    }
 		    @Override
@@ -118,6 +120,7 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 		        existingEmpresario.setAnios(updatedEmpresarioDTO.getAnios());
 		        existingEmpresario.setPuesto(updatedEmpresarioDTO.getPuesto());
 		        existingEmpresario.setEmail(updatedEmpresarioDTO.getEmail());
+		        existingEmpresario.setDescripcion(updatedEmpresarioDTO.getDescripcion());
 		        return mapToDTO(empresariorepository.save(existingEmpresario));
 		    }
 		  

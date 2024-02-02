@@ -80,5 +80,9 @@ public class ReferenciaProfesionalServiceImp extends GenericServiceImpl<Referenc
 	public ReferenciaProfesional save(Object entity) {
 		return referenciaProfesionalRepository.save(mapToEntity((ReferenciaProfesionalDTO) entity));
 	}
+	public List<ReferenciaProfesionalDTO> findByNombreUsuario(String nombreUsuario) {
+	    List<ReferenciaProfesional> referencias = referenciaProfesionalRepository.findByNombreUsuario(nombreUsuario);
+	    return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
+	}
 
 }
