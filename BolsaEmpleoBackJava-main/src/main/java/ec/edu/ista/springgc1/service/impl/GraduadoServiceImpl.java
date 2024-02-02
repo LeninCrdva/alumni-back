@@ -107,7 +107,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
 	public GraduadoDTO findByUsuario(long id_usuario) {
 
-		Graduado estudiante = graduadoRepository.findByUsuario(id_usuario)
+		Graduado estudiante = graduadoRepository.findByUsuarioId(id_usuario)
 				.orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
 		estudiante
 				.setUrl_pdf(estudiante.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudiante.getRuta_pdf()));
@@ -165,6 +165,28 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         }
         
         return mapToDTO(graduadoRepository.save(graduadoFromDb));
+	}
+	
+	public GraduadoDTO updatePostulacion(Long idGraduado, Long ofertas) {
+		Graduado estudiante = graduadoRepository.findById(idGraduado)
+				.orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
+
+		GraduadoDTO graduadoFromDb= mapToDTO(estudiante);
+		
+		graduadoFromDb.getIdOferta().add(ofertas);
+		
+		return graduadoFromDb;
+	}
+	
+	public GraduadoDTO cancelPostulacion(Long idGraduado, Long ofertas) {
+		Graduado estudiante = graduadoRepository.findById(idGraduado)
+				.orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
+
+		GraduadoDTO graduadoFromDb= mapToDTO(estudiante);
+		
+		graduadoFromDb.getIdOferta().remove(ofertas);
+		
+		return graduadoFromDb;
 	}
 
 	public Long countEstudiantes() {

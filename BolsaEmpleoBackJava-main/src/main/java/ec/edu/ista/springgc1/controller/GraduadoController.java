@@ -1,7 +1,10 @@
 package ec.edu.ista.springgc1.controller;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.validation.Valid;
 
@@ -78,14 +81,34 @@ public class GraduadoController {
     	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
     }
     
+    
+    
     @PutMapping("postulaciones/{id}")
     public ResponseEntity<?> savePostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
-    	GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
-    	
-    	gradDTO.setIdOferta(estudianteDTO.getIdOferta());
-    	
-    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
+        GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
+
+        Set<Long> existingIds = new HashSet<>(gradDTO.getIdOferta());
+        
+        existingIds.addAll(estudianteDTO.getIdOferta());
+
+        gradDTO.setIdOferta(new ArrayList<>(existingIds));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
     }
+
+    @PutMapping("cancel-postulaciones/{id}")
+    public ResponseEntity<?> cancelPostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
+        GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
+
+        Set<Long> existingIds = new HashSet<>(gradDTO.getIdOferta());
+
+        existingIds.removeAll(estudianteDTO.getIdOferta());
+
+        gradDTO.setIdOferta(new ArrayList<>(existingIds));
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
+    }
+
 
 
     @DeleteMapping("/{id}")
