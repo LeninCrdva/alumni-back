@@ -193,4 +193,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 		return graduadoRepository.count();
 	}
 
+	public List<Graduado> findGRaduadoWithOutOfertas(){
+		return graduadoRepository.findAllGraduadosWithoutOfertas();
+	}
 }

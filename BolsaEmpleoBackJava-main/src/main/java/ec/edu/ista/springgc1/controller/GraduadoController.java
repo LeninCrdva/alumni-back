@@ -118,4 +118,8 @@ public class GraduadoController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/without-oferta")
+    ResponseEntity<List<?>> listWithOut() {
+        return ResponseEntity.ok(estudianteService.findGRaduadoWithOutOfertas());
+    }
 }
