@@ -14,12 +14,14 @@ import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 @Repository
 public interface GraduadoRepository extends GenericRepository<Graduado> {
 
-	@Query(value = "select * from estudiante where usuario_id = :id_usuario", nativeQuery = true)
-	Optional<Graduado> findByUsuario(long id_usuario);
+	Optional<Graduado> findByUsuarioId(long id_usuario);
 
 	Optional<Graduado> findByUsuarioPersonaCedulaContaining(String cedula);
 	
 	List<Graduado> findByEmailPersonalIn(Set<String> email_personal);
-	
+
 	Optional<Graduado> findByUsuarioNombreUsuario(String name);
+
+	@Query("SELECT g FROM Graduado g LEFT JOIN g.ofertas o WHERE o IS NULL")
+	List<Graduado> findAllGraduadosWithoutOfertas();
 }
