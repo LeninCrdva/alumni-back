@@ -6,4 +6,5 @@ import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 
 public interface OfertaslaboralesRepository extends GenericRepository<OfertasLaborales>{
 	List<OfertasLaborales> findOfertasByIdIn(List<Long> idOfertas);
+	 List<OfertasLaborales> findByGraduados_Usuario_NombreUsuario(String nombreUsuario);
 }

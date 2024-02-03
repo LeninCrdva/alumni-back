@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
+import ec.edu.ista.springgc1.model.dto.ReferenciaProfesionalDTO;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 
@@ -67,4 +68,9 @@ public class OfertasLaboralesController {
 	        ofertasLaboralesService.delete(id);
 	        return ResponseEntity.noContent().build();
 	    }
+	    @GetMapping("/usuario/{nombreUsuario}")
+		ResponseEntity<List<OfertasLaboralesDTO>> findByNombreUsuario(@PathVariable("nombreUsuario") String nombreUsuario) {
+		    List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findByNombreUsuario(nombreUsuario);
+		    return ResponseEntity.ok(referencias);
+		}
 }

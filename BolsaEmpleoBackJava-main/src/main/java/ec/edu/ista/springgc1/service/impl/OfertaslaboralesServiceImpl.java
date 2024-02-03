@@ -11,9 +11,11 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
+import ec.edu.ista.springgc1.model.dto.ReferenciaProfesionalDTO;
 import ec.edu.ista.springgc1.model.entity.Empresa;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
+import ec.edu.ista.springgc1.model.entity.ReferenciaProfesional;
 import ec.edu.ista.springgc1.repository.EmpresaRepository;
 import ec.edu.ista.springgc1.repository.GraduadoRepository;
 import ec.edu.ista.springgc1.repository.OfertaslaboralesRepository;
@@ -140,4 +142,10 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 	public void delete(Long id) {
 		ofertasLaboralesRepository.deleteById(id);
 	}
+	public List<OfertasLaboralesDTO> findByNombreUsuario(String nombreUsuario) {
+	    List<OfertasLaborales> referencias = ofertasLaboralesRepository.findByGraduados_Usuario_NombreUsuario(nombreUsuario);
+	    return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
+	}
+
+	
 }
