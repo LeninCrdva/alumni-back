@@ -21,4 +21,5 @@ public interface OfertaslaboralesRepository extends GenericRepository<OfertasLab
 	    List<Graduado> findGraduadosByOfertaId(@Param("ofertaId") Long ofertaId);
 	 @Query("SELECT o FROM OfertasLaborales o JOIN o.empresa e WHERE UPPER(e.nombre) = UPPER(:nombreEmpresa)")
 	    List<OfertasLaborales> findOfertasByNombreEmpresa(@Param("nombreEmpresa") String nombreEmpresa);
+	 
 }
