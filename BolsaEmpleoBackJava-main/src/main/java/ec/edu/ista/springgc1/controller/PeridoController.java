@@ -60,6 +60,7 @@ public class PeridoController {
         periodoFromDb.setFecha_fin(p.getFecha_fin());
         periodoFromDb.setFecha_inicio(p.getFecha_inicio());
         periodoFromDb.setEstado(p.getEstado());
+        periodoFromDb.setCarreras(p.getCarreras());
         return ResponseEntity.status(HttpStatus.CREATED).body(periodoService.save(periodoFromDb));
     }
 

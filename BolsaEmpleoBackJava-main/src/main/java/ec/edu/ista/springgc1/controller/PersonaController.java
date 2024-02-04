@@ -37,6 +37,11 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.findById(id));
     }
 
+    @GetMapping("cedula/{cedula}")
+    ResponseEntity<?> findByCedula(@PathVariable String cedula) {
+        return ResponseEntity.ok(personaService.findBycedula(cedula));
+    }
+    
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody Persona p) {
     	 if (p.getFechaNacimiento() == null) {
