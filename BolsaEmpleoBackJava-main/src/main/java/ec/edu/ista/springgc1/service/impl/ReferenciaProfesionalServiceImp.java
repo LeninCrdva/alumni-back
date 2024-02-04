@@ -50,8 +50,7 @@ public class ReferenciaProfesionalServiceImp extends GenericServiceImpl<Referenc
 		ReferenciaProfesionalDTO referenciaProfesionalDTO = new ReferenciaProfesionalDTO();
 
 		referenciaProfesionalDTO.setId(referenciaProfesional.getId());
-		referenciaProfesionalDTO
-				.setGraduado(referenciaProfesional.getGraduado().getUsuario().getPersona().getCedula());
+		referenciaProfesionalDTO.setGraduado(referenciaProfesional.getGraduado().getUsuario().getPersona().getCedula());
 		referenciaProfesionalDTO.setNombre(referenciaProfesional.getNombre());
 		referenciaProfesionalDTO.setInstitucion(referenciaProfesional.getInstitucion());
 		referenciaProfesionalDTO.setEmail(referenciaProfesional.getEmail());
