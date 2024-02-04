@@ -28,17 +28,17 @@ public class ReferenciaProfesionalServiceImp extends GenericServiceImpl<Referenc
 
 		ReferenciaProfesional referenciaProfesional = new ReferenciaProfesional();
 		Graduado graduado = graduadoRepository
-				.findByUsuarioPersonaCedulaContaining(referenciaProfesionalDTO.getCedulaGraduado())
+				.findByUsuarioPersonaCedulaContaining(referenciaProfesionalDTO.getGraduado())
 				.orElseThrow(() -> new ResourceNotFoundException("Referencia Profesional",
-						referenciaProfesionalDTO.getNombreInstitucion()));
+						referenciaProfesionalDTO.getNombre()));
 
 		referenciaProfesional.setId(referenciaProfesionalDTO.getId());
 		referenciaProfesional.setGraduado(graduado);
-		referenciaProfesional.setNombre(referenciaProfesionalDTO.getNombreReferencia());
-		referenciaProfesional.setInstitucion(referenciaProfesionalDTO.getNombreInstitucion());
+		referenciaProfesional.setNombre(referenciaProfesionalDTO.getNombre());
+		referenciaProfesional.setInstitucion(referenciaProfesionalDTO.getInstitucion());
 		referenciaProfesional.setEmail(referenciaProfesionalDTO.getEmail());
 
-		System.out.println(referenciaProfesionalDTO.getNombreInstitucion());
+		System.out.println(referenciaProfesionalDTO.getInstitucion());
 
 		return referenciaProfesional;
 
@@ -51,9 +51,9 @@ public class ReferenciaProfesionalServiceImp extends GenericServiceImpl<Referenc
 
 		referenciaProfesionalDTO.setId(referenciaProfesional.getId());
 		referenciaProfesionalDTO
-				.setCedulaGraduado(referenciaProfesional.getGraduado().getUsuario().getPersona().getCedula());
-		referenciaProfesionalDTO.setNombreReferencia(referenciaProfesional.getNombre());
-		referenciaProfesionalDTO.setNombreInstitucion(referenciaProfesional.getInstitucion());
+				.setGraduado(referenciaProfesional.getGraduado().getUsuario().getPersona().getCedula());
+		referenciaProfesionalDTO.setNombre(referenciaProfesional.getNombre());
+		referenciaProfesionalDTO.setInstitucion(referenciaProfesional.getInstitucion());
 		referenciaProfesionalDTO.setEmail(referenciaProfesional.getEmail());
 
 		return referenciaProfesionalDTO;
@@ -80,9 +80,10 @@ public class ReferenciaProfesionalServiceImp extends GenericServiceImpl<Referenc
 	public ReferenciaProfesional save(Object entity) {
 		return referenciaProfesionalRepository.save(mapToEntity((ReferenciaProfesionalDTO) entity));
 	}
+
 	public List<ReferenciaProfesionalDTO> findByNombreUsuario(String nombreUsuario) {
-	    List<ReferenciaProfesional> referencias = referenciaProfesionalRepository.findByNombreUsuario(nombreUsuario);
-	    return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
+		List<ReferenciaProfesional> referencias = referenciaProfesionalRepository.findByNombreUsuario(nombreUsuario);
+		return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
 	}
 
 }

@@ -14,6 +14,7 @@ import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 public interface ReferenciaProfesionalRepository extends GenericRepository<ReferenciaProfesional> {
 
 	Optional<ReferenciaProfesional> findById(Long id);
-	 @Query("SELECT rp FROM ReferenciaProfesional rp JOIN rp.graduado g JOIN g.usuario u WHERE UPPER(u.nombreUsuario) = UPPER(:nombreUsuario)")
-	    List<ReferenciaProfesional> findByNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
+
+	@Query("SELECT rp FROM ReferenciaProfesional rp JOIN rp.graduado g JOIN g.usuario u WHERE UPPER(u.nombreUsuario) = UPPER(:nombreUsuario)")
+	List<ReferenciaProfesional> findByNombreUsuario(@Param("nombreUsuario") String nombreUsuario);
 }
