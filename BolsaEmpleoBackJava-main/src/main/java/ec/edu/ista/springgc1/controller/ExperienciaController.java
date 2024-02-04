@@ -1,9 +1,12 @@
 package ec.edu.ista.springgc1.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
+import ec.edu.ista.springgc1.model.entity.Graduado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -64,5 +67,19 @@ public class ExperienciaController {
 		experienciaServiceImp.delete(experiencia.getId());
 		return ResponseEntity.noContent().build();
 	}
-	
+	@GetMapping("/graduados-con-experiencia")
+	ResponseEntity<?> getGraduadosConExperiencia() {
+		List<Graduado> graduadosConExperiencia = experienciaServiceImp.findGraduadosConExperiencia();
+
+		// Contar cuántos tienen experiencia y cuántos no
+		long graduadosConExperienciaCount = graduadosConExperiencia.size();
+		long graduadosSinExperienciaCount = experienciaServiceImp.countGraduadosSinExperiencia();
+
+		// Crear un objeto para devolver la respuesta
+		Map<String, Object> response = new HashMap<>();
+		response.put("graduadosConExperienciaCount", graduadosConExperienciaCount);
+		response.put("graduadosSinExperienciaCount", graduadosSinExperienciaCount);
+
+		return ResponseEntity.ok(response);
+	}
 }

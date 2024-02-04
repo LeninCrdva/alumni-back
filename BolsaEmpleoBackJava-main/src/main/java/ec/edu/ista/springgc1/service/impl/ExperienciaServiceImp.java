@@ -1,6 +1,8 @@
 package ec.edu.ista.springgc1.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -74,4 +76,25 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 	public Experiencia save(Object entity) {
 		return experienciaRepository.save(mapToEntity((ExperienciaDTO) entity));
 	}
+	public List<Graduado> findGraduadosConExperiencia() {
+		// Obtener todos los graduados con experiencia
+		List<Experiencia> experiencias = experienciaRepository.findAll();
+		Set<Graduado> graduadosConExperiencia = experiencias.stream()
+				.map(Experiencia::getGraduado)
+				.collect(Collectors.toSet());
+
+		return new ArrayList<>(graduadosConExperiencia);
+	}
+
+	public long countGraduadosSinExperiencia() {
+		// Obtener todos los graduados
+		List<Graduado> todosGraduados = graduadoRepository.findAll();
+
+		// Obtener los graduados con experiencia
+		List<Graduado> graduadosConExperiencia = findGraduadosConExperiencia();
+
+		// Contar cuántos graduados no tienen experiencia
+		return todosGraduados.size() - graduadosConExperiencia.size();
+	}
+
 }

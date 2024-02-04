@@ -1,9 +1,7 @@
 package ec.edu.ista.springgc1.service.impl;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,6 +144,20 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 	    List<OfertasLaborales> referencias = ofertasLaboralesRepository.findByGraduados_Usuario_NombreUsuario(nombreUsuario);
 	    return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
 	}
+	public Map<LocalDate, Long> calcularPostulacionesPorDia() {
+		List<OfertasLaborales> ofertasLaborales = ofertasLaboralesRepository.findAll();
 
+		Map<LocalDate, Long> postulacionesPorDia = new HashMap<>();
+
+		for (OfertasLaborales oferta : ofertasLaborales) {
+			LocalDate fechaPublicacion = oferta.getFechaPublicacion();
+
+			if (fechaPublicacion != null) {
+				postulacionesPorDia.merge(fechaPublicacion, 1L, Long::sum);
+			}
+		}
+
+		return postulacionesPorDia;
+	}
 	
 }

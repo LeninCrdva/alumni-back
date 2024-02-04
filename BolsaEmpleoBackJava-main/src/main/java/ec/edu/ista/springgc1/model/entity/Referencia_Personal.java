@@ -25,15 +25,17 @@ public class Referencia_Personal {
 	@JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
 	private Graduado graduado;
 	@ColumnTransformer(write = "UPPER(?)")
-	private String nombre;
+	private String nombreReferencia;
 	@Nullable
-	//@Pattern(regexp = "\\d+", message = "El teléfono debe contener solo dígitos.")
-	//@Size(min = 10, max = 10, message = "El teléfono debe tener exactamente 10 dígitos.")
+	// @Pattern(regexp = "\\d+", message = "El teléfono debe contener solo
+	// dígitos.")
+	// @Size(min = 10, max = 10, message = "El teléfono debe tener exactamente 10
+	// dígitos.")
 	@Column(name = "telefono")
 	private String telefono;
 	@Nullable
-	//@Email(message = "Debe ser una dirección de correo electrónico válida.")
-	//@Column(name = "email", nullable = false, length = 255)
+	// @Email(message = "Debe ser una dirección de correo electrónico válida.")
+	// @Column(name = "email", nullable = false, length = 255)
 	@Column(name = "email")
 	private String email;
 

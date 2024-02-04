@@ -1,6 +1,9 @@
 package ec.edu.ista.springgc1.controller;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -73,4 +76,16 @@ public class OfertasLaboralesController {
 		    List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findByNombreUsuario(nombreUsuario);
 		    return ResponseEntity.ok(referencias);
 		}
+	@GetMapping("/postulaciones-por-dia")
+	public ResponseEntity<Map<String, Long>> calcularPostulacionesPorDia() {
+		Map<LocalDate, Long> postulacionesPorDia = ofertasLaboralesService.calcularPostulacionesPorDia();
+
+		// Convertir las claves (LocalDate) a cadenas
+		Map<String, Long> postulacionesPorDiaStringKey = new HashMap<>();
+		for (Map.Entry<LocalDate, Long> entry : postulacionesPorDia.entrySet()) {
+			postulacionesPorDiaStringKey.put(entry.getKey().toString(), entry.getValue());
+		}
+
+		return ResponseEntity.ok(postulacionesPorDiaStringKey);
+	}
 }
