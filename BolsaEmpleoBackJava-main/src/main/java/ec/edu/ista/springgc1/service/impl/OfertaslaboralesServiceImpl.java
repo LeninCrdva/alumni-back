@@ -4,14 +4,21 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
+import ec.edu.ista.springgc1.model.entity.Contratacion;
 import ec.edu.ista.springgc1.model.entity.Empresa;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
+import ec.edu.ista.springgc1.repository.ContratacionRepository;
 import ec.edu.ista.springgc1.repository.EmpresaRepository;
 import ec.edu.ista.springgc1.repository.GraduadoRepository;
 import ec.edu.ista.springgc1.repository.OfertaslaboralesRepository;
@@ -24,6 +31,8 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
 	@Autowired
 	private OfertaslaboralesRepository ofertasLaboralesRepository;
+	@Autowired
+	private ContratacionRepository contratacionRepository;
 
 	@Autowired
 	private EmpresaRepository empresarepository;
@@ -182,5 +191,20 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 	 public List<OfertasLaborales> findOfertasByNombreEmpresa(String nombreEmpresa) {
 	        return ofertasLaboralesRepository.findOfertasByNombreEmpresa(nombreEmpresa);
 	    }
+	 @Modifying
+	 @Transactional
+	 public Contratacion seleccionarContratados(Long ofertaId, List<Long> graduadosIds) {
+	     OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(ofertaId)
+	             .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(ofertaId)));
+
+	     List<Graduado> graduadosSeleccionados = graduadoRepository.findAllById(graduadosIds);
+
+	     Contratacion contratacion = new Contratacion();
+	     contratacion.setOfertaLaboral(ofertaLaboral);
+	     contratacion.setGraduados(graduadosSeleccionados);
+
+	     return contratacionRepository.save(contratacion);
+	 }
+
 
 }

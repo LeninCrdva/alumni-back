@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -20,9 +22,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.amazonaws.services.sns.model.ResourceNotFoundException;
+
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
+import ec.edu.ista.springgc1.model.entity.Contratacion;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
+import ec.edu.ista.springgc1.repository.ContratacionRepository;
+import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -30,8 +37,11 @@ import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 @RequestMapping("/ofertas-laborales")
 public class OfertasLaboralesController {
 	@Autowired
+	ContratacionRepository contratacionRepository;
+	@Autowired
 	private OfertaslaboralesServiceImpl ofertasLaboralesService;
-
+	@Autowired
+    private GraduadoServiceImpl  graduadoService;
 	@GetMapping
 	ResponseEntity<List<OfertasLaboralesDTO>> list() {
 		return ResponseEntity.ok(ofertasLaboralesService.findAll());
@@ -119,4 +129,45 @@ public class OfertasLaboralesController {
 	    ResponseEntity<List<OfertasLaborales>> findOfertasByNombreEmpresa(@PathVariable String nombreEmpresa) {
 	        return ResponseEntity.ok(ofertasLaboralesService.findOfertasByNombreEmpresa(nombreEmpresa));
 	    }
+
+	    @PostMapping("/seleccionar-contratados/{ofertaId}")
+	    public ResponseEntity<Contratacion> seleccionarContratados(@PathVariable Long ofertaId, @RequestBody List<Long> graduadosIds) {
+	        try {
+	            Contratacion contratacion = ofertasLaboralesService.seleccionarContratados(ofertaId, graduadosIds);
+	            return ResponseEntity.status(HttpStatus.CREATED).body(contratacion);
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+	        }
+	    }
+	    @GetMapping("/contrataciones")
+	    public ResponseEntity<List<Contratacion>> getAllContrataciones() {
+	        List<Contratacion> contrataciones =contratacionRepository.findAll();
+	        return ResponseEntity.ok(contrataciones);
+	    }
+	    @GetMapping("/contrataciones/{id}")
+	    public ResponseEntity<Contratacion> getContratacionById(@PathVariable Long id) {
+	        Contratacion contratacion = contratacionRepository.findById(id)
+	                .orElseThrow(() -> new ec.edu.ista.springgc1.exception.ResourceNotFoundException("Contratacion", String.valueOf(id)));
+	        return ResponseEntity.ok(contratacion);
+	    }
+	    @DeleteMapping("/contrataciones/{id}")
+	    public ResponseEntity<String> deleteContratacionById(@PathVariable Long id) {
+	        if (contratacionRepository.existsById(id)) {
+	            contratacionRepository.deleteById(id);
+	            return ResponseEntity.ok("Contratacion eliminada exitosamente.");
+	        } else {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contratacion no encontrada con ID: " + id);
+	        }
+	    }
+
+
+
+
+
+
+
+	  
+
+
 }

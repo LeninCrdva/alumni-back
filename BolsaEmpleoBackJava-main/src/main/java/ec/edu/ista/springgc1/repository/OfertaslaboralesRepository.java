@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.repository;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,5 +22,8 @@ public interface OfertaslaboralesRepository extends GenericRepository<OfertasLab
 	    List<Graduado> findGraduadosByOfertaId(@Param("ofertaId") Long ofertaId);
 	 @Query("SELECT o FROM OfertasLaborales o JOIN o.empresa e WHERE UPPER(e.nombre) = UPPER(:nombreEmpresa)")
 	    List<OfertasLaborales> findOfertasByNombreEmpresa(@Param("nombreEmpresa") String nombreEmpresa);
+	 @Modifying
+	    @Query("UPDATE OfertasLaborales o SET o.graduados = :graduados WHERE o.id = :ofertaId")
+	    void seleccionarContratados(@Param("ofertaId") Long ofertaId, @Param("graduados") List<Graduado> graduados);
 	 
 }
