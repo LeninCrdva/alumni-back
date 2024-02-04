@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
-import ec.edu.ista.springgc1.model.dto.ReferenciaProfesionalDTO;
 import ec.edu.ista.springgc1.model.entity.Empresa;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
-import ec.edu.ista.springgc1.model.entity.ReferenciaProfesional;
 import ec.edu.ista.springgc1.repository.EmpresaRepository;
 import ec.edu.ista.springgc1.repository.GraduadoRepository;
 import ec.edu.ista.springgc1.repository.OfertaslaboralesRepository;
@@ -29,10 +27,10 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
 	@Autowired
 	private EmpresaRepository empresarepository;
-	
+
 	@Autowired
 	private GraduadoRepository graduadoRepository;
-	
+
 	@Override
 	public OfertasLaborales mapToEntity(OfertasLaboralesDTO dto) {
 		OfertasLaborales ofertaLaboral = new OfertasLaborales();
@@ -47,13 +45,13 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 		ofertaLaboral.setEstado(dto.getEstado());
 		Empresa emp = empresarepository.findByNombre(dto.getNombreEmpresa())
 				.orElseThrow(() -> new ResourceNotFoundException("Empresa", dto.getNombreEmpresa()));
-		
+
 		List<Graduado> graduados = new ArrayList<>();
-		if(dto.getCorreoGraduado() == null && !dto.getCorreoGraduado().isEmpty()) {
+		if (dto.getCorreoGraduado() != null) {
 			graduados = graduadoRepository.findByEmailPersonalIn(dto.getCorreoGraduado());
 			ofertaLaboral.setGraduados(graduados);
 		}
-		
+
 		ofertaLaboral.setEmpresa(emp);
 
 		return ofertaLaboral;
@@ -73,14 +71,14 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 		dto.setEstado(entity.getEstado());
 		dto.setNombreEmpresa(entity.getEmpresa().getNombre());
 		Set<String> correoGraduado = new HashSet<>();
-		if(entity.getGraduados() != null) {
+		if (entity.getGraduados() != null) {
 			for (Graduado graduado : entity.getGraduados()) {
-				if(graduado.getEmailPersonal() != null) {
+				if (graduado.getEmailPersonal() != null) {
 					correoGraduado.add(graduado.getEmailPersonal());
 				}
 			}
 		}
-		
+
 		dto.setCorreoGraduado(correoGraduado);
 
 		return dto;
@@ -97,38 +95,39 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 	}
 
 	public OfertasLaboralesDTO update(Long id, OfertasLaboralesDTO updatedOfertaLaboralDTO) {
-	    OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
-	            .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+		OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
 
-	    existingOfertaLaboral.setSalario(updatedOfertaLaboralDTO.getSalario());
-	    existingOfertaLaboral.setFecha_cierre(updatedOfertaLaboralDTO.getFechaCierre());
-	    existingOfertaLaboral.setFecha_apertura(updatedOfertaLaboralDTO.getFechaApertura());
-	    existingOfertaLaboral.setCargo(updatedOfertaLaboralDTO.getCargo());
-	    existingOfertaLaboral.setExperiencia(updatedOfertaLaboralDTO.getExperiencia());
-	    existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
-	    existingOfertaLaboral.setArea_conocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
-	    existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
+		existingOfertaLaboral.setSalario(updatedOfertaLaboralDTO.getSalario());
+		existingOfertaLaboral.setFecha_cierre(updatedOfertaLaboralDTO.getFechaCierre());
+		existingOfertaLaboral.setFecha_apertura(updatedOfertaLaboralDTO.getFechaApertura());
+		existingOfertaLaboral.setCargo(updatedOfertaLaboralDTO.getCargo());
+		existingOfertaLaboral.setExperiencia(updatedOfertaLaboralDTO.getExperiencia());
+		existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
+		existingOfertaLaboral.setArea_conocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
+		existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
 
-	    Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa())
-	            .orElseThrow(() -> new ResourceNotFoundException("Empresa", updatedOfertaLaboralDTO.getNombreEmpresa()));
+		Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa()).orElseThrow(
+				() -> new ResourceNotFoundException("Empresa", updatedOfertaLaboralDTO.getNombreEmpresa()));
 
-	    List<Graduado> existingGraduados = existingOfertaLaboral.getGraduados();
+		List<Graduado> existingGraduados = existingOfertaLaboral.getGraduados();
 
-	    List<Graduado> nuevosGraduados = graduadoRepository.findByEmailPersonalIn(updatedOfertaLaboralDTO.getCorreoGraduado());
+		List<Graduado> nuevosGraduados = graduadoRepository
+				.findByEmailPersonalIn(updatedOfertaLaboralDTO.getCorreoGraduado());
 
-	    existingOfertaLaboral.setGraduados(nuevosGraduados);
+		existingOfertaLaboral.setGraduados(nuevosGraduados);
 
-	    for (Graduado graduado : existingGraduados) {
-	        graduado.getOfertas().remove(existingOfertaLaboral);
-	    }
+		for (Graduado graduado : existingGraduados) {
+			graduado.getOfertas().remove(existingOfertaLaboral);
+		}
 
-	    for (Graduado nuevoGraduado : nuevosGraduados) {
-	        nuevoGraduado.getOfertas().add(existingOfertaLaboral);
-	    }
+		for (Graduado nuevoGraduado : nuevosGraduados) {
+			nuevoGraduado.getOfertas().add(existingOfertaLaboral);
+		}
 
-	    existingOfertaLaboral.setEmpresa(empresa);
+		existingOfertaLaboral.setEmpresa(empresa);
 
-	    return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
+		return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
 	}
 
 	public OfertasLaboralesDTO findByIdToDTO(Long id) {
@@ -140,10 +139,13 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 	public void delete(Long id) {
 		ofertasLaboralesRepository.deleteById(id);
 	}
+
 	public List<OfertasLaboralesDTO> findByNombreUsuario(String nombreUsuario) {
-	    List<OfertasLaborales> referencias = ofertasLaboralesRepository.findByGraduados_Usuario_NombreUsuario(nombreUsuario);
-	    return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
+		List<OfertasLaborales> referencias = ofertasLaboralesRepository
+				.findByGraduados_Usuario_NombreUsuario(nombreUsuario);
+		return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
 	}
+
 	public Map<LocalDate, Long> calcularPostulacionesPorDia() {
 		List<OfertasLaborales> ofertasLaborales = ofertasLaboralesRepository.findAll();
 
@@ -159,5 +161,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
 		return postulacionesPorDia;
 	}
-	
+
+	public List<OfertasLaboralesDTO> findEmpresarioByNombreUsuario(String nombreUsuario) {
+		List<OfertasLaborales> referencias = ofertasLaboralesRepository.buscarOfertasPorNombreUsuario(nombreUsuario);
+		return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
+	}
 }

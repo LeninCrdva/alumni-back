@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
-import ec.edu.ista.springgc1.model.dto.ReferenciaProfesionalDTO;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 
@@ -29,53 +28,56 @@ import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 @RestController
 @RequestMapping("/ofertas-laborales")
 public class OfertasLaboralesController {
-	 @Autowired
-	    private OfertaslaboralesServiceImpl ofertasLaboralesService;
+	@Autowired
+	private OfertaslaboralesServiceImpl ofertasLaboralesService;
 
-	    @GetMapping
-	    ResponseEntity<List<OfertasLaboralesDTO>> list() {
-	        return ResponseEntity.ok(ofertasLaboralesService.findAll());
-	    }
+	@GetMapping
+	ResponseEntity<List<OfertasLaboralesDTO>> list() {
+		return ResponseEntity.ok(ofertasLaboralesService.findAll());
+	}
 
-	    @GetMapping("/{id}")
-	    ResponseEntity<?> findById(@PathVariable Long id) {
-	        return ResponseEntity.ok(ofertasLaboralesService.findById(id));
-	    }
-	    
-	    @GetMapping("dto/{id}")
-	    ResponseEntity<OfertasLaboralesDTO> findByIdDTO(@PathVariable Long id) {
-	        return ResponseEntity.ok(ofertasLaboralesService.findByIdToDTO(id));
-	    }
+	@GetMapping("/{id}")
+	ResponseEntity<?> findById(@PathVariable Long id) {
+		return ResponseEntity.ok(ofertasLaboralesService.findById(id));
+	}
 
-	    @PostMapping
-	    ResponseEntity<OfertasLaborales> create(@Valid @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
-	        return ResponseEntity.status(HttpStatus.CREATED).body(ofertasLaboralesService.save(ofertaLaboralDTO));
-	    }
+	@GetMapping("dto/{id}")
+	ResponseEntity<OfertasLaboralesDTO> findByIdDTO(@PathVariable Long id) {
+		return ResponseEntity.ok(ofertasLaboralesService.findByIdToDTO(id));
+	}
 
-	    @PutMapping("/{id}")
-	    ResponseEntity<OfertasLaboralesDTO> update(@PathVariable Long id, @Valid @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
-	        return ResponseEntity.ok(ofertasLaboralesService.update(id, ofertaLaboralDTO));
-	    }
-	    
-	    @PutMapping("postulado/{id}")
-	    ResponseEntity<?> savePostulado(@PathVariable Long id, @RequestBody OfertasLaboralesDTO ofertaLaboralDTO){
-	    	OfertasLaboralesDTO ofer = ofertasLaboralesService.findByIdToDTO(id);
-	    	
-	    	ofer.setCorreoGraduado(ofertaLaboralDTO.getCorreoGraduado());
-	    	
-	    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.update(id, ofer));
-	    }
+	@PostMapping
+	ResponseEntity<OfertasLaborales> create(@Valid @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
+		return ResponseEntity.status(HttpStatus.CREATED).body(ofertasLaboralesService.save(ofertaLaboralDTO));
+	}
 
-	    @DeleteMapping("/{id}")
-	    ResponseEntity<?> delete(@PathVariable Long id) {
-	        ofertasLaboralesService.delete(id);
-	        return ResponseEntity.noContent().build();
-	    }
-	    @GetMapping("/usuario/{nombreUsuario}")
-		ResponseEntity<List<OfertasLaboralesDTO>> findByNombreUsuario(@PathVariable("nombreUsuario") String nombreUsuario) {
-		    List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findByNombreUsuario(nombreUsuario);
-		    return ResponseEntity.ok(referencias);
-		}
+	@PutMapping("/{id}")
+	ResponseEntity<OfertasLaboralesDTO> update(@PathVariable Long id,
+			@Valid @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
+		return ResponseEntity.ok(ofertasLaboralesService.update(id, ofertaLaboralDTO));
+	}
+
+	@PutMapping("postulado/{id}")
+	ResponseEntity<?> savePostulado(@PathVariable Long id, @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
+		OfertasLaboralesDTO ofer = ofertasLaboralesService.findByIdToDTO(id);
+
+		ofer.setCorreoGraduado(ofertaLaboralDTO.getCorreoGraduado());
+
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.update(id, ofer));
+	}
+
+	@DeleteMapping("/{id}")
+	ResponseEntity<?> delete(@PathVariable Long id) {
+		ofertasLaboralesService.delete(id);
+		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/usuario/{nombreUsuario}")
+	ResponseEntity<List<OfertasLaboralesDTO>> findByNombreUsuario(@PathVariable("nombreUsuario") String nombreUsuario) {
+		List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findByNombreUsuario(nombreUsuario);
+		return ResponseEntity.ok(referencias);
+	}
+
 	@GetMapping("/postulaciones-por-dia")
 	public ResponseEntity<Map<String, Long>> calcularPostulacionesPorDia() {
 		Map<LocalDate, Long> postulacionesPorDia = ofertasLaboralesService.calcularPostulacionesPorDia();
@@ -87,5 +89,12 @@ public class OfertasLaboralesController {
 		}
 
 		return ResponseEntity.ok(postulacionesPorDiaStringKey);
+	}
+
+	@GetMapping("/empresario/{nombreUsuario}")
+	ResponseEntity<List<OfertasLaboralesDTO>> findEmpresarioByNombreUsuario(
+			@PathVariable("nombreUsuario") String nombreUsuario) {
+		List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findEmpresarioByNombreUsuario(nombreUsuario);
+		return ResponseEntity.ok(referencias);
 	}
 }
