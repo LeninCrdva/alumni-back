@@ -176,5 +176,11 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 						Collectors.counting()
 				));
 	}
+	 public List<Graduado> findGraduadosByOfertaId(Long ofertaId) {
+	        return ofertasLaboralesRepository.findGraduadosByOfertaId(ofertaId);
+	    }
+	 public List<OfertasLaborales> findOfertasByNombreEmpresa(String nombreEmpresa) {
+	        return ofertasLaboralesRepository.findOfertasByNombreEmpresa(nombreEmpresa);
+	    }
 
 }

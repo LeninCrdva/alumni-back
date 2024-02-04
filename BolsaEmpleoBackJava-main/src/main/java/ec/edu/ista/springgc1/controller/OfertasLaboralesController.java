@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
+import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 
@@ -109,4 +110,13 @@ public class OfertasLaboralesController {
 
 		return ResponseEntity.ok(cargosConOfertas);
 	}
+	  @GetMapping("/graduados/{ofertaId}")
+	    ResponseEntity<List<Graduado>> findGraduadosByOfertaId(@PathVariable Long ofertaId) {
+	        return ResponseEntity.ok(ofertasLaboralesService.findGraduadosByOfertaId(ofertaId));
+	    }
+
+	    @GetMapping("/empresa/{nombreEmpresa}")
+	    ResponseEntity<List<OfertasLaborales>> findOfertasByNombreEmpresa(@PathVariable String nombreEmpresa) {
+	        return ResponseEntity.ok(ofertasLaboralesService.findOfertasByNombreEmpresa(nombreEmpresa));
+	    }
 }
