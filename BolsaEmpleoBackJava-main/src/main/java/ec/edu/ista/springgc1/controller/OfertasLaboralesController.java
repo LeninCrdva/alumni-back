@@ -97,4 +97,16 @@ public class OfertasLaboralesController {
 		List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findEmpresarioByNombreUsuario(nombreUsuario);
 		return ResponseEntity.ok(referencias);
 	}
+	@GetMapping("/cargos-con-ofertas")
+	ResponseEntity<Map<String, Long>> getCargosConOfertas() {
+		List<OfertasLaboralesDTO> ofertasLaboralesDTOList = ofertasLaboralesService.findAll();
+		Map<String, Long> cargosConOfertas = new HashMap<>();
+
+		for (OfertasLaboralesDTO ofertaLaboralDTO : ofertasLaboralesDTOList) {
+			String cargo = ofertaLaboralDTO.getCargo().toLowerCase().replace(" ", ""); // Normaliza el cargo
+			cargosConOfertas.merge(cargo, 1L, Long::sum);
+		}
+
+		return ResponseEntity.ok(cargosConOfertas);
+	}
 }

@@ -166,4 +166,15 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 		List<OfertasLaborales> referencias = ofertasLaboralesRepository.buscarOfertasPorNombreUsuario(nombreUsuario);
 		return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
 	}
+
+	public Map<String, Long> getCargosConOfertas() {
+		List<OfertasLaboralesDTO> ofertasLaboralesDTOList = findAll();
+
+		return ofertasLaboralesDTOList.stream()
+				.collect(Collectors.groupingBy(
+						oferta -> oferta.getCargo().toLowerCase().replace(" ", ""),
+						Collectors.counting()
+				));
+	}
+
 }
