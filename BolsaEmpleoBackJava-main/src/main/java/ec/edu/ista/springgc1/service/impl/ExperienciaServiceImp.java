@@ -33,7 +33,7 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 				.orElseThrow(() -> new ResourceNotFoundException("De Graduado", experienciaDTO.getInstitucionNombre()));
 
 		experiencia.setId(experienciaDTO.getId());
-		experiencia.setGraduado(graduado);
+		experiencia.setCedulaGraduado(graduado);
 		experiencia.setInstitucionNombre(experienciaDTO.getInstitucionNombre());
 		experiencia.setActividad(experienciaDTO.getActividad());
 		experiencia.setCargo(experienciaDTO.getCargo());
@@ -46,7 +46,7 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 	public ExperienciaDTO mapToDTO(Experiencia experiencia) {
 		ExperienciaDTO experienciaDTO = new ExperienciaDTO();
 		experienciaDTO.setId(experiencia.getId());
-		experienciaDTO.setCedulaGraduado(experiencia.getGraduado().getUsuario().getPersona().getCedula());
+		experienciaDTO.setCedulaGraduado(experiencia.getCedulaGraduado().getUsuario().getPersona().getCedula());
 		experienciaDTO.setInstitucionNombre(experiencia.getInstitucionNombre());
 		experienciaDTO.setActividad(experiencia.getActividad());
 		experienciaDTO.setCargo(experiencia.getCargo());
@@ -80,7 +80,7 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 		// Obtener todos los graduados con experiencia
 		List<Experiencia> experiencias = experienciaRepository.findAll();
 		Set<Graduado> graduadosConExperiencia = experiencias.stream()
-				.map(Experiencia::getGraduado)
+				.map(Experiencia::getCedulaGraduado)
 				.collect(Collectors.toSet());
 
 		return new ArrayList<>(graduadosConExperiencia);

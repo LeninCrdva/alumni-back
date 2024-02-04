@@ -16,7 +16,7 @@ public class Experiencia {
 	private Long id;
 	@ManyToOne
 	@JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
-	private Graduado graduado;
+	private Graduado cedulaGraduado;
 	@ColumnTransformer(write = "UPPER(?)")
 	private String cargo;
 	@ColumnTransformer(write = "UPPER(?)")

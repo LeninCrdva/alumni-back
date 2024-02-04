@@ -24,7 +24,6 @@ import ec.edu.ista.springgc1.model.dto.ExperienciaDTO;
 import ec.edu.ista.springgc1.model.entity.Experiencia;
 import ec.edu.ista.springgc1.service.impl.ExperienciaServiceImp;
 
-
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/experiencias")
@@ -49,14 +48,13 @@ public class ExperienciaController {
 	}
 
 	@PutMapping("update/{id}")
-	public ResponseEntity<?> update(@PathVariable("id") Long id,
-			@Valid @RequestBody ExperienciaDTO experienciaDTO) {
+	public ResponseEntity<?> update(@PathVariable("id") Long id, @Valid @RequestBody ExperienciaDTO experienciaDTO) {
 		ExperienciaDTO currentExperiencie = experienciaServiceImp.findByIdToDTO(id);
 		currentExperiencie.setInstitucionNombre(experienciaDTO.getInstitucionNombre());
 		currentExperiencie.setActividad(experienciaDTO.getActividad());
 		currentExperiencie.setCargo(experienciaDTO.getCargo());
 		currentExperiencie.setDuracion(experienciaDTO.getDuracion());
-
+		currentExperiencie.setArea_trabajo(experienciaDTO.getArea_trabajo());
 
 		return ResponseEntity.status(HttpStatus.OK).body(experienciaServiceImp.save(currentExperiencie));
 	}
@@ -67,6 +65,7 @@ public class ExperienciaController {
 		experienciaServiceImp.delete(experiencia.getId());
 		return ResponseEntity.noContent().build();
 	}
+
 	@GetMapping("/graduados-con-experiencia")
 	ResponseEntity<?> getGraduadosConExperiencia() {
 		List<Graduado> graduadosConExperiencia = experienciaServiceImp.findGraduadosConExperiencia();
