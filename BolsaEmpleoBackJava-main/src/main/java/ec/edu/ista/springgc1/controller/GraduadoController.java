@@ -122,4 +122,8 @@ public class GraduadoController {
     ResponseEntity<List<?>> listWithOut() {
         return ResponseEntity.ok(estudianteService.findGRaduadoWithOutOfertas());
     }
+    @GetMapping("/all")
+    ResponseEntity<List<Graduado>> findAllGraduados() {
+        return ResponseEntity.ok(estudianteService.findAllGraduados());
+    }
 }

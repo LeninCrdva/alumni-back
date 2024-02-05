@@ -196,4 +196,9 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 	public List<Graduado> findGRaduadoWithOutOfertas(){
 		return graduadoRepository.findAllGraduadosWithoutOfertas();
 	}
+	 public List<Graduado> findAllGraduados() {
+	        return graduadoRepository.findAll().stream()
+	                .peek(e -> e.setUrl_pdf(e.getRuta_pdf() == null ? null : s3Service.getObjectUrl(e.getRuta_pdf())))
+	                .collect(Collectors.toList());
+	    }
 }
