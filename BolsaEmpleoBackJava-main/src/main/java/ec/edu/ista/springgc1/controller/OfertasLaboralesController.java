@@ -160,6 +160,11 @@ public class OfertasLaboralesController {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Contratacion no encontrada con ID: " + id);
 	        }
 	    }
+	    @GetMapping("/ofertaLaboral/{ofertaLaboralId}")
+	    public ResponseEntity<List<Contratacion>> getContratacionesPorOfertaLaboral(@PathVariable Long ofertaLaboralId) {
+	        List<Contratacion> contrataciones = ofertasLaboralesService.getContratacionesPorOfertaLaboral(ofertaLaboralId);
+	        return ResponseEntity.ok(contrataciones);
+	    }
 
 
 

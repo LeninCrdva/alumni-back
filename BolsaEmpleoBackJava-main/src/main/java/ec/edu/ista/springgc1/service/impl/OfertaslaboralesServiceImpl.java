@@ -205,6 +205,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
 	     return contratacionRepository.save(contratacion);
 	 }
+	 public List<Contratacion> getContratacionesPorOfertaLaboral(Long ofertaLaboralId) {
+	        return contratacionRepository.findByOfertaLaboralId(ofertaLaboralId);
+	    }
 
 
 }
