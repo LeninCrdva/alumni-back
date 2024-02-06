@@ -181,7 +181,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
 		return ofertasLaboralesDTOList.stream()
 				.collect(Collectors.groupingBy(
-						oferta -> oferta.getCargo().toLowerCase().replace(" ", ""),
+						oferta -> oferta.getCargo().toLowerCase().trim(),
 						Collectors.counting()
 				));
 	}
