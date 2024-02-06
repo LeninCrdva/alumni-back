@@ -114,7 +114,7 @@ public class OfertasLaboralesController {
 		Map<String, Long> cargosConOfertas = new HashMap<>();
 
 		for (OfertasLaboralesDTO ofertaLaboralDTO : ofertasLaboralesDTOList) {
-			String cargo = ofertaLaboralDTO.getCargo().toLowerCase().replace(" ", ""); // Normaliza el cargo
+			String cargo = ofertaLaboralDTO.getCargo().toLowerCase().trim();
 			cargosConOfertas.merge(cargo, 1L, Long::sum);
 		}
 
