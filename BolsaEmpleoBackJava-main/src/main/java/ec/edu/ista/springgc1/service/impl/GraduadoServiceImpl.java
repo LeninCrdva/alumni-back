@@ -188,6 +188,13 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 		
 		return graduadoFromDb;
 	}
+	
+	public Graduado findByEmail(String email) {
+		Graduado graduado = graduadoRepository.findByEmailPersonal(email)
+				.orElseThrow(() -> new ResourceNotFoundException("Email de graduado: ", email));
+		
+		return graduado;
+	}
 
 	public Long countEstudiantes() {
 		return graduadoRepository.count();

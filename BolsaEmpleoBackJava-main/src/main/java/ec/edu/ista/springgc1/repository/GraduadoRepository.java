@@ -24,4 +24,6 @@ public interface GraduadoRepository extends GenericRepository<Graduado> {
 
 	@Query("SELECT g FROM Graduado g LEFT JOIN g.ofertas o WHERE o IS NULL")
 	List<Graduado> findAllGraduadosWithoutOfertas();
+	
+	Optional<Graduado> findByEmailPersonal(String emailPersonal);
 }

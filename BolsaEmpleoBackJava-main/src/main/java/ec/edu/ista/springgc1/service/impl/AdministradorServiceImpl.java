@@ -95,5 +95,10 @@ public class AdministradorServiceImpl  extends GenericServiceImpl<Administrador 
 	        return adminrepository.findAll();
 	    }
 
-	   
+	   public Administrador findByEmail(String email) {
+		   Administrador adminw = adminrepository.findByEmail(email)
+    			   .orElseThrow(() -> new ResourceNotFoundException("id_usuario", email));
+		   
+		   return adminw;
+	   }
 }
