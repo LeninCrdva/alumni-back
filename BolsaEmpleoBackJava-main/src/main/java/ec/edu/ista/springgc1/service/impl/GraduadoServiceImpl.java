@@ -167,6 +167,35 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         
         return mapToDTO(graduadoRepository.save(graduadoFromDb));
 	}
+	
+	public GraduadoDTO updatePostulacion(Long idGraduado, Long ofertas) {
+		Graduado estudiante = graduadoRepository.findById(idGraduado)
+				.orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
+
+		GraduadoDTO graduadoFromDb= mapToDTO(estudiante);
+		
+		graduadoFromDb.getIdOferta().add(ofertas);
+		
+		return graduadoFromDb;
+	}
+	
+	public GraduadoDTO cancelPostulacion(Long idGraduado, Long ofertas) {
+		Graduado estudiante = graduadoRepository.findById(idGraduado)
+				.orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
+
+		GraduadoDTO graduadoFromDb= mapToDTO(estudiante);
+		
+		graduadoFromDb.getIdOferta().remove(ofertas);
+		
+		return graduadoFromDb;
+	}
+	
+	public Graduado findByEmail(String email) {
+		Graduado graduado = graduadoRepository.findByEmailPersonal(email)
+				.orElseThrow(() -> new ResourceNotFoundException("Email de graduado: ", email));
+		
+		return graduado;
+	}
 
 	public Long countEstudiantes() {
 		return graduadoRepository.count();
