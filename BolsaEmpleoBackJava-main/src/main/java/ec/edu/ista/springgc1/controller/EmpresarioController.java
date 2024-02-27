@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.controller;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +40,11 @@ public class EmpresarioController {
     }
 
 
-    @GetMapping("/usuario/{id}")
-    ResponseEntity<?> findByUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(emprendimientoService.findByUsuario(id));
+    @GetMapping("/usuario/{usuario}")
+    ResponseEntity<?> findByUserUsername(@PathVariable String usuario) {
+        return ResponseEntity.ok(emprendimientoService.findByUsuario(usuario));
     }
+
 
    
     @PostMapping
@@ -60,9 +62,14 @@ public class EmpresarioController {
 
     @DeleteMapping("/{id}")
     ResponseEntity<?> delete(@PathVariable Long id) {
-    	emprendimientoService.delete(id);
+        try {
+            emprendimientoService.delete(id);
             return ResponseEntity.ok("Empresa eliminada exitosamente.");
-       
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la empresa.");
+        }
     }
 
 }

@@ -2,9 +2,11 @@ package ec.edu.ista.springgc1.service.impl;
 
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
+import javax.persistence.NonUniqueResultException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,7 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 		        empresario.setAnios(empresarioDTO.getAnios());
 		        empresario.setPuesto(empresarioDTO.getPuesto());
 		        empresario.setEmail(empresarioDTO.getEmail());
+		        empresario.setDescripcion(empresarioDTO.getDescripcion());
 		       
 		       
 		       
@@ -55,7 +58,8 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 		    	empresarioDTO.setPuesto(empresario.getPuesto());
 		    	empresarioDTO.setEstado(empresario.isEstado());
 		    	empresarioDTO.setAnios(empresario.getAnios());
-		       empresarioDTO.setEmail(empresario.getEmail());	
+		       empresarioDTO.setEmail(empresario.getEmail());
+		       empresarioDTO.setDescripcion(empresario.getDescripcion());
 		        return empresarioDTO;
 		    }
 		    @Override
@@ -77,14 +81,19 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 
 
 
-		    public EmpresarioDTO findByUsuario(long id_usuario) {
+		    public Optional<Empresario> findByUsuario(String username) {
+		        List<Empresario> empresarios = empresariorepository.findByUsuario(username);
 
-		    	Empresario empresario = empresariorepository.findByUsuario(id_usuario)
-		    			   .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
-
-		                
-		        return mapToDTO(empresario);
+		        if (empresarios.size() == 1) {
+		            return Optional.of(empresarios.get(0));
+		        } else if (empresarios.isEmpty()) {
+		            return Optional.empty();
+		        } else {
+		            
+		            throw new NonUniqueResultException("La consulta devolvió más de un resultado.");
+		        }
 		    }
+
 
 		  
 
@@ -111,6 +120,7 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
 		        existingEmpresario.setAnios(updatedEmpresarioDTO.getAnios());
 		        existingEmpresario.setPuesto(updatedEmpresarioDTO.getPuesto());
 		        existingEmpresario.setEmail(updatedEmpresarioDTO.getEmail());
+		        existingEmpresario.setDescripcion(updatedEmpresarioDTO.getDescripcion());
 		        return mapToDTO(empresariorepository.save(existingEmpresario));
 		    }
 		  

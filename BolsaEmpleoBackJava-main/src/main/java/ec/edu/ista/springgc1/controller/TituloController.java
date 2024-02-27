@@ -60,21 +60,24 @@ public class TituloController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TituloDTO e) {
-    	TituloDTO tituloFromDb = tituloService.findByIdToDTO(id);
-        
-    	tituloFromDb.setFecha_emision(e.getFecha_emision());
-    	tituloFromDb.setFecha_registro(e.getFecha_registro());
-    	tituloFromDb.setIdgraduado(e.getIdgraduado());
-    	tituloFromDb.setInstitucion(e.getInstitucion());
-    	tituloFromDb.setNivel(e.getInstitucion());
-    	tituloFromDb.setNombre_titulo(e.getNombre_titulo());
-    	tituloFromDb.setNombrecarrera(e.getNombrecarrera());
-   
-    	tituloFromDb.setNum_registro(e.getNum_registro());
-    	tituloFromDb.setTipo(e.getTipo());
+        TituloDTO tituloFromDb = tituloService.findByIdToDTO(id);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(tituloService.save(tituloFromDb));
+        tituloFromDb.setFecha_emision(e.getFecha_emision());
+        tituloFromDb.setFecha_registro(e.getFecha_registro());
+        tituloFromDb.setIdgraduado(e.getIdgraduado());
+        tituloFromDb.setInstitucion(e.getInstitucion());
+        tituloFromDb.setNivel(e.getInstitucion());
+        tituloFromDb.setNombre_titulo(e.getNombre_titulo());
+        tituloFromDb.setNombrecarrera(e.getNombrecarrera());
+        tituloFromDb.setNum_registro(e.getNum_registro());
+        tituloFromDb.setTipo(e.getTipo());
+
+        // Utiliza el método update del servicio para actualizar la instancia existente
+        Titulo updatedTitulo = tituloService.update(id, tituloFromDb);
+
+        return ResponseEntity.status(HttpStatus.OK).body(updatedTitulo);
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {

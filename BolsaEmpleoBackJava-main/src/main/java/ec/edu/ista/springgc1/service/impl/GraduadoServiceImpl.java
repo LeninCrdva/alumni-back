@@ -107,7 +107,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
 	public GraduadoDTO findByUsuario(long id_usuario) {
 
-		Graduado estudiante = graduadoRepository.findByUsuario(id_usuario)
+		Graduado estudiante = graduadoRepository.findByUsuarioId(id_usuario)
 				.orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
 		estudiante
 				.setUrl_pdf(estudiante.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudiante.getRuta_pdf()));
@@ -125,7 +125,6 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 	    
 	    List<OfertasLaborales> ofertas = graduado.getOfertas();
 	    
-	    System.out.println(ofertas.get(1).getEmpresa().getNombre());
 	    return ofertas;
 	}
 
@@ -201,4 +200,12 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 		return graduadoRepository.count();
 	}
 
+	public List<Graduado> findGRaduadoWithOutOfertas(){
+		return graduadoRepository.findAllGraduadosWithoutOfertas();
+	}
+	 public List<Graduado> findAllGraduados() {
+	        return graduadoRepository.findAll().stream()
+	                .peek(e -> e.setUrl_pdf(e.getRuta_pdf() == null ? null : s3Service.getObjectUrl(e.getRuta_pdf())))
+	                .collect(Collectors.toList());
+	    }
 }

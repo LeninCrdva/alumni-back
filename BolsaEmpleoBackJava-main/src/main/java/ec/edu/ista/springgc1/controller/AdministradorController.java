@@ -70,4 +70,9 @@ public class AdministradorController {
     	adminService.delete(adminFromDb.getId());
         return ResponseEntity.noContent().build();
     }
+    @GetMapping("/todos")
+    ResponseEntity<List<Administrador>> findAllAdministradores() {
+        return ResponseEntity.ok(adminService.findAllAdministradores());
+    }
+
 }

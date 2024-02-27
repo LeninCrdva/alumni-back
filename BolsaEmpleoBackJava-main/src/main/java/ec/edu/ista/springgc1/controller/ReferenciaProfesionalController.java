@@ -38,22 +38,24 @@ public class ReferenciaProfesionalController {
 
 	@PostMapping
 	public ResponseEntity<?> create(@Valid @RequestBody ReferenciaProfesionalDTO referenciaProfesionalDTO) {
-		//return ResponseEntity.status(HttpStatus.CREATED)
-			//	.body(referenciaProfesionalService.save(referenciaProfesionalDTO));
-		return ResponseEntity.status(HttpStatus.CREATED).body(referenciaProfesionalService.save(referenciaProfesionalDTO));
+		// return ResponseEntity.status(HttpStatus.CREATED)
+		// .body(referenciaProfesionalService.save(referenciaProfesionalDTO));
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(referenciaProfesionalService.save(referenciaProfesionalDTO));
 	}
 
 	@PutMapping("/{id}")
 	public ResponseEntity<?> update(@PathVariable("id") Long id,
 			@Valid @RequestBody ReferenciaProfesionalDTO referenciaProfesionalDTO) {
-		
+
 		ReferenciaProfesionalDTO currentProfesionalReference = referenciaProfesionalService.findByIdToDTO(id);
 
-		currentProfesionalReference.setNombreReferencia(referenciaProfesionalDTO.getNombreReferencia());
-		currentProfesionalReference.setNombreInstitucion(referenciaProfesionalDTO.getNombreInstitucion());
+		currentProfesionalReference.setNombre(referenciaProfesionalDTO.getNombre());
+		currentProfesionalReference.setInstitucion(referenciaProfesionalDTO.getInstitucion());
 		currentProfesionalReference.setEmail(referenciaProfesionalDTO.getEmail());
 
-		return ResponseEntity.status(HttpStatus.OK).body(referenciaProfesionalService.save(currentProfesionalReference));
+		return ResponseEntity.status(HttpStatus.OK)
+				.body(referenciaProfesionalService.save(currentProfesionalReference));
 	}
 
 	@DeleteMapping("/{id}")
@@ -61,6 +63,13 @@ public class ReferenciaProfesionalController {
 		ReferenciaProfesional referenciaProfesional = referenciaProfesionalService.findById(id);
 		referenciaProfesionalService.delete(referenciaProfesional.getId());
 		return ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/usuario/{nombreUsuario}")
+	ResponseEntity<List<ReferenciaProfesionalDTO>> findByNombreUsuario(
+			@PathVariable("nombreUsuario") String nombreUsuario) {
+		List<ReferenciaProfesionalDTO> referencias = referenciaProfesionalService.findByNombreUsuario(nombreUsuario);
+		return ResponseEntity.ok(referencias);
 	}
 
 }

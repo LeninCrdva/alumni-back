@@ -91,7 +91,9 @@ public class AdministradorServiceImpl  extends GenericServiceImpl<Administrador 
 	        return adminrepository.save(mapToEntity((AdminDTO) entity));
 	    }
 	 
-	 
+	    public List<Administrador> findAllAdministradores() {
+	        return adminrepository.findAll();
+	    }
 
 	   public Administrador findByEmail(String email) {
 		   Administrador adminw = adminrepository.findByEmail(email)

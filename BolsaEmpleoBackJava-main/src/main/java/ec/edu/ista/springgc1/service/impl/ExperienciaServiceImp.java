@@ -1,6 +1,8 @@
 package ec.edu.ista.springgc1.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,12 +33,12 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 				.orElseThrow(() -> new ResourceNotFoundException("De Graduado", experienciaDTO.getInstitucionNombre()));
 
 		experiencia.setId(experienciaDTO.getId());
-		experiencia.setGraduado(graduado);
-		experiencia.setInstitucion(experienciaDTO.getInstitucionNombre());
+		experiencia.setCedulaGraduado(graduado);
+		experiencia.setInstitucionNombre(experienciaDTO.getInstitucionNombre());
 		experiencia.setActividad(experienciaDTO.getActividad());
 		experiencia.setCargo(experienciaDTO.getCargo());
 		experiencia.setDuracion(experienciaDTO.getDuracion());
-
+		experiencia.setArea_trabajo(experienciaDTO.getArea_trabajo());
 		return experiencia;
 	}
 
@@ -44,11 +46,12 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 	public ExperienciaDTO mapToDTO(Experiencia experiencia) {
 		ExperienciaDTO experienciaDTO = new ExperienciaDTO();
 		experienciaDTO.setId(experiencia.getId());
-		experienciaDTO.setCedulaGraduado(experiencia.getGraduado().getUsuario().getPersona().getCedula());
-		experienciaDTO.setInstitucionNombre(experiencia.getInstitucion());
+		experienciaDTO.setCedulaGraduado(experiencia.getCedulaGraduado().getUsuario().getPersona().getCedula());
+		experienciaDTO.setInstitucionNombre(experiencia.getInstitucionNombre());
 		experienciaDTO.setActividad(experiencia.getActividad());
 		experienciaDTO.setCargo(experiencia.getCargo());
 		experienciaDTO.setDuracion(experiencia.getDuracion());
+		experienciaDTO.setArea_trabajo(experiencia.getArea_trabajo());
 		return experienciaDTO;
 	}
 
@@ -73,4 +76,25 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 	public Experiencia save(Object entity) {
 		return experienciaRepository.save(mapToEntity((ExperienciaDTO) entity));
 	}
+	public List<Graduado> findGraduadosConExperiencia() {
+		// Obtener todos los graduados con experiencia
+		List<Experiencia> experiencias = experienciaRepository.findAll();
+		Set<Graduado> graduadosConExperiencia = experiencias.stream()
+				.map(Experiencia::getCedulaGraduado)
+				.collect(Collectors.toSet());
+
+		return new ArrayList<>(graduadosConExperiencia);
+	}
+
+	public long countGraduadosSinExperiencia() {
+		// Obtener todos los graduados
+		List<Graduado> todosGraduados = graduadoRepository.findAll();
+
+		// Obtener los graduados con experiencia
+		List<Graduado> graduadosConExperiencia = findGraduadosConExperiencia();
+
+		// Contar cuántos graduados no tienen experiencia
+		return todosGraduados.size() - graduadosConExperiencia.size();
+	}
+
 }

@@ -19,6 +19,7 @@ import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityExistsException;
@@ -43,8 +44,8 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa > implements 
 	SectorEmpresarial emp=sectorrepository.findByNombre(d.getSectorEmpresarial().getNombre())
 			   .orElseThrow(() -> new ResourceNotFoundException("Sector empresarial", d.getCiudad().getNombre()));
 	
-	Empresario empresario = empresariorepository.findById(d.getEmpresario().getId())
-             .orElseThrow(() -> new ResourceNotFoundException("Empresario", String.valueOf(d.getEmpresario().getId())));
+	Empresario empresario = empresariorepository.findByUsuarioNombreUsuarioIgnoreCase(d.getEmpresario())
+             .orElseThrow(() -> new ResourceNotFoundException("Empresario", String.valueOf(d.getEmpresario())));
      em.setId(d.getId());
      em.setCiudad(ci);
      em.setSectorEmpresarial(emp);
@@ -66,7 +67,7 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa > implements 
 			em1.setId(e.getId());
 			em1.setArea(e.getArea());
 			em1.setCiudad(e.getCiudad());
-			em1.setEmpresario(e.getEmpresario());
+			em1.setEmpresario(e.getEmpresario().getUsuario().getNombreUsuario());
 			em1.setNombre(e.getNombre());
 			em1.setRazonSocial(e.getRazonSocial());
 			em1.setRuc(e.getRuc());
@@ -117,6 +118,10 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa > implements 
 	    
 	    public void delete(Long id) {
 	        empresarepository.deleteById(id);
+	    }
+	    public Set<EmpresaDTO> findByNombreUsuario(String nombreUsuario) {
+	        Set<Empresa> empresas = empresarepository.findByNombreUsuario(nombreUsuario);
+	        return empresas.stream().map(this::mapToDTO).collect(Collectors.toSet());
 	    }
 	  
 

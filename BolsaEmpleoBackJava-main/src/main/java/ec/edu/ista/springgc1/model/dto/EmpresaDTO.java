@@ -12,7 +12,7 @@ import lombok.Data;
 public class EmpresaDTO implements Serializable{
 	 private Long id;
 
-	 private Empresario empresario;
+	 private String empresario;
 
 	 private Ciudad ciudad;
 	 
@@ -44,7 +44,7 @@ public class EmpresaDTO implements Serializable{
 	        this.ubicacion= ubicacion;
 	    }*/
 	    //listar y buscar
-	    public EmpresaDTO(Long id, String ruc, String nombre, String tipoEmpresa, String razonSocial, String area, String sitioWeb, Ciudad ciudad, SectorEmpresarial sectorEmpresarial, Empresario empresario,String ubicacion) {
+	    public EmpresaDTO(Long id, String ruc, String nombre, String tipoEmpresa, String razonSocial, String area, String sitioWeb, Ciudad ciudad, SectorEmpresarial sectorEmpresarial, String empresario,String ubicacion) {
 	        this.id = id;
 	        this.ruc = ruc;
 	        this.nombre = nombre;
