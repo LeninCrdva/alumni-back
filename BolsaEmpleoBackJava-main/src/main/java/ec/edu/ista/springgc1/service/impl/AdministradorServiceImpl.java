@@ -19,86 +19,80 @@ import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
 @Service
-public class AdministradorServiceImpl  extends GenericServiceImpl<Administrador > implements Mapper<Administrador, AdminDTO>{
-	@Autowired
-	private AdministradorRepository adminrepository;
-	  @Autowired
-	    private UsuarioRepository usuarioRepository;
+public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> implements Mapper<Administrador, AdminDTO> {
+    @Autowired
+    private AdministradorRepository adminrepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
 
-	    @Override
-	    public Administrador mapToEntity(AdminDTO adminDTO) {
-	    	Administrador admin = new Administrador();
+    @Override
+    public Administrador mapToEntity(AdminDTO adminDTO) {
+        Administrador admin = new Administrador();
 
-	        Usuario usuario = usuarioRepository.findBynombreUsuario(adminDTO.getUsuario())
-	                .orElseThrow(() -> new ResourceNotFoundException("usuario", adminDTO.getUsuario()));
+        Usuario usuario = usuarioRepository.findBynombreUsuario(adminDTO.getUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("usuario", adminDTO.getUsuario()));
 
-	        admin.setId(adminDTO.getId());
-	        admin.setUsuario(usuario);
-	        admin.setEstado(adminDTO.isEstado());
-	        admin.setEmail(adminDTO.getEmail());
-	        admin.setCargo(adminDTO.getCargo());
-	       
-	       
-	       
-
-	        return admin;
-	    }
-
-	    @Override
-	    public AdminDTO mapToDTO(Administrador admin) {
-	        AdminDTO adminDTO = new AdminDTO();
-	        adminDTO.setId(admin.getId());
-	    	adminDTO.setUsuario(admin.getUsuario().getNombreUsuario());
-	    	adminDTO.setEstado(admin.isEstado());
-            adminDTO.setEmail(admin.getEmail());
-            adminDTO.setCargo(admin.getCargo());
-	        return adminDTO;
-	    }
-	    @Override
-	    public List findAll() {
-	        return adminrepository.findAll()
-	                .stream()
-	                .map(c -> mapToDTO(c))
-	                .collect(Collectors.toList());
-	    }
-	    public AdminDTO findByIdToDTO(Long id) {
-	    	Administrador admin = adminrepository.findById(id)
-	                .orElseThrow(() -> new ResourceNotFoundException("id", id));
-
-	        return mapToDTO(admin);
-	    }
+        admin.setId(adminDTO.getId());
+        admin.setUsuario(usuario);
+        admin.setEstado(adminDTO.isEstado());
+        admin.setEmail(adminDTO.getEmail());
+        admin.setCargo(adminDTO.getCargo());
 
 
-	   
+        return admin;
+    }
+
+    @Override
+    public AdminDTO mapToDTO(Administrador admin) {
+        AdminDTO adminDTO = new AdminDTO();
+        adminDTO.setId(admin.getId());
+        adminDTO.setUsuario(admin.getUsuario().getNombreUsuario());
+        adminDTO.setEstado(admin.isEstado());
+        adminDTO.setEmail(admin.getEmail());
+        adminDTO.setCargo(admin.getCargo());
+        return adminDTO;
+    }
+
+    @Override
+    public List findAll() {
+        return adminrepository.findAll()
+                .stream()
+                .map(c -> mapToDTO(c))
+                .collect(Collectors.toList());
+    }
+
+    public AdminDTO findByIdToDTO(Long id) {
+        Administrador admin = adminrepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("id", id));
+
+        return mapToDTO(admin);
+    }
 
 
+    public AdminDTO findByUsuario(long id_usuario) {
 
-	    public AdminDTO findByUsuario(long id_usuario) {
+        Administrador adminw = adminrepository.findByUsuario(id_usuario)
+                .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
 
-	    	Administrador adminw = adminrepository.findByUsuario(id_usuario)
-	    			   .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
 
-	                
-	        return mapToDTO(adminw);
-	    }
+        return mapToDTO(adminw);
+    }
 
-	  
 
-	    @Override
-	    public Administrador save(Object entity) {
+    @Override
+    public Administrador save(Object entity) {
 
-	        return adminrepository.save(mapToEntity((AdminDTO) entity));
-	    }
-	 
-	    public List<Administrador> findAllAdministradores() {
-	        return adminrepository.findAll();
-	    }
+        return adminrepository.save(mapToEntity((AdminDTO) entity));
+    }
 
-	   public Administrador findByEmail(String email) {
-		   Administrador adminw = adminrepository.findByEmail(email)
-    			   .orElseThrow(() -> new ResourceNotFoundException("id_usuario", email));
-		   
-		   return adminw;
-	   }
+    public List<Administrador> findAllAdministradores() {
+        return adminrepository.findAll();
+    }
+
+    public Administrador findByEmail(String email) {
+
+        return adminrepository.findByEmail(email)
+                .orElse(null);
+    }
 }

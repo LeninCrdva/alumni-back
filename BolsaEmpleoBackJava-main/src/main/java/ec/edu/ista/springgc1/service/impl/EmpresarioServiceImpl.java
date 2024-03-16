@@ -120,8 +120,6 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
     }
 
     public Empresario findByEmail(String email) {
-        return empresariorepository.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("Email de empresario: ", email)
-        );
+        return empresariorepository.findByEmail(email).orElse(null);
     }
 }
