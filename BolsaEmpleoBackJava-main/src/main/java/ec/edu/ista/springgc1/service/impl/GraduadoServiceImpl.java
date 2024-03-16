@@ -193,7 +193,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
     public Graduado findByEmail(String email) {
         return graduadoRepository.findByEmailPersonal(email)
-                .orElse(null);
+                .orElse(new Graduado());
     }
 
     public Long countEstudiantes() {

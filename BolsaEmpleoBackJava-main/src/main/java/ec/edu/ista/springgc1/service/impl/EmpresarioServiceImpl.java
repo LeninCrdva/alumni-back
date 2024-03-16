@@ -120,6 +120,6 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
     }
 
     public Empresario findByEmail(String email) {
-        return empresariorepository.findByEmail(email).orElse(null);
+        return empresariorepository.findByEmail(email).orElse(new Empresario());
     }
 }

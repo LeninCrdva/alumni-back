@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -63,14 +64,14 @@ public class EmailController {
     @PostMapping("/recovery-password")
     public ResponseEntity<?> recoveryPassword(@RequestBody MailRequest request) {
         Graduado graduado = graduadoService.findByEmail(request.getTo());
-        Empresario empresario = graduado == null ? empresarioService.findByEmail(request.getTo()) : null;
-        Administrador administrador = (graduado == null && empresario == null) ? administradorService.findByEmail(request.getTo()) : null;
+        Empresario empresario = StringUtils.hasText(graduado.getEmailPersonal()) ? empresarioService.findByEmail(request.getTo()) : new Empresario();
+        Administrador administrador = (!StringUtils.hasText(graduado.getEmailPersonal()) && !StringUtils.hasText(empresario.getEmail())) ? administradorService.findByEmail(request.getTo()) : new Administrador();
 
-        if (graduado != null) {
+        if (!StringUtils.hasText(graduado.getEmailPersonal())) {
             return createResponse(graduado.getUsuario(), request);
-        } else if (empresario != null) {
+        } else if (!StringUtils.hasText(empresario.getEmail())) {
             return createResponse(empresario.getUsuario(), request);
-        } else if (administrador != null) {
+        } else if (!StringUtils.hasText(administrador.getEmail())) {
             return createResponse(administrador.getUsuario(), request);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");

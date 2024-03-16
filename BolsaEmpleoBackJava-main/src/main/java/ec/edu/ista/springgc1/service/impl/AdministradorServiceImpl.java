@@ -93,6 +93,6 @@ public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> 
     public Administrador findByEmail(String email) {
 
         return adminrepository.findByEmail(email)
-                .orElse(null);
+                .orElse(new Administrador());
     }
 }
