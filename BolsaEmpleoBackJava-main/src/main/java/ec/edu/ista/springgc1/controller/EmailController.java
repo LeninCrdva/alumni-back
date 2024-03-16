@@ -67,11 +67,11 @@ public class EmailController {
         Empresario empresario = StringUtils.hasText(graduado.getEmailPersonal()) ? empresarioService.findByEmail(request.getTo()) : new Empresario();
         Administrador administrador = (!StringUtils.hasText(graduado.getEmailPersonal()) && !StringUtils.hasText(empresario.getEmail())) ? administradorService.findByEmail(request.getTo()) : new Administrador();
 
-        if (!StringUtils.hasText(graduado.getEmailPersonal())) {
+        if (StringUtils.hasText(graduado.getEmailPersonal())) {
             return createResponse(graduado.getUsuario(), request);
-        } else if (!StringUtils.hasText(empresario.getEmail())) {
+        } else if (StringUtils.hasText(empresario.getEmail())) {
             return createResponse(empresario.getUsuario(), request);
-        } else if (!StringUtils.hasText(administrador.getEmail())) {
+        } else if (StringUtils.hasText(administrador.getEmail())) {
             return createResponse(administrador.getUsuario(), request);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
