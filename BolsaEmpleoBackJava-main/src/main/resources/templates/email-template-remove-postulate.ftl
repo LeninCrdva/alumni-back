@@ -18,13 +18,13 @@
 </head>
 
 <body>
-    <table width="100%" border="0" cellspacing="0" cellpadding="0">
+    <table>
         <tr>
-            <td align="center" valign="top" style="background-color: white;"><br> <br>
-                <table width="600" border="0" cellspacing="0" cellpadding="0">
+            <td style="background-color: white;"><br> <br>
+                <table>
                     <tr>
-                        <td align="center" valign="top"
-                            style="background-color: white; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #000000; padding: 0px 15px 10px 15px;">
+                        <td
+                            style="background-color: white; font-family: Arial, Helvetica, sans-serif; font-size: 13px; color: #000000; padding: 0 15px 10px 15px;">
 
                             <body>
                                 <div class="center-icon">

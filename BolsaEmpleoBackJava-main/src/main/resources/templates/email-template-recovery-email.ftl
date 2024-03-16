@@ -14,7 +14,7 @@
             color: black;
         }
         
-        .center-icon a button::hover {
+        .center-icon a button:hover {
             cursor: pointer;
         }
 
@@ -82,7 +82,7 @@
                                     <p>Copyright (C) 2024 <strong>Instituto Tecnológico del Azuay</strong>. All rights
                                         reserved.</p>
                                     <p>Octavio Chacón Moscoso 1-98 y Primera Transversal (Parque industrial)</p>
-                                    <p>${graduado.ciudad.nombre}, ${graduado.ciudad.provincia.nombre}</p><br>
+                                    <p>Cuenca, Azuay</p>
                                     <p>Teléfono: 07 2809 551 - 0995363076</p>
                                     <p>O contáctanos a nuestro correo: info.alumni.est@gmail.com</p>
                                 </small>

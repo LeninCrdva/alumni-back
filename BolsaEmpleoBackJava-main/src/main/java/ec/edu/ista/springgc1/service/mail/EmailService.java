@@ -62,16 +62,7 @@ public class EmailService {
 			Template t = getTemplate(emailCase);
 
 			if (t != null) {
-				String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
-
-				helper.setTo(request.getTo());
-				helper.setText(html, true);
-				helper.setSubject(request.getSubject());
-				helper.setFrom(request.getFrom());
-				sender.send(message);
-
-				response.setMessage("Email enviado a: " + request.getTo());
-				response.setStatus(Boolean.TRUE);
+				getHtml(request, model, response, message, helper, t);
 			} else {
 				response.setMessage("No se pudo enviar el correo, no hay caso específico");
 				response.setStatus(Boolean.FALSE);
@@ -99,22 +90,26 @@ public class EmailService {
 			Template t = getTemplate(emailCase);
 
 			model.put("URL", activationUrl);
-			String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
-
-			helper.setTo(request.getTo());
-			helper.setText(html, true);
-			helper.setSubject(request.getSubject());
-			helper.setFrom(request.getFrom());
-			sender.send(message);
-
-			response.setMessage("Email enviado a: " + request.getTo());
-			response.setStatus(Boolean.TRUE);
+			getHtml(request, model, response, message, helper, t);
 		} catch (MessagingException | IOException | TemplateException e) {
 			response.setMessage("Fallo al enviar email: " + e.getMessage());
 			response.setStatus(Boolean.FALSE);
 		}
 
 		return response;
+	}
+
+	private void getHtml(MailRequest request, Map<String, Object> model, MailResponse response, MimeMessage message, MimeMessageHelper helper, Template t) throws IOException, TemplateException, MessagingException {
+		String html = FreeMarkerTemplateUtils.processTemplateIntoString(t, model);
+
+		helper.setTo(request.getTo());
+		helper.setText(html, true);
+		helper.setSubject(request.getSubject());
+		helper.setFrom(request.getFrom());
+		sender.send(message);
+
+		response.setMessage("Email enviado a: " + request.getTo());
+		response.setStatus(Boolean.TRUE);
 	}
 
 	private Template getTemplate(String emailCase) {
@@ -135,7 +130,7 @@ public class EmailService {
 					t = config.getTemplate("email-template-recovery-email.ftl");
 					break;
 				default:
-					t = null;
+					t = config.getTemplate("email-template-contact-us.ftl");
 					break;
 			}
 		} catch (IOException e) {
