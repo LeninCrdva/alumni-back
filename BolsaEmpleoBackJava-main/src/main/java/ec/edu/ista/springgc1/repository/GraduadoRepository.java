@@ -1,9 +1,11 @@
 package ec.edu.ista.springgc1.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import ec.edu.ista.springgc1.model.entity.Persona;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +28,6 @@ public interface GraduadoRepository extends GenericRepository<Graduado> {
 	List<Graduado> findAllGraduadosWithoutOfertas();
 	
 	Optional<Graduado> findByEmailPersonal(String emailPersonal);
+
+	Integer countAllByUsuarioPersonaSexo(Persona.Sex usuario_persona_sexo);
 }
