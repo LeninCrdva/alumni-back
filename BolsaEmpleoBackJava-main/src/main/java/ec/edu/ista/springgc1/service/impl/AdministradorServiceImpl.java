@@ -70,12 +70,11 @@ public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> 
     }
 
 
-    public AdminDTO findByUsuario(long id_usuario) {
+    public AdminDTO findByUsuario(Long id_usuario) {
 
-        Administrador adminw = adminrepository.findByUsuario(id_usuario)
+        Administrador adminw = adminrepository.findByUsuarioId(id_usuario)
                 .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
-
-
+        
         return mapToDTO(adminw);
     }
 
