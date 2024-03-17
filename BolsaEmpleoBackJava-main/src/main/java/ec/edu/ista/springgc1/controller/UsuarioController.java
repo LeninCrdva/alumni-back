@@ -49,6 +49,13 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PutMapping("/photo/{id}/{url_imagen}")
+    public ResponseEntity<?> updatePhoto(@PathVariable Long id, @PathVariable String url_imagen) {
+        Usuario usuario = usuarioService.updatePhoto(id, url_imagen);
+        return ResponseEntity.status(HttpStatus.OK).body(usuario);
+    }
+
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
