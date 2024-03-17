@@ -19,20 +19,18 @@ import org.hibernate.annotations.ColumnTransformer;
 @Entity
 @Table(name = "logro")
 public class Logro implements Serializable{
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_logro")
 	private Long id;
+
 	@ManyToOne
 	@JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
 	private Graduado graduado;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String descripcion;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String tipo;
 }

@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnTransformer;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -36,10 +37,12 @@ public class OfertasLaborales {
 	private double salario;
 	
 	@JsonView(View.Base.class)
+	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
 	private LocalDate fecha_cierre;
 	
 	@Column(name = "fechaPublicacion")
 	@JsonView(View.Base.class)
+	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
 	private LocalDate fechaPublicacion;
 	
 	@ColumnTransformer(write = "UPPER(?)")
@@ -51,6 +54,7 @@ public class OfertasLaborales {
 	private String experiencia;
 	
 	@JsonView(View.Base.class)
+	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
 	private LocalDate fecha_apertura;
 	
 	@JsonView(View.Base.class)

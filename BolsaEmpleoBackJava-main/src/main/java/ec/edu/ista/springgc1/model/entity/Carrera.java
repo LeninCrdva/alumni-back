@@ -16,18 +16,20 @@ import javax.persistence.Table;
 import org.hibernate.annotations.ColumnTransformer;
 
 import lombok.Data;
+
 @Data
 @Entity
-@Table(name="carrera")
+@Table(name = "carrera")
 public class Carrera {
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "id_carrera")
-	    private Long id;
-	  @ColumnTransformer(write = "UPPER(?)")
-	    private String nombre;
-	  @ColumnTransformer(write = "UPPER(?)")
-	    private String descripcion;
-	 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_carrera")
+    private Long id;
+
+    @ColumnTransformer(write = "UPPER(?)")
+    private String nombre;
+
+    @ColumnTransformer(write = "UPPER(?)")
+    private String descripcion;
 }
 

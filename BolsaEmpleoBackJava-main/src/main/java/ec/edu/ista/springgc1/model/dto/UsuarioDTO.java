@@ -16,17 +16,23 @@ import java.time.LocalDate;
 public class UsuarioDTO implements Serializable {
 
     private Long id;
+
     @NotEmpty
     private String nombreUsuario;
+
     @NotNull
     private String clave;
+
     @NotNull
     private String cedula;
 	
     @NotEmpty
     private String rol;
+
     @NotNull
     private boolean estado;
+
     private String ruta_imagen;
+
     private String url_imagen;
 }

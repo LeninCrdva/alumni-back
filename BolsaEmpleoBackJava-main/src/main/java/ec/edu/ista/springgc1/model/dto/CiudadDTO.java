@@ -9,8 +9,10 @@ import java.io.Serializable;
 public class CiudadDTO implements Serializable {
 
     private Long id;
+
     @NotEmpty
     private String nombre;
+
     @NotEmpty
     private String provincia;
 }
