@@ -91,32 +91,27 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
 	        return mapToDTO(t);
 	    }
 
-    public Titulo update(long id, TituloDTO e) {
+	  public Titulo update(long id, TituloDTO e) {
+	        Titulo tituloFromDb = titulorepository.findById(id)
+	                .orElseThrow(() -> new ResourceNotFoundException("id", id));
 
-        Titulo t = titulorepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("id", id));
-      
-        Graduado g= graduadoRepository.findById(e.getIdgraduado())
-        	    .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", e.getIdgraduado()));
-        	    Carrera c =  carrerarepository.findByNombre(e.getNombrecarrera())
-        	 .orElseThrow(() -> new ResourceNotFoundException("carrera:", e.getNombrecarrera()));
-        
-      
-        
-      
-       t.setCarrera(c);
-       t.setGraduado(g);
-       t.setFecha_emision(e.getFecha_emision());
-       t.setFecha_registro(e.getFecha_registro());
-       t.setInstitucion(e.getInstitucion());
-       t.setNivel(e.getNivel());
-       t.setNombre_titulo(e.getNombre_titulo());
-       t.setNum_registro(e.getNum_registro());
-       t.setTipo(e.getTipo());
-     
-        return titulorepository.save(t);
+	        Graduado graduado = graduadoRepository.findById(e.getIdgraduado())
+	                .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", e.getIdgraduado()));
+	        Carrera carrera = carrerarepository.findByNombre(e.getNombrecarrera())
+	                .orElseThrow(() -> new ResourceNotFoundException("carrera:", e.getNombrecarrera()));
 
-    }
+	        tituloFromDb.setGraduado(graduado);
+	        tituloFromDb.setCarrera(carrera);
+	        tituloFromDb.setFecha_emision(e.getFecha_emision());
+	        tituloFromDb.setFecha_registro(e.getFecha_registro());
+	        tituloFromDb.setInstitucion(e.getInstitucion());
+	        tituloFromDb.setNivel(e.getNivel());
+	        tituloFromDb.setNombre_titulo(e.getNombre_titulo());
+	        tituloFromDb.setNum_registro(e.getNum_registro());
+	        tituloFromDb.setTipo(e.getTipo());
 
+	        return titulorepository.save(tituloFromDb);
+	    }
    
 
     @Override

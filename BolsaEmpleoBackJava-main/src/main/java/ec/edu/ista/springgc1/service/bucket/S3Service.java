@@ -1,10 +1,11 @@
 package ec.edu.ista.springgc1.service.bucket;
 
-import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.*;
 import com.amazonaws.util.IOUtils;
 import ec.edu.ista.springgc1.model.vm.Asset;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,10 +16,11 @@ import java.util.UUID;
 @Service
 public class S3Service {
 
-    private final static String BUCKET = "demosprint";
+    @Value("${cloud.aws.s3.bucket}")
+    private String BUCKET;
 
     @Autowired
-    private AmazonS3Client s3Client; //cliente de conexión con nuestro bucket
+    private AmazonS3 s3Client; //cliente de conexión con nuestro bucket
 
     //Enviar Objeto al Bucket
     public String putObject(MultipartFile multipartFile) {

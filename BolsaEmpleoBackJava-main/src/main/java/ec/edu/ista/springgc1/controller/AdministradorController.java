@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,23 +30,25 @@ public class AdministradorController {
 	@Autowired
     private AdministradorServiceImpl adminService;
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(adminService.findAll());
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/{id}")
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.findById(id));
     }
 
-
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/usuario/{id}")
     ResponseEntity<?> findByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.findByUsuario(id));
     }
 
-   
+    @PreAuthorize("hasRole('ADMINISTRADOR') or isAnonymous()") // <--Chane this, it's not possible to create an admin if you are not logged in...
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody AdminDTO adminDTO) {
 
@@ -53,6 +56,7 @@ public class AdministradorController {
                 .body(adminService.save(adminDTO));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody AdminDTO adminDTO) {
     	 AdminDTO adminFromDb = adminService.findByIdToDTO(id);       
@@ -64,10 +68,18 @@ public class AdministradorController {
         return ResponseEntity.status(HttpStatus.CREATED).body(adminService.save(adminFromDb));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
     	Administrador adminFromDb = adminService.findById(id);
     	adminService.delete(adminFromDb.getId());
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @GetMapping("/todos")
+    ResponseEntity<List<Administrador>> findAllAdministradores() {
+        return ResponseEntity.ok(adminService.findAllAdministradores());
+    }
+
 }

@@ -30,10 +30,10 @@ public class ReferenciaPersonalServiceImp extends GenericServiceImpl<Referencia_
 				.findByUsuarioPersonaCedulaContaining(referenciaPersonalDTO.getCedulaGraduado())
 				.orElseThrow(() -> new ResourceNotFoundException("De Graduado",
 						referenciaPersonalDTO.getNombreReferencia()));
-		
+
 		referenciaPersonal.setId(referenciaPersonalDTO.getId());
 		referenciaPersonal.setGraduado(graduado);
-		referenciaPersonal.setNombre(referenciaPersonalDTO.getNombreReferencia());
+		referenciaPersonal.setNombreReferencia(referenciaPersonalDTO.getNombreReferencia());
 		referenciaPersonal.setEmail(referenciaPersonalDTO.getEmail());
 		referenciaPersonal.setTelefono(referenciaPersonalDTO.getTelefono());
 		return referenciaPersonal;
@@ -44,7 +44,7 @@ public class ReferenciaPersonalServiceImp extends GenericServiceImpl<Referencia_
 
 		ReferenciaPersonalDTO referenciaPersonalDTO = new ReferenciaPersonalDTO();
 		referenciaPersonalDTO.setId(referenciaPersonal.getId());
-		referenciaPersonalDTO.setNombreReferencia(referenciaPersonal.getNombre());
+		referenciaPersonalDTO.setNombreReferencia(referenciaPersonal.getNombreReferencia());
 		referenciaPersonalDTO.setCedulaGraduado(referenciaPersonal.getGraduado().getUsuario().getPersona().getCedula());
 		referenciaPersonalDTO.setEmail(referenciaPersonal.getEmail());
 		referenciaPersonalDTO.setTelefono(referenciaPersonal.getTelefono());
@@ -77,12 +77,12 @@ public class ReferenciaPersonalServiceImp extends GenericServiceImpl<Referencia_
 		return referenciaPersonalRepository.save(mapToEntity((ReferenciaPersonalDTO) entity));
 	}
 
-    public Optional<Referencia_Personal> findByEmail(String email){
-        return referenciaPersonalRepository.findByEmail(email);
-    }
-    
-    public Optional<Referencia_Personal> findByTelefono(String telefono){
-        return referenciaPersonalRepository.findByTelefono(telefono);
-    }
-	
+	public Optional<Referencia_Personal> findByEmail(String email) {
+		return referenciaPersonalRepository.findByEmail(email);
+	}
+
+	public Optional<Referencia_Personal> findByTelefono(String telefono) {
+		return referenciaPersonalRepository.findByTelefono(telefono);
+	}
+
 }

@@ -1,9 +1,11 @@
 package ec.edu.ista.springgc1.repository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import ec.edu.ista.springgc1.model.entity.Persona;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
@@ -14,12 +16,24 @@ import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 @Repository
 public interface GraduadoRepository extends GenericRepository<Graduado> {
 
-	@Query(value = "select * from estudiante where usuario_id = :id_usuario", nativeQuery = true)
-	Optional<Graduado> findByUsuario(long id_usuario);
+    Optional<Graduado> findByUsuarioId(long id_usuario);
 
-	Optional<Graduado> findByUsuarioPersonaCedulaContaining(String cedula);
-	
-	List<Graduado> findByEmailPersonalIn(Set<String> email_personal);
-	
-	Optional<Graduado> findByUsuarioNombreUsuario(String name);
+    Optional<Graduado> findByUsuarioPersonaCedulaContaining(String cedula);
+
+    List<Graduado> findByEmailPersonalIn(Set<String> email_personal);
+
+    Optional<Graduado> findByUsuarioNombreUsuario(String name);
+
+    Optional<Graduado> findByEmailPersonal(String emailPersonal);
+
+    Integer countAllByUsuarioPersonaSexo(Persona.Sex usuario_persona_sexo);
+
+    @Query("SELECT g FROM Graduado g LEFT JOIN g.ofertas o WHERE o IS NULL")
+    List<Graduado> findAllGraduadosWithoutOfertas();
+
+    @Query("SELECT g FROM Graduado g WHERE SIZE(g.ofertas) > 0")
+    List<Graduado> findAllGraduadosWithOfertas();
+
+    @Query("SELECT g FROM Graduado g WHERE g NOT IN (SELECT e.cedulaGraduado FROM Experiencia e)")
+    List<Graduado> findAllGraduadosSinExperiencia();
 }

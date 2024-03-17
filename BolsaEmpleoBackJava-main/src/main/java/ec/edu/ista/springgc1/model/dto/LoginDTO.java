@@ -10,6 +10,7 @@ public class LoginDTO implements Serializable {
 
     @NotEmpty
     private String username;
+
     @NotEmpty
     private String password;
 }

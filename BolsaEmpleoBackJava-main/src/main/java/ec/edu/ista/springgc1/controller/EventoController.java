@@ -2,9 +2,11 @@ package ec.edu.ista.springgc1.controller;
 
 import java.util.List;
 import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,42 +28,47 @@ import ec.edu.ista.springgc1.service.impl.EventoServiceImp;
 @RequestMapping("/eventos")
 public class EventoController {
 
-	@Autowired
-	private EventoServiceImp eventoService;
+    @Autowired
+    private EventoServiceImp eventoService;
 
-	@Autowired
-	private EventoRegistroGraduadoServiceImp eventoRegistroGraduadoServiceImp;
+    @Autowired
+    private EventoRegistroGraduadoServiceImp eventoRegistroGraduadoServiceImp;
 
-	@GetMapping
-	ResponseEntity<List<?>> list() {
-		return ResponseEntity.ok(eventoService.findAll());
-	}
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping
+    ResponseEntity<List<?>> list() {
+        return ResponseEntity.ok(eventoService.findAll());
+    }
 
-	@GetMapping("/{id}")
-	ResponseEntity<?> findById(@PathVariable Long id) {
-		return ResponseEntity.ok(eventoService.findById(id));
-	}
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/{id}")
+    ResponseEntity<?> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(eventoService.findById(id));
+    }
 
-	@PostMapping("/create")
-	ResponseEntity<?> create(@Valid @RequestBody EventoDTO eventoDTO) {
-		return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.save(eventoDTO));
-	}
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PostMapping("/create")
+    ResponseEntity<?> create(@Valid @RequestBody EventoDTO eventoDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(eventoService.save(eventoDTO));
+    }
 
-	@PostMapping("/asign-event")
-	ResponseEntity<?> asignEvent(@Valid @RequestBody EventoDTO eventoDTO, @RequestParam("cedula") String cedula) {
-		return ResponseEntity.status(HttpStatus.CREATED)
-				.body(eventoRegistroGraduadoServiceImp.AsignEventToGraduate(eventoDTO, cedula));
-	}
+    @PreAuthorize("hasRole('ADMINISTRADOR')") //<-- If you need other role, you can change "hasRole('ADMINISTRADOR')" to "hasAnyRole('ADMINISTRADOR', 'GRADUADO')"
+    @PostMapping("/asign-event")
+    ResponseEntity<?> asignEvent(@Valid @RequestBody EventoDTO eventoDTO, @RequestParam("cedula") String cedula) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(eventoRegistroGraduadoServiceImp.AsignEventToGraduate(eventoDTO, cedula));
+    }
 
-	@PutMapping("/update-asign-event/{id}")
-	public ResponseEntity<?> updateAsignEvent(@PathVariable("id") Long id, @Valid @RequestBody EventoDTO eventoDTO,
-			@RequestParam("cedula") String cedula) {
-		// Registro_Evento_Grad currentAsignEvent =
-		// eventoRegistroGraduadoServiceImp.findById(id);
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    @PutMapping("/update-asign-event/{id}")
+    public ResponseEntity<?> updateAsignEvent(@PathVariable("id") Long id, @Valid @RequestBody EventoDTO eventoDTO,
+                                              @RequestParam("cedula") String cedula) {
+        // Registro_Evento_Grad currentAsignEvent =
+        // eventoRegistroGraduadoServiceImp.findById(id);
 
-		return ResponseEntity.status(HttpStatus.OK)
-				.body(eventoRegistroGraduadoServiceImp.updateEventGraduate(eventoDTO, cedula, id));
-	}
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(eventoRegistroGraduadoServiceImp.updateEventGraduate(eventoDTO, cedula, id));
+    }
 
 	
 	/*
@@ -71,25 +78,26 @@ public class EventoController {
 		eventoService.delete(eventGraduate.getId());
 		return ResponseEntity.noContent().build();
 	}*/
-	
-	@PutMapping("update/{id}")
-	public ResponseEntity<?> update(@PathVariable("id") Long id, @Valid @RequestBody EventoDTO eventoDTO) {
-		EventoDTO currentEvent = eventoService.findByIdToDTO(id);
 
-		currentEvent.setNombreEvento(eventoDTO.getNombreEvento());
-		currentEvent.setFecha(eventoDTO.getFecha());
-		currentEvent.setHoraInicio(eventoDTO.getHoraInicio());
-		currentEvent.setHoraFin(eventoDTO.getHoraFin());
-		currentEvent.setLugar(eventoDTO.getLugar());
-		currentEvent.setDescripcion(eventoDTO.getDescripcion());
-		return ResponseEntity.status(HttpStatus.OK).body(eventoService.save(currentEvent));
-	}
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    @PutMapping("update/{id}")
+    public ResponseEntity<?> update(@PathVariable("id") Long id, @Valid @RequestBody EventoDTO eventoDTO) {
+        EventoDTO currentEvent = eventoService.findByIdToDTO(id);
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> delete(@PathVariable Long id) {
-		Evento evento = eventoService.findById(id);
-		eventoService.delete(evento.getId());
-		return ResponseEntity.noContent().build();
-	}
+        currentEvent.setNombreEvento(eventoDTO.getNombreEvento());
+        currentEvent.setFecha(eventoDTO.getFecha());
+        currentEvent.setHoraInicio(eventoDTO.getHoraInicio());
+        currentEvent.setHoraFin(eventoDTO.getHoraFin());
+        currentEvent.setLugar(eventoDTO.getLugar());
+        currentEvent.setDescripcion(eventoDTO.getDescripcion());
+        return ResponseEntity.status(HttpStatus.OK).body(eventoService.save(currentEvent));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> delete(@PathVariable Long id) {
+        Evento evento = eventoService.findById(id);
+        eventoService.delete(evento.getId());
+        return ResponseEntity.noContent().build();
+    }
 
 }

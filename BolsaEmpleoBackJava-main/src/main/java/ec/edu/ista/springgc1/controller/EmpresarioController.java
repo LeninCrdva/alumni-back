@@ -2,11 +2,13 @@ package ec.edu.ista.springgc1.controller;
 
 import java.util.List;
 
+import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,26 +27,29 @@ import ec.edu.ista.springgc1.service.impl.EmpresarioServiceImpl;
 @RestController
 @RequestMapping("/empresarios")
 public class EmpresarioController {
-	@Autowired
+
+    @Autowired
     private EmpresarioServiceImpl emprendimientoService;
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(emprendimientoService.findAll());
     }
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(emprendimientoService.findById(id));
     }
 
-
-    @GetMapping("/usuario/{id}")
-    ResponseEntity<?> findByUserId(@PathVariable Long id) {
-        return ResponseEntity.ok(emprendimientoService.findByUsuario(id));
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/usuario/{usuario}")
+    ResponseEntity<?> findByUserUsername(@PathVariable String usuario) {
+        return ResponseEntity.ok(emprendimientoService.findByUsuario(usuario));
     }
 
-   
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO') or isAnonymous()") // <--Change this, it's not possible to create an admin if you are not logged in...
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody EmpresarioDTO empresarioDTO) {
 
@@ -52,17 +57,23 @@ public class EmpresarioController {
                 .body(emprendimientoService.save(empresarioDTO));
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
     @PutMapping("/{id}")
     ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody EmpresarioDTO empresarioDTO) {
         EmpresarioDTO updatedEmpresario = emprendimientoService.update(id, empresarioDTO);
         return ResponseEntity.ok(updatedEmpresario);
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
     @DeleteMapping("/{id}")
     ResponseEntity<?> delete(@PathVariable Long id) {
-    	emprendimientoService.delete(id);
+        try {
+            emprendimientoService.delete(id);
             return ResponseEntity.ok("Empresa eliminada exitosamente.");
-       
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al eliminar la empresa.");
+        }
     }
-
 }

@@ -15,16 +15,12 @@ public class SectorEmpresarial {
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "sec_emp_id", nullable = false)
     private Long id;
-
     
     @Column(length = 255)
     @ColumnTransformer(write = "UPPER(?)")
     private String nombre;
-
     
     @Column(length = 255)
     @ColumnTransformer(write = "UPPER(?)")
     private String descripcion;
-
-
 }

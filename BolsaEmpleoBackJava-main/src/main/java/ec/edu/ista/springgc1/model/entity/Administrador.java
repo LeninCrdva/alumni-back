@@ -16,20 +16,24 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name="administrador")
+@Table(name = "administrador")
 public class Administrador {
-	  @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "id_admi")
-	    private Long id;
-	  @OneToOne
-	    @JoinColumn(referencedColumnName = "id_usuario")
-	   private Usuario usuario;
-	    private boolean estado;
-	    @ColumnTransformer(write = "UPPER(?)")
-	    private String cargo;
-	    @Email(message = "Debe ser una dirección de correo electrónico válida.")
-	    @Column(name = "email", nullable = false, length = 255)
-	    private String email;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_admi")
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(referencedColumnName = "id_usuario")
+    private Usuario usuario;
+
+    private boolean estado;
+
+    @ColumnTransformer(write = "UPPER(?)")
+    private String cargo;
+
+    @Email(message = "Debe ser una dirección de correo electrónico válida.")
+    @Column(name = "email", nullable = false, length = 255)
+    private String email;
 
 }

@@ -16,17 +16,23 @@ public class Usuario {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_usuario")
 	private Long id;
+
 	private String clave;
+
 	@Column(name = "nombre_usuario", unique = true)
 	 @ColumnTransformer(write = "UPPER(?)")
 	private String nombreUsuario;
+
 	@NotNull
 	private Boolean estado;
+
 	@OneToOne
 	@NotNull
 	@JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
 	private Rol rol;
+
 	private String ruta_imagen;
+
 	@Transient
 	private String url_imagen;
 	

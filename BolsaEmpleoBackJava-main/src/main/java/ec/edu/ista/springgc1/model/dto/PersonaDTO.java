@@ -7,24 +7,30 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
+
 @Data
 public class PersonaDTO  implements Serializable{
-	
 
 	private Long id;
 	
     @NotEmpty
 	private String cedula;
+
     @NotEmpty
 	private String primer_nombre;
     @NotEmpty
 	private String segundo_nombre;
-    
+
+	@DateTimeFormat(pattern = "YYYY-MM-dd")
 	private LocalDate fechaNacimiento;
+
     @NotEmpty
 	private String telefono;
+
     @NotEmpty
 	private String apellido_paterno;
+
     @NotEmpty
 	private String apellido_materno;
 }

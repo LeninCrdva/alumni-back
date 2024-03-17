@@ -11,22 +11,25 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @Entity
 @Table(name = "registro_evento_grad")
 public class Registro_Evento_Grad {
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_registro")
 	private Long id;
+
 	@ManyToOne
 	@JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
 	private Graduado graduado;
+
 	@ManyToOne
 	@JoinColumn(name = "id_evento", referencedColumnName = "id_evento")
 	private Evento evento;
-	private LocalDate fecha_registro;
 
+	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+	private LocalDate fecha_registro;
 }

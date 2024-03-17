@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -29,16 +30,19 @@ public class CapacitacionController {
 	@Autowired
 	private CapacitacionServiceImpl capacitacionService;
 
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO', 'EMPRESARIO', 'RESPONSABLE_CARRERA')")
 	@GetMapping("/list")
 	public ResponseEntity<List<?>> listAllCapacitacion() {
 		return ResponseEntity.ok(capacitacionService.findAllToDTO());
 	}
 
+	@PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
 	@GetMapping("/find-cap/{id}")
 	public ResponseEntity<?> findCapacById(@PathVariable("id") Long id) {
 		return ResponseEntity.ok(capacitacionService.findTrainingByIdToDTO(id));
 	}
 
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
 	@PostMapping("/save-cap")
 	public ResponseEntity<?> saveTraining(@Valid @RequestBody CapacitacionDTO capacitacionDTO) {
 		if (capacitacionDTO.getNombre().isEmpty()) {
@@ -52,6 +56,7 @@ public class CapacitacionController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(capacitacionService.save(capacitacionDTO));
 	}
 
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
 	@PutMapping("update-cap/{id}")
 	public ResponseEntity<?> updateTraining(@PathVariable("id") Long id,
 			@Valid @RequestBody CapacitacionDTO capacitacion) {
@@ -68,7 +73,8 @@ public class CapacitacionController {
 
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(capacitacionService.save(capacitacionDb));
 	}
-	
+
+	@PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')") //This method should be an updated of state...
 	@DeleteMapping("/delete-cap/{id}")
 	public ResponseEntity<?> deleteTrainingById(@PathVariable("id") Long id){
 		Capacitacion capacitacionDb = capacitacionService.findById(id);

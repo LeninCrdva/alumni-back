@@ -7,6 +7,7 @@ import ec.edu.ista.springgc1.service.impl.CiudadServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -19,16 +20,19 @@ public class CiudadController {
     @Autowired
     private CiudadServiceImpl ciudadService;
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(ciudadService.findAll());
     }
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ciudadService.findById(id));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody CiudadDTO ciudadDTO) {
         if (ciudadService.findByNombre(ciudadDTO.getNombre()).isPresent()){
@@ -39,6 +43,7 @@ public class CiudadController {
                 .body(ciudadService.save(ciudadDTO));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody CiudadDTO ciudadDTO) {
         CiudadDTO ciudadFromDb = ciudadService.findByIdToDTO(id);
@@ -51,6 +56,7 @@ public class CiudadController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ciudadService.save(ciudadFromDb));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Ciudad ciudadFromDb = ciudadService.findById(id);
