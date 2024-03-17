@@ -148,6 +148,17 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
 
         return usuarioRepository.save(usuario);
     }
+    
+    public Usuario updatePassword(long id, String newPassword) {
+    	Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No encontrado el id: ", id));
+    	
+    	if (!newPassword.isEmpty()) {
+    		String code = passwordEncoder.encode(newPassword);
+            usuario.setClave(code);
+        }
+    	
+    	return usuarioRepository.save(usuario);
+    }
 
     @Override
     public Usuario save(Object entity) {
