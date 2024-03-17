@@ -20,11 +20,12 @@ import ec.edu.ista.springgc1.service.map.Mapper;
 
 @Service
 public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> implements Mapper<Administrador, AdminDTO> {
+
     @Autowired
     private AdministradorRepository adminrepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
-
 
     @Override
     public Administrador mapToEntity(AdminDTO adminDTO) {
@@ -58,7 +59,7 @@ public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> 
     public List findAll() {
         return adminrepository.findAll()
                 .stream()
-                .map(c -> mapToDTO(c))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -74,7 +75,7 @@ public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> 
 
         Administrador adminw = adminrepository.findByUsuarioId(id_usuario)
                 .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
-        
+
         return mapToDTO(adminw);
     }
 

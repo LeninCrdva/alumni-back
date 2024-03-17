@@ -8,6 +8,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,38 +27,43 @@ import ec.edu.ista.springgc1.service.impl.TituloServiceImpl;
 @RestController
 @RequestMapping("/titulos")
 public class TituloController {
+
 	@Autowired
     private TituloServiceImpl tituloService;
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(tituloService.findAll());
     }
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(tituloService.findById(id));
     }
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/resumen/{id}")
     ResponseEntity<?> findByIdResumen(@PathVariable Long id) {
         return ResponseEntity.ok(tituloService.findByIdToDTO(id));
     }
 
-
-
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/total")
     ResponseEntity<?> countEstudiantes() {
         return ResponseEntity.ok(Collections.singletonMap("total:", tituloService.count()));
     }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody TituloDTO e) {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(tituloService.save(e));
     }
-    
 
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TituloDTO e) {
         TituloDTO tituloFromDb = tituloService.findByIdToDTO(id);
@@ -78,7 +84,7 @@ public class TituloController {
         return ResponseEntity.status(HttpStatus.OK).body(updatedTitulo);
     }
 
-
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
     	Titulo tituloFromDb = tituloService.findById(id);
@@ -86,6 +92,4 @@ public class TituloController {
     	tituloService.delete(tituloFromDb.getId());
         return ResponseEntity.noContent().build();
     }
-
-
 }

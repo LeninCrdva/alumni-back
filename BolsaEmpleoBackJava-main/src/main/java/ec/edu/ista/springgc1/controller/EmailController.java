@@ -1,6 +1,7 @@
 package ec.edu.ista.springgc1.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import ec.edu.ista.springgc1.model.entity.*;
@@ -48,7 +49,7 @@ public class EmailController {
     @PostMapping("/sendingEmail")
     public ResponseEntity<?> sendEmail(@RequestBody MailRequest request) {
         Graduado graduado = graduadoService.findByEmail(request.getTo());
-        OfertasLaborales oferta = ofertaService.findById(Long.valueOf(request.getName()));
+        OfertasLaborales oferta = ofertaService.findById(Long.parseLong(request.getName()));
 
         String fullName = getFullName(graduado.getUsuario());
 
@@ -76,6 +77,18 @@ public class EmailController {
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
         }
+    }
+
+    @PreAuthorize("denyAll()")
+    @PostMapping("/send-list-businessman") // <-- This method is incomplete, don't consume in front.
+    public ResponseEntity<?> sendListPostulates(@RequestBody MailRequest request) {
+        List<Graduado> postulates = ofertaService.findGraduadosByOfertaId(Long.parseLong(request.getName()));
+        Map<String, Object> model = new HashMap<>();
+
+        model.put("postulates", postulates);
+
+        Administrador administrador = administradorService.findByEmail(request.getTo());
+        return createResponse(administrador.getUsuario(), request);
     }
 
     @PreAuthorize("permitAll()")

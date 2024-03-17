@@ -7,6 +7,7 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,17 +29,20 @@ public class LogroController {
 	
 	@Autowired
 	private LogroServiceImpl logroService;
-	
+
+	@PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
 	@GetMapping("/get-list-logro")
 	public ResponseEntity<List<?>> listAllLogro(){
 		return ResponseEntity.ok(logroService.findAllDTO());
 	}
-	
+
+	@PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
 	@GetMapping("/get-logro/{id}")
 	public ResponseEntity<?> finLogroById(@PathVariable("id") Long id){
 		return ResponseEntity.ok(logroService.findLogroByIdToDTO(id));
 	}
-	
+
+	@PreAuthorize("hasRole('GRADUADO')") //<-- Solo el graduado puede crear su logro
 	@PostMapping("/save-logro")
 	public ResponseEntity<?> saveLogro(@Valid @RequestBody LogroDTO logroDTO){
 		if(logroDTO.getTipoLogro().isEmpty()) {
@@ -47,7 +51,8 @@ public class LogroController {
 		
 		return ResponseEntity.status(HttpStatus.CREATED).body(logroService.save(logroDTO));
 	}
-	
+
+	@PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
 	@PutMapping("/update-logro/{id}")
 	public ResponseEntity<?> updateLogro(@PathVariable("id") Long id,
 			@Valid @RequestBody LogroDTO logroDTO){
@@ -59,7 +64,8 @@ public class LogroController {
 	
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).body(logroService.save(logroDB));
 	}
-	
+
+	@PreAuthorize("hasRole('GRADUADO')")
 	@DeleteMapping("/delete-logro/{id}")
 	public ResponseEntity<?> deleteLogro(@PathVariable("id") Long id, 
 			@Valid @RequestBody Logro logro){

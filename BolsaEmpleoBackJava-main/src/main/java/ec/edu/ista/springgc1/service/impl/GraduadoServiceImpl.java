@@ -219,4 +219,11 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
         return countSex;
     }
+
+    public List<Graduado> findGraduadosWithOfertas() {
+        return graduadoRepository.findAllGraduadosWithOfertas();
+    }
+    public List<Graduado> findGraduadosSinExperiencia() {
+        return graduadoRepository.findAllGraduadosSinExperiencia();
+    }
 }

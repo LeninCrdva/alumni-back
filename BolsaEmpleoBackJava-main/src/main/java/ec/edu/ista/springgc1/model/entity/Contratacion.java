@@ -20,10 +20,10 @@ public class Contratacion {
 
     @ManyToMany
     @JoinTable(
-        name = "contrataciones_graduados",
-        joinColumns = @JoinColumn(name = "contratacion_id"),
-        inverseJoinColumns = @JoinColumn(name = "graduado_id"))
+            name = "contrataciones_graduados",
+            joinColumns = @JoinColumn(name = "contratacion_id"),
+            inverseJoinColumns = @JoinColumn(name = "graduado_id"))
     private List<Graduado> graduados;
 
-   
+
 }

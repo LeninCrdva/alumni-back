@@ -10,20 +10,21 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 
-
 import lombok.Data;
 
 @Data
 @Entity
-@Table(name="superadmin")
+@Table(name = "superadmin")
 public class SuperAdmin {
-	 @Id
-	    @GeneratedValue(strategy = GenerationType.IDENTITY)
-	    @Column(name = "id_super_admi")
-	    private Long id;
-	 @OneToOne
-	    @JoinColumn(referencedColumnName = "id_usuario")
-	   private Usuario usuario;
-	 private boolean estado=true;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_super_admi")
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(referencedColumnName = "id_usuario")
+    private Usuario usuario;
+
+    private boolean estado = true;
 
 }

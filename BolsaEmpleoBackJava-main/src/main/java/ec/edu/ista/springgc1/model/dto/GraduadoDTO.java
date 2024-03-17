@@ -17,17 +17,26 @@ import lombok.Data;
 @Data
 public class GraduadoDTO implements Serializable {
 	private Long id;
+
 	@NotEmpty
 	private String usuario;
+
 	@NotEmpty
 	private String ciudad;
+
+	@DateTimeFormat(pattern = "YYYY-MM-dd")
 	private LocalDate año_graduacion;
+
 	@NotEmpty
 	private String email_personal;
+
 	@NotEmpty
 	private String estadocivil;
+
 	private String ruta_pdf;
+
 	private String url_pdf;
+
 	@ElementCollection
 	private List<Long> idOferta;
 }

@@ -20,6 +20,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.Email;
 
 import org.hibernate.annotations.ColumnTransformer;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -39,27 +40,36 @@ public class Graduado {
 	@Column(name = "graduado_id")
 	@JsonView(View.Base.class)
 	private Long id;
+
 	@OneToOne
 	@JoinColumn(referencedColumnName = "id_usuario")
 	@JsonView(View.Base.class)
 	private Usuario usuario;
+
 	@ManyToOne
 	@JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
 	@JsonView(View.Base.class)
 	private Ciudad ciudad;
+
 	@JsonView(View.Base.class)
+	@DateTimeFormat(pattern = "YYYY-MM-dd")
 	private LocalDate año_graduacion;
+
 	@JsonView(View.Base.class)
 	@Email(message = "Debe ser una dirección de correo electrónico válida.")
 	@Column(name = "email_personal", nullable = false, length = 255, unique = true)
 	private String emailPersonal;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	@JsonView(View.Base.class)
 	private String estadocivil;
+
 	@JsonView(View.Base.class)
 	private String ruta_pdf;
+
 	@Transient
 	private String url_pdf;
+
 	@Nullable
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(

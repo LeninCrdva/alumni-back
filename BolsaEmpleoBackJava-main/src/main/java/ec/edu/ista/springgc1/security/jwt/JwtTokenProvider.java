@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.Map;
 
 @Component
 public class JwtTokenProvider {
@@ -20,18 +21,24 @@ public class JwtTokenProvider {
     @Value("${app.jwt-expiration-milliseconds}")
     private long jwtExpirationInMs;
 
-    public String generateToken(Authentication authentication){
+    public String generateToken(Authentication authentication, Map<String, Object> extraClaims) {
         String username = authentication.getName();
         Date currentDate = new Date();
         Date expirationDate = new Date(currentDate.getTime() + jwtExpirationInMs);
 
-        String token = Jwts.builder()
+        JwtBuilder jwtBuilder = Jwts.builder()
+
                 .setSubject(username)
                 .setIssuedAt(currentDate)
-                .setExpiration(expirationDate)
+                .setExpiration(expirationDate);
+
+        for ( Map.Entry<String, Object> entry : extraClaims.entrySet() ) {
+            jwtBuilder.claim(entry.getKey(), entry.getValue());
+        }
+
+        return jwtBuilder
                 .signWith(Keys.hmacShaKeyFor(jwtSecret.getBytes()))
                 .compact();
-        return token;
     }
 
     public String getUsernameOfJWT(String token){

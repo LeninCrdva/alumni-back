@@ -14,17 +14,19 @@ import ec.edu.ista.springgc1.service.impl.UsuarioServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Collections;
-import java.util.Date;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -46,18 +48,22 @@ public class AuthController {
     @Autowired
     private UsuarioServiceImpl userService;
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(),loginDTO.getPassword()));
-
-        
         
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String token = jwtTokenProvider.generateToken(authentication);
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
         Usuario usuario = usuarioService.findByUsername(userDetails.getUsername());
+
+        if (!usuario.getEstado()) {
+            return ResponseEntity.status(HttpStatus.LOCKED).build();
+        }
+
+        String token = jwtTokenProvider.generateToken(authentication, generateExtraClaims(userDetails));
 
         JwtAuthResponse jwtAuthResponse = new JwtAuthResponse(
                 token, usuario.getId(), usuario.getNombreUsuario(),userDetails.getAuthorities()
@@ -66,6 +72,7 @@ public class AuthController {
         return ResponseEntity.ok(jwtAuthResponse);
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UsuarioDTO usuarioDTO){
 
@@ -76,7 +83,8 @@ public class AuthController {
         usuarioService.save(usuarioDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("mensaje","Usuario Registrado"));
     }
-    
+
+    @PreAuthorize("permitAll()")
     @PutMapping("/login/recovery-password")
     public ResponseEntity<?> recoveryPassword(@RequestBody RecoveryDTO recovery){
     	RecoveryToken bypassToken = recoveryTokenService.findByToken(recovery.getToken());
@@ -104,5 +112,17 @@ public class AuthController {
     private void deactivateTokenAndSave(RecoveryToken token) {
         token.setActive(Boolean.FALSE);
         recoveryTokenService.save(token);
+    }
+
+    private Map<String, Object> generateExtraClaims(UserDetails user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+
+        List<String> roles = user.getAuthorities().stream()
+                .map(authority -> "ROLE_" + authority.getAuthority())
+                .collect(Collectors.toList());
+
+        extraClaims.put("role", roles);
+
+        return extraClaims;
     }
 }

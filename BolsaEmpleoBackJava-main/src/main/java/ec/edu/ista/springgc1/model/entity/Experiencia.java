@@ -14,17 +14,23 @@ public class Experiencia {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "id_experiencia")
 	private Long id;
+
 	@ManyToOne
 	@JoinColumn(name = "graduado_id", referencedColumnName = "graduado_id")
 	private Graduado cedulaGraduado;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String cargo;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String duracion;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String institucionNombre;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String actividad;
+
 	@ColumnTransformer(write = "UPPER(?)")
 	private String area_trabajo;
 }

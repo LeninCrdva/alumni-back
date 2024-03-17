@@ -113,24 +113,27 @@ public class EmailService {
 	}
 
 	private Template getTemplate(String emailCase) {
-		Template t = null;
+		Template t;
 
 		try {
 			switch (emailCase) {
 				case "postulate":
-					t = config.getTemplate("email-template-postulate.ftl");
+					t = config.getTemplate("graduate/email-template-postulate.ftl");
 					break;
 				case "remove-postulate":
-					t = config.getTemplate("email-template-remove-postulate.ftl");
+					t = config.getTemplate("graduate/email-template-remove-postulate.ftl");
 					break;
 				case "accept-postulate":
-					t = config.getTemplate("email-template-accept-postulate.ftl");
+					t = config.getTemplate("graduate/email-template-accept-postulate.ftl");
 					break;
 				case "reset-password":
-					t = config.getTemplate("email-template-recovery-email.ftl");
+					t = config.getTemplate("graduate/email-template-recovery-email.ftl");
+					break;
+				case "list-postulates":
+					t = config.getTemplate("businessman/email-template-list-postulates.ftl");
 					break;
 				default:
-					t = config.getTemplate("email-template-contact-us.ftl");
+					t = config.getTemplate("graduate/email-template-contact-us.ftl");
 					break;
 			}
 		} catch (IOException e) {
@@ -155,10 +158,7 @@ public class EmailService {
 	    
 	    recoveryToken.setToken(tokenValue);
 	    recoveryToken.setExpiration(expirationDate);
-	    
-	    RecoveryToken savedToken = tokenService.save(recoveryToken);
-	    
-	    return savedToken;
-	}
 
+        return tokenService.save(recoveryToken);
+	}
 }
