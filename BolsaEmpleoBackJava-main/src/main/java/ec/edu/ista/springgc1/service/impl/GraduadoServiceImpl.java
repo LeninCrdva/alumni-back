@@ -10,10 +10,7 @@ import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -211,7 +208,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     }
 
     public Map<String, Object> countBySex() {
-        Map<String, Object> countSex = new HashMap<>();
+        Map<String, Object> countSex = new LinkedHashMap<>();
 
         countSex.put("masculino", graduadoRepository.countAllByUsuarioPersonaSexo(Persona.Sex.MASCULINO));
         countSex.put("femenino", graduadoRepository.countAllByUsuarioPersonaSexo(Persona.Sex.FEMENINO));
