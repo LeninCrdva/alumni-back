@@ -131,6 +131,13 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         return usuarioRepository.save(usuario);
     }
 
+    public Usuario updatePhoto(long id, String ruta) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User NOT FOUND", id));
+        usuario.setRuta_imagen(ruta);
+        usuario.setUrl_imagen(s3Service.getObjectUrl(ruta));
+        return usuarioRepository.save(usuario);
+    }
+
     public Usuario updatePassword(long id, String newPassword) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No encontrado el id: ", id));
 
