@@ -24,6 +24,7 @@ public class UsuarioController {
     private UsuarioServiceImpl usuarioService;
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    //@PreAuthorize("permitAll()")
     @GetMapping
     public ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(usuarioService.findAll());

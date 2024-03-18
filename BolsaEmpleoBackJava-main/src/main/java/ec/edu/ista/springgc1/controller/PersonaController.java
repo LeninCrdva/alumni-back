@@ -47,7 +47,8 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.findBycedula(cedula));
     }
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
+   // @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PreAuthorize("permitAll()")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody Persona p) {
     	 if (p.getFechaNacimiento() == null) {
