@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.service.impl;
 
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
+import ec.edu.ista.springgc1.model.dto.RegistroDTO;
 import ec.edu.ista.springgc1.model.dto.UsuarioDTO;
 import ec.edu.ista.springgc1.model.entity.Persona;
 import ec.edu.ista.springgc1.model.entity.Rol;
@@ -158,5 +159,20 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     @Transactional
     public Boolean existsByUsername(String username) {
         return usuarioRepository.existsBynombreUsuario(username);
+    }
+
+    @Transactional
+    public void registerUserAndPerson(Persona persona, RegistroDTO usuarioDTO) {
+
+        UsuarioDTO user = new UsuarioDTO();
+        user.setNombreUsuario(usuarioDTO.getNombreUsuario());
+        user.setCedula(persona.getCedula());
+        user.setClave(usuarioDTO.getClave());
+        user.setRol(usuarioDTO.getRol());
+        user.setEstado(usuarioDTO.isEstado());
+        user.setRuta_imagen(usuarioDTO.getRutaImagen());
+        user.setUrl_imagen(usuarioDTO.getUrlImagen());
+
+        save(user);
     }
 }

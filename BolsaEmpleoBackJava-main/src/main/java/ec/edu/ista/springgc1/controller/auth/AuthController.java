@@ -3,11 +3,12 @@ package ec.edu.ista.springgc1.controller.auth;
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.dto.LoginDTO;
 import ec.edu.ista.springgc1.model.dto.RecoveryDTO;
+import ec.edu.ista.springgc1.model.dto.RegistroDTO;
 import ec.edu.ista.springgc1.model.dto.UsuarioDTO;
-import ec.edu.ista.springgc1.model.entity.RecoveryToken;
-import ec.edu.ista.springgc1.model.entity.Usuario;
+import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.security.jwt.JwtAuthResponse;
 import ec.edu.ista.springgc1.security.jwt.JwtTokenProvider;
+import ec.edu.ista.springgc1.service.impl.PersonaServiceImp;
 import ec.edu.ista.springgc1.service.impl.RecoveryTokenServiceImpl;
 import ec.edu.ista.springgc1.service.impl.UsuarioServiceImpl;
 
@@ -48,6 +49,9 @@ public class AuthController {
     @Autowired
     private UsuarioServiceImpl userService;
 
+    @Autowired
+    private PersonaServiceImp personaServiceImp;
+
     @PreAuthorize("permitAll()")
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginDTO loginDTO){
@@ -74,13 +78,14 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody UsuarioDTO usuarioDTO){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegistroDTO usuarioDTO, @RequestBody(required = false) Empresa empresa, @RequestBody(required = false)SectorEmpresarial sectorEmpresarial){
 
         if (usuarioService.existsByUsername(usuarioDTO.getNombreUsuario())){
             throw new AppException(HttpStatus.BAD_REQUEST,"Ya se encuentra registrado el nombre de usuario");
         }
 
-        usuarioService.save(usuarioDTO);
+        usuarioService.registerUserAndPerson(personaServiceImp.getPersona(usuarioDTO) ,usuarioDTO);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("mensaje","Usuario Registrado"));
     }
 
