@@ -26,11 +26,11 @@ import ec.edu.ista.springgc1.service.impl.PersonaServiceImp;
 @RestController
 @RequestMapping("/personas")
 public class PersonaController {
-	@Autowired
-	private PersonaServiceImp personaService;
+    @Autowired
+    private PersonaServiceImp personaService;
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
-	@GetMapping
+    @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(personaService.findAll());
     }
@@ -47,16 +47,15 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.findBycedula(cedula));
     }
 
-   // @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
-    @PreAuthorize("permitAll()")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody Persona p) {
-    	 if (p.getFechaNacimiento() == null) {
-    	        throw new AppException(HttpStatus.BAD_REQUEST, "La fecha de nacimiento no puede ser nula");
-    	    }
+        if (p.getFechaNacimiento() == null) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "La fecha de nacimiento no puede ser nula");
+        }
 
-        if (personaService.findBycedula(p.getCedula()).isPresent()){
-            throw new AppException(HttpStatus.BAD_REQUEST,"Ya se encuentra registrado esta cedula");
+        if (personaService.findBycedula(p.getCedula()).isPresent()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Ya se encuentra registrado esta cedula");
         }
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -67,8 +66,8 @@ public class PersonaController {
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody Persona p) {
         Persona pFromDb = personaService.findById(id);
-        if (!p.getCedula().equalsIgnoreCase(pFromDb.getCedula()) && personaService.findBycedula(p.getCedula()).isPresent()){
-            throw new AppException(HttpStatus.BAD_REQUEST,"Ya se encuentra registrado la cedula, no es posible actualizar");
+        if (!p.getCedula().equalsIgnoreCase(pFromDb.getCedula()) && personaService.findBycedula(p.getCedula()).isPresent()) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Ya se encuentra registrado la cedula, no es posible actualizar");
         }
         pFromDb.setCedula(p.getCedula());
         pFromDb.setApellido_materno(p.getApellido_materno());
