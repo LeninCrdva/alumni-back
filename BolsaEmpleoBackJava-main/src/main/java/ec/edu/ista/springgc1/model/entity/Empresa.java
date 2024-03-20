@@ -57,4 +57,6 @@ public class Empresa {
     @Column(name = "sitio_web")
     @ColumnTransformer(write = "UPPER(?)")
     private String sitioWeb;
+
+    private boolean estado;
 }

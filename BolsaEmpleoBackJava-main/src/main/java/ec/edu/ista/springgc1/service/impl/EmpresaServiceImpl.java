@@ -58,6 +58,7 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         em.setSitioWeb(d.getSitioWeb());
         em.setTipoEmpresa(d.getTipoEmpresa());
         em.setUbicacion(d.getUbicacion());
+        em.setEstado(d.isEstado());
         return em;
     }
 
@@ -76,7 +77,7 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         em1.setTipoEmpresa(e.getTipoEmpresa());
         em1.setSectorEmpresarial(e.getSectorEmpresarial());
         em1.setUbicacion(e.getUbicacion());
-
+        em1.setEstado(e.isEstado());
 		return em1;
     }
 
@@ -116,7 +117,7 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
 
         existingEmpresa.setNombre(updatedEmpresaDTO.getNombre());
         existingEmpresa.setArea(updatedEmpresaDTO.getArea());
-
+        existingEmpresa.setEstado(updatedEmpresaDTO.isEstado());
         return mapToDTO(empresarepository.save(existingEmpresa));
     }
 
