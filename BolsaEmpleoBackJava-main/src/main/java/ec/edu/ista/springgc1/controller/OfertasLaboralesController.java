@@ -54,6 +54,14 @@ public class OfertasLaboralesController {
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/ofertas-sin-postular/{id}")
+    public ResponseEntity<?> getOfertasSinPostularPorGraduado(@PathVariable Long id) {
+        List<OfertasLaboralesDTO> ofertasSinPostularPorGraduado = ofertasLaboralesService.getOfertasSinPostulacion(id);
+
+        return ResponseEntity.ok(ofertasSinPostularPorGraduado);
+    }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ofertasLaboralesService.findById(id));
@@ -76,16 +84,6 @@ public class OfertasLaboralesController {
     ResponseEntity<OfertasLaboralesDTO> update(@PathVariable Long id,
                                                @Valid @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
         return ResponseEntity.ok(ofertasLaboralesService.update(id, ofertaLaboralDTO));
-    }
-
-    @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
-    @PutMapping("postulado/{id}")
-    ResponseEntity<?> savePostulado(@PathVariable Long id, @RequestBody OfertasLaboralesDTO ofertaLaboralDTO) {
-        OfertasLaboralesDTO ofer = ofertasLaboralesService.findByIdToDTO(id);
-
-        ofer.setCorreoGraduado(ofertaLaboralDTO.getCorreoGraduado());
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(ofertasLaboralesService.update(id, ofer));
     }
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")

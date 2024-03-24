@@ -36,7 +36,4 @@ public class GraduadoDTO implements Serializable {
 	private String ruta_pdf;
 
 	private String url_pdf;
-
-	@ElementCollection
-	private List<Long> idOferta;
 }

@@ -48,7 +48,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuario.setId(usuarioDTO.getId());
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
         usuario.setClave(passwordEncoder.encode(usuarioDTO.getClave()));
-      
+
         Persona p = personaRepository.findBycedula(usuarioDTO.getCedula())
                 .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));
 
@@ -137,7 +137,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         return usuarioRepository.save(usuario);
     }
 
-    public Usuario updatePassword(long id, String newPassword) {
+    public void updatePassword(long id, String newPassword) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("No encontrado el id: ", id));
 
         if (!newPassword.isEmpty()) {
@@ -145,7 +145,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
             usuario.setClave(code);
         }
 
-        return usuarioRepository.save(usuario);
+        usuarioRepository.save(usuario);
     }
 
     @Override

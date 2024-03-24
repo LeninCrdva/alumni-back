@@ -33,6 +33,4 @@ public class OfertasLaboralesDTO implements Serializable {
     private Boolean estado;
 
     private String nombreEmpresa;
-
-    private Set<String> correoGraduado;
 }

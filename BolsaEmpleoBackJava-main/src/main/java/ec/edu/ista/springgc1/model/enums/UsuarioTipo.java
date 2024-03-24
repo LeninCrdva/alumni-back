@@ -1,4 +1,4 @@
-package ec.edu.ista.springgc1.model.entity;
+package ec.edu.ista.springgc1.model.enums;
 
 public enum UsuarioTipo {
 	    GRADUADO,

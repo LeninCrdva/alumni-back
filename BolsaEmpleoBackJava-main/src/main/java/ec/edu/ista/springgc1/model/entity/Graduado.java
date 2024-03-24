@@ -69,13 +69,4 @@ public class Graduado {
 
 	@Transient
 	private String url_pdf;
-
-	@Nullable
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-			name = "postulados", 
-			joinColumns = @JoinColumn(name = "graduado_id"), 
-			inverseJoinColumns = @JoinColumn(name = "oferta_id"))
-	@JsonBackReference
-	private List<OfertasLaborales> ofertas;
 }

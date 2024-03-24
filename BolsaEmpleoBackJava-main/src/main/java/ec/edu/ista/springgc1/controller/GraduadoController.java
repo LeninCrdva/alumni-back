@@ -90,34 +90,6 @@ public class GraduadoController {
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
-    @PutMapping("postulaciones/{id}")
-    public ResponseEntity<?> savePostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
-        GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
-
-        Set<Long> existingIds = new HashSet<>(gradDTO.getIdOferta());
-        
-        existingIds.addAll(estudianteDTO.getIdOferta());
-
-        gradDTO.setIdOferta(new ArrayList<>(existingIds));
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
-    }
-
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
-    @PutMapping("cancel-postulaciones/{id}")
-    public ResponseEntity<?> cancelPostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
-        GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
-
-        Set<Long> existingIds = new HashSet<>(gradDTO.getIdOferta());
-
-        existingIds.removeAll(estudianteDTO.getIdOferta());
-
-        gradDTO.setIdOferta(new ArrayList<>(existingIds));
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
-    }
-
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Long id) {
         Graduado estudianteFromDb = estudianteService.findById(id);

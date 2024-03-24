@@ -1,7 +1,9 @@
 package ec.edu.ista.springgc1.model.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
+@AllArgsConstructor
 @Data
 public class MailRequest {
 	

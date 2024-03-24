@@ -67,9 +67,4 @@ public class OfertasLaborales {
 	@JoinColumn(name = "id_empresa", referencedColumnName = "id_empresa")
 	@JsonView(View.Base.class)
 	private Empresa empresa;
-
-	@Nullable
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "ofertas")
-	@JsonManagedReference
-	private List<Graduado> graduados;
 }

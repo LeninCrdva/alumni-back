@@ -55,12 +55,6 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudiante.setUrl_pdf(
                 estudianteDTO.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudianteDTO.getRuta_pdf()));
 
-        List<OfertasLaborales> ofertas = new ArrayList<>();
-        if (estudianteDTO.getIdOferta() != null) {
-            ofertas = ofertasRepository.findOfertasByIdIn(estudianteDTO.getIdOferta());
-            estudiante.setOfertas(ofertas);
-        }
-
         return estudiante;
     }
 
@@ -78,14 +72,6 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudianteDTO.setRuta_pdf(estudiante.getRuta_pdf());
         estudianteDTO.setUrl_pdf(estudiante.getUrl_pdf());
         List<Long> idOfertas = new ArrayList<>();
-        if (estudiante.getOfertas() != null) {
-            for (OfertasLaborales oferta : estudiante.getOfertas()) {
-                if (oferta.getId() != null) {
-                    idOfertas.add(oferta.getId());
-                }
-            }
-        }
-        estudianteDTO.setIdOferta(idOfertas);
 
         return estudianteDTO;
     }
@@ -121,10 +107,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     public List<OfertasLaborales> findByUsuarioNombreUsuario(String username) {
         Graduado graduado = graduadoRepository.findByUsuarioNombreUsuario(username)
                 .orElseThrow(() -> new ResourceNotFoundException("usuario", username));
-
-        List<OfertasLaborales> ofertas = graduado.getOfertas();
-
-        return ofertas;
+        return null;
     }
 
 
@@ -149,43 +132,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         graduadoFromDb.setRuta_pdf(estudianteDTO.getRuta_pdf());
         graduadoFromDb.setUrl_pdf(estudianteDTO.getUrl_pdf());
 
-        List<OfertasLaborales> existingOfertas = graduadoFromDb.getOfertas();
-
-        List<OfertasLaborales> nuevasOfertas = ofertasRepository.findOfertasByIdIn(estudianteDTO.getIdOferta());
-
-        graduadoFromDb.setOfertas(nuevasOfertas);
-
-        for (OfertasLaborales oferta : existingOfertas) {
-            oferta.getGraduados().remove(graduadoFromDb);
-        }
-
-        for (OfertasLaborales nuevaOferta : nuevasOfertas) {
-            nuevaOferta.getGraduados().add(graduadoFromDb);
-        }
-
         return mapToDTO(graduadoRepository.save(graduadoFromDb));
-    }
-
-    public GraduadoDTO updatePostulacion(Long idGraduado, Long ofertas) {
-        Graduado estudiante = graduadoRepository.findById(idGraduado)
-                .orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
-
-        GraduadoDTO graduadoFromDb = mapToDTO(estudiante);
-
-        graduadoFromDb.getIdOferta().add(ofertas);
-
-        return graduadoFromDb;
-    }
-
-    public GraduadoDTO cancelPostulacion(Long idGraduado, Long ofertas) {
-        Graduado estudiante = graduadoRepository.findById(idGraduado)
-                .orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
-
-        GraduadoDTO graduadoFromDb = mapToDTO(estudiante);
-
-        graduadoFromDb.getIdOferta().remove(ofertas);
-
-        return graduadoFromDb;
     }
 
     public Graduado findByEmail(String email) {

@@ -58,7 +58,13 @@ public class EmailController {
         model.put("graduado", graduado);
         model.put("oferta", oferta);
 
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.sendEmail(request, model));
+        MailResponse response = service.sendEmail(request, model);
+
+        if (response.getMessage().contains("Fallo al enviar email:")) {
+            return ResponseEntity.status(HttpStatus.REQUEST_TIMEOUT).body(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PreAuthorize("permitAll()")
@@ -69,11 +75,14 @@ public class EmailController {
         Administrador administrador = (!StringUtils.hasText(graduado.getEmailPersonal()) && !StringUtils.hasText(empresario.getEmail())) ? administradorService.findByEmail(request.getTo()) : new Administrador();
 
         if (StringUtils.hasText(graduado.getEmailPersonal())) {
-            return createResponse(graduado.getUsuario(), request);
+            createResponse(graduado.getUsuario(), request);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else if (StringUtils.hasText(empresario.getEmail())) {
-            return createResponse(empresario.getUsuario(), request);
+            createResponse(empresario.getUsuario(), request);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else if (StringUtils.hasText(administrador.getEmail())) {
-            return createResponse(administrador.getUsuario(), request);
+            createResponse(administrador.getUsuario(), request);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
         }
@@ -114,6 +123,13 @@ public class EmailController {
     private ResponseEntity<?> createResponse(Usuario usuario, MailRequest request) {
         Map<String, Object> model = new HashMap<>();
         model.put("fullName", getFullName(usuario));
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(service.sendRecoveryEmail(request, model));
+
+        MailResponse response = service.sendRecoveryEmail(request, model);
+
+        if (response.getMessage().contains("Fallo al enviar email:") ){
+            return ResponseEntity.internalServerError().body(response);
+        }
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

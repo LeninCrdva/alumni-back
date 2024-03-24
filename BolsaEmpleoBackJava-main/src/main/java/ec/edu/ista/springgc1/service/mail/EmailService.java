@@ -111,7 +111,6 @@ public class EmailService {
                 t = "graduate/email-template-postulate";
                 break;
             case "remove-postulate":
-                System.out.println("Email case: " + emailCase);
                 t = "graduate/email-template-remove-postulate";
                 break;
             case "accept-postulate":
