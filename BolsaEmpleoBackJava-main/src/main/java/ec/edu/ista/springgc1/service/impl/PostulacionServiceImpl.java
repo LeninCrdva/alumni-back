@@ -76,7 +76,7 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
     @Override
     public Postulacion mapToEntity(PostulacionDto postulacionDto) {
         Postulacion postulacion = new Postulacion();
-        Graduado graduado = graduadoService.findById(postulacionDto.getGraduado());
+        Graduado graduado = graduadoService.findByIdUsuario(postulacionDto.getGraduado());
         OfertasLaborales ofertaLaboral = ofertasLaboralesService.findById(postulacionDto.getOfertaLaboral());
 
         postulacion.setId(postulacionDto.getId());

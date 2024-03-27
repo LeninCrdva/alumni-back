@@ -99,6 +99,11 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         return mapToDTO(estudiante);
     }
 
+    public Graduado findByIdUsuario(long id_usuario) {
+        return graduadoRepository.findByUsuarioId(id_usuario)
+                .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
+    }
+
     public Graduado findByUsuarioPersonaCedulaContaining(String cedula) {
         return graduadoRepository.findByUsuarioPersonaCedulaContaining(cedula)
                 .orElseThrow(() -> new ResourceNotFoundException("cedula", cedula));
@@ -167,6 +172,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     public List<Graduado> findGraduadosWithOfertas() {
         return graduadoRepository.findAllGraduadosWithOfertas();
     }
+
     public List<Graduado> findGraduadosSinExperiencia() {
         return graduadoRepository.findAllGraduadosSinExperiencia();
     }
