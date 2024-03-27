@@ -1,6 +1,6 @@
 package ec.edu.ista.springgc1.controller;
 
-import ec.edu.ista.springgc1.model.entity.Option;
+import ec.edu.ista.springgc1.model.entity.OptionQuestion;
 import ec.edu.ista.springgc1.service.impl.OptionServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -29,14 +29,14 @@ public class OptionControlller {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/create")
-    public ResponseEntity<?> createOption(@RequestBody Option option) {
+    public ResponseEntity<?> createOption(@RequestBody OptionQuestion option) {
         return ResponseEntity.ok(optionService.save(option));
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateOption(@PathVariable Long id, @RequestBody Option option) {
-        Option optionToUpdate = optionService.findById(id);
+    public ResponseEntity<?> updateOption(@PathVariable Long id, @RequestBody OptionQuestion option) {
+        OptionQuestion optionToUpdate = optionService.findById(id);
 
         if (optionToUpdate == null) {
             return ResponseEntity.notFound().build();
