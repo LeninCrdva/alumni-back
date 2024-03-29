@@ -22,6 +22,7 @@ public class OfertasLaboralesDTO implements Serializable {
     private LocalDate fechaPublicacion;
 
     private String cargo;
+    private String tiempo; 
 
     private String experiencia;
 
@@ -33,4 +34,7 @@ public class OfertasLaboralesDTO implements Serializable {
     private Boolean estado;
 
     private String nombreEmpresa;
+    
+    private String foto_portada;
+    private String tipo;
 }

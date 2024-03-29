@@ -1,6 +1,7 @@
 package ec.edu.ista.springgc1.controller;
 
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,8 @@ import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.repository.ContratacionRepository;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -61,7 +64,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(ofertasSinPostularPorGraduado);
     }
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+   @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ofertasLaboralesService.findById(id));
@@ -192,6 +195,20 @@ public class OfertasLaboralesController {
         List<Contratacion> contrataciones = ofertasLaboralesService.getContratacionesPorOfertaLaboral(ofertaLaboralId);
         return ResponseEntity.ok(contrataciones);
     }
+    @GetMapping("/foto-portada/{id}")
+    public ResponseEntity<byte[]> getFotoPortadaById(@PathVariable Long id) {
+        OfertasLaboralesDTO ofertaLaboralDTO = ofertasLaboralesService.findByIdToDTO(id);
+        
+        String fotoBase64 = ofertaLaboralDTO.getFoto_portada();
+        
+        byte[] fotoBytes = Base64.getDecoder().decode(fotoBase64.split(",")[1]); 
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG); 
+
+        return new ResponseEntity<>(fotoBytes, headers, HttpStatus.OK);
+    }
+
 
 
 }

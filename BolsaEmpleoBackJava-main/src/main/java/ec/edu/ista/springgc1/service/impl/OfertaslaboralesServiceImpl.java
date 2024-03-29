@@ -1,5 +1,6 @@
 package ec.edu.ista.springgc1.service.impl;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,6 +15,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
@@ -23,7 +25,7 @@ import ec.edu.ista.springgc1.service.map.Mapper;
 @Service
 public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLaborales>
         implements Mapper<OfertasLaborales, OfertasLaboralesDTO> {
-
+	private DataCompression dataCompression = new DataCompression();
     @Autowired
     private OfertaslaboralesRepository ofertasLaboralesRepository;
 
@@ -55,6 +57,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
                 .orElseThrow(() -> new ResourceNotFoundException("Empresa", dto.getNombreEmpresa()));
 
         ofertaLaboral.setEmpresa(emp);
+        ofertaLaboral.setTipo(dto.getTipo());
+        ofertaLaboral.setFoto_portada(dto.getFoto_portada());
+        ofertaLaboral.setTiempo(dto.getTiempo());
 
         return ofertaLaboral;
     }
@@ -72,19 +77,36 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         dto.setAreaConocimiento(entity.getArea_conocimiento());
         dto.setEstado(entity.getEstado());
         dto.setNombreEmpresa(entity.getEmpresa().getNombre());
-
+        dto.setTipo(entity.getTipo());
+        dto.setFoto_portada(entity.getFoto_portada());
+        dto.setTiempo(entity.getTiempo());
         return dto;
     }
 
-    @Override
+    /*@Override
     public List<OfertasLaboralesDTO> findAll() {
         return ofertasLaboralesRepository.findAll().stream().map(c -> mapToDTO(c)).collect(Collectors.toList());
+    }*/
+    @Override
+    public List<OfertasLaboralesDTO> findAll() {
+        return ofertasLaboralesRepository.findAll().stream().map(oferta -> {
+            OfertasLaboralesDTO dto = mapToDTO(oferta);
+            String fotoBase64 = oferta.getFoto_portada();
+            dto.setFoto_portada(fotoBase64);
+            return dto;
+        }).collect(Collectors.toList());
     }
+
+
+
 
     @Override
     public OfertasLaborales save(Object entity) {
         return ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
     }
+    
+    
+ 
 
     public OfertasLaboralesDTO update(Long id, OfertasLaboralesDTO updatedOfertaLaboralDTO) {
         OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
@@ -98,7 +120,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
         existingOfertaLaboral.setArea_conocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
         existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
-
+        existingOfertaLaboral.setFoto_portada(updatedOfertaLaboralDTO.getFoto_portada());
+        existingOfertaLaboral.setTipo(updatedOfertaLaboralDTO.getTipo());
+        existingOfertaLaboral.setTiempo(updatedOfertaLaboralDTO.getTiempo());
         Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa()).orElseThrow(
                 () -> new ResourceNotFoundException("Empresa", updatedOfertaLaboralDTO.getNombreEmpresa()));
 
@@ -107,11 +131,23 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
     }
 
-    public OfertasLaboralesDTO findByIdToDTO(Long id) {
+    /*public OfertasLaboralesDTO findByIdToDTO(Long id) {
         OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
         return mapToDTO(ofertaLaboral);
+    }*/
+  
+    public OfertasLaboralesDTO findByIdToDTO(Long id) {
+        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+        
+        OfertasLaboralesDTO dto = mapToDTO(ofertaLaboral);
+        String fotoBase64 = ofertaLaboral.getFoto_portada();
+        dto.setFoto_portada(fotoBase64);
+        
+        return dto;
     }
+
 
     public void delete(Long id) {
         ofertasLaboralesRepository.deleteById(id);

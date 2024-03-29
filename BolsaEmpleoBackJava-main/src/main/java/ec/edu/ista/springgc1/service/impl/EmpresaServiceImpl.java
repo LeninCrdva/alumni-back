@@ -108,18 +108,27 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         Empresa existingEmpresa = empresarepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Empresa", String.valueOf(id)));
 
-
         String nuevoNombre = updatedEmpresaDTO.getNombre();
         if (!existingEmpresa.getNombre().equals(nuevoNombre) && existsBynombre(nuevoNombre)) {
             throw new EntityExistsException("Ya existe una empresa con el mismo nombre.");
         }
 
-
         existingEmpresa.setNombre(updatedEmpresaDTO.getNombre());
         existingEmpresa.setArea(updatedEmpresaDTO.getArea());
         existingEmpresa.setEstado(updatedEmpresaDTO.isEstado());
+        existingEmpresa.setSitioWeb(updatedEmpresaDTO.getSitioWeb());
+        existingEmpresa.setRazonSocial(updatedEmpresaDTO.getRazonSocial());
+        existingEmpresa.setTipoEmpresa(updatedEmpresaDTO.getTipoEmpresa());
+        existingEmpresa.setUbicacion(updatedEmpresaDTO.getUbicacion());
+        SectorEmpresarial sectorEmpresarial = sectorrepository.findByNombre(updatedEmpresaDTO.getSectorEmpresarial().getNombre())
+                .orElseThrow(() -> new ResourceNotFoundException("Sector empresarial", updatedEmpresaDTO.getSectorEmpresarial().getNombre()));
+        existingEmpresa.setSectorEmpresarial(sectorEmpresarial);
+        Ciudad ciudad = ciudadrepository.findByNombre(updatedEmpresaDTO.getCiudad().getNombre())
+                .orElseThrow(() -> new ResourceNotFoundException("Ciudad", updatedEmpresaDTO.getCiudad().getNombre()));
+        existingEmpresa.setCiudad(ciudad);
         return mapToDTO(empresarepository.save(existingEmpresa));
     }
+
 
     public void delete(Long id) {
         empresarepository.deleteById(id);

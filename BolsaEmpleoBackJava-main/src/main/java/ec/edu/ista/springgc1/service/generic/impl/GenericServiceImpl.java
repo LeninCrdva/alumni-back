@@ -1,10 +1,12 @@
 package ec.edu.ista.springgc1.service.generic.impl;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
+import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 import ec.edu.ista.springgc1.service.generic.GenericService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -43,5 +45,7 @@ public class GenericServiceImpl <T> implements GenericService {
     public long count() {
         return genericRepository.count();
     }
+
+	
 
 }
