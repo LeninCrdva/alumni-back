@@ -122,10 +122,10 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
 
     private String getFullName(Usuario usuario) {
 
-        return usuario.getPersona().getPrimer_nombre()
-                + " " + usuario.getPersona().getSegundo_nombre()
-                + " " + usuario.getPersona().getApellido_paterno()
-                + " " + usuario.getPersona().getApellido_materno();
+        return usuario.getPersona().getPrimerNombre()
+                + " " + usuario.getPersona().getSegundoNombre()
+                + " " + usuario.getPersona().getApellidoPaterno()
+                + " " + usuario.getPersona().getApellidoMaterno();
     }
 
     private MailRequest createMailRequest(Graduado graduado, String fullName, String mailCase) {
