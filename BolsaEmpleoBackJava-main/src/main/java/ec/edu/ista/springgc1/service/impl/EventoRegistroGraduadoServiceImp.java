@@ -1,6 +1,6 @@
 package ec.edu.ista.springgc1.service.impl;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -43,7 +43,7 @@ public class EventoRegistroGraduadoServiceImp extends GenericServiceImpl<Registr
 		Registro_Evento_Grad registroEventoGraduado = new Registro_Evento_Grad();
 		registroEventoGraduado.setEvento(evento);
 		registroEventoGraduado.setGraduado(graduado);
-		registroEventoGraduado.setFecha_registro(LocalDate.now());
+		registroEventoGraduado.setFechaRegistro(LocalDateTime.now());
 
 		return eventoRegistroGraduadoRepository.save(registroEventoGraduado);
 	}
@@ -65,7 +65,7 @@ public class EventoRegistroGraduadoServiceImp extends GenericServiceImpl<Registr
 				.orElseThrow(() -> new ResourceNotFoundException("id", id));
 		registroEventoGraduado.setEvento(evento);
 		//registroEventoGraduado.setGraduado(graduado);
-		registroEventoGraduado.setFecha_registro(LocalDate.now());
+		registroEventoGraduado.setFechaRegistro(LocalDateTime.now());
 
 		return eventoRegistroGraduadoRepository.save(registroEventoGraduado);
 	}

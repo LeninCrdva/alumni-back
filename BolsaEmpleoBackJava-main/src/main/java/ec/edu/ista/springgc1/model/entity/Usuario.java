@@ -31,10 +31,10 @@ public class Usuario {
 	@JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
 	private Rol rol;
 
-	private String ruta_imagen;
+	private String rutaImagen;
 
 	@Transient
-	private String url_imagen;
+	private String urlImagen;
 	
 	@ManyToOne
 	@JoinColumn(referencedColumnName = "cod_perso")

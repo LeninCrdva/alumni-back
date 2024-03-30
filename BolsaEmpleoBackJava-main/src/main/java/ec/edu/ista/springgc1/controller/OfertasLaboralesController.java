@@ -199,7 +199,7 @@ public class OfertasLaboralesController {
     public ResponseEntity<byte[]> getFotoPortadaById(@PathVariable Long id) {
         OfertasLaboralesDTO ofertaLaboralDTO = ofertasLaboralesService.findByIdToDTO(id);
         
-        String fotoBase64 = ofertaLaboralDTO.getFoto_portada();
+        String fotoBase64 = ofertaLaboralDTO.getFotoPortada();
         
         byte[] fotoBytes = Base64.getDecoder().decode(fotoBase64.split(",")[1]); 
 
@@ -208,7 +208,4 @@ public class OfertasLaboralesController {
 
         return new ResponseEntity<>(fotoBytes, headers, HttpStatus.OK);
     }
-
-
-
 }

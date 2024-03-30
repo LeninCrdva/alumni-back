@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,9 +17,10 @@ public class PersonaDTO  implements Serializable{
 	private String cedula;
 
     @NotEmpty
-	private String primer_nombre;
+	private String primerNombre;
+
     @NotEmpty
-	private String segundo_nombre;
+	private String segundoNombre;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
 	private LocalDate fechaNacimiento;
@@ -29,8 +29,8 @@ public class PersonaDTO  implements Serializable{
 	private String telefono;
 
     @NotEmpty
-	private String apellido_paterno;
+	private String apellidoPaterno;
 
     @NotEmpty
-	private String apellido_materno;
+	private String apellidoMaterno;
 }

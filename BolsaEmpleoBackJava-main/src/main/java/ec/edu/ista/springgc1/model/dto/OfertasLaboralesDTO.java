@@ -1,10 +1,7 @@
 package ec.edu.ista.springgc1.model.dto;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.Set;
-
-import ec.edu.ista.springgc1.model.entity.Empresa;
+import java.time.LocalDateTime;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -16,18 +13,19 @@ public class OfertasLaboralesDTO implements Serializable {
     private double salario;
 
     @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDate fechaCierre;
+    private LocalDateTime fechaCierre;
 
     @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDate fechaPublicacion;
+    private LocalDateTime fechaPublicacion;
 
     private String cargo;
+
     private String tiempo; 
 
     private String experiencia;
 
     @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDate fechaApertura;
+    private LocalDateTime fechaApertura;
 
     private String areaConocimiento;
 
@@ -35,6 +33,7 @@ public class OfertasLaboralesDTO implements Serializable {
 
     private String nombreEmpresa;
     
-    private String foto_portada;
+    private String fotoPortada;
+
     private String tipo;
 }

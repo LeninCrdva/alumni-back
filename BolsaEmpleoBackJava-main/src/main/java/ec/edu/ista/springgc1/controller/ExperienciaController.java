@@ -59,7 +59,7 @@ public class ExperienciaController {
 		currentExperiencie.setActividad(experienciaDTO.getActividad());
 		currentExperiencie.setCargo(experienciaDTO.getCargo());
 		currentExperiencie.setDuracion(experienciaDTO.getDuracion());
-		currentExperiencie.setArea_trabajo(experienciaDTO.getArea_trabajo());
+		currentExperiencie.setAreaTrabajo(experienciaDTO.getAreaTrabajo());
 
 		return ResponseEntity.status(HttpStatus.OK).body(experienciaServiceImp.save(currentExperiencie));
 	}

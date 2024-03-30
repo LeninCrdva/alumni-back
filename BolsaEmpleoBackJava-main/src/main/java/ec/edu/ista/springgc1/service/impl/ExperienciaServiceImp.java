@@ -34,11 +34,11 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 
 		experiencia.setId(experienciaDTO.getId());
 		experiencia.setCedulaGraduado(graduado);
-		experiencia.setInstitucionNombre(experienciaDTO.getInstitucionNombre());
+		experiencia.setNombreInstitucion(experienciaDTO.getInstitucionNombre());
 		experiencia.setActividad(experienciaDTO.getActividad());
 		experiencia.setCargo(experienciaDTO.getCargo());
 		experiencia.setDuracion(experienciaDTO.getDuracion());
-		experiencia.setArea_trabajo(experienciaDTO.getArea_trabajo());
+		experiencia.setAreaTrabajo(experienciaDTO.getAreaTrabajo());
 		return experiencia;
 	}
 
@@ -47,11 +47,11 @@ public class ExperienciaServiceImp extends GenericServiceImpl<Experiencia>
 		ExperienciaDTO experienciaDTO = new ExperienciaDTO();
 		experienciaDTO.setId(experiencia.getId());
 		experienciaDTO.setCedulaGraduado(experiencia.getCedulaGraduado().getUsuario().getPersona().getCedula());
-		experienciaDTO.setInstitucionNombre(experiencia.getInstitucionNombre());
+		experienciaDTO.setInstitucionNombre(experiencia.getNombreInstitucion());
 		experienciaDTO.setActividad(experiencia.getActividad());
 		experienciaDTO.setCargo(experiencia.getCargo());
 		experienciaDTO.setDuracion(experiencia.getDuracion());
-		experienciaDTO.setArea_trabajo(experiencia.getArea_trabajo());
+		experienciaDTO.setAreaTrabajo(experiencia.getAreaTrabajo());
 		return experienciaDTO;
 	}
 

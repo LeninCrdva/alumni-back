@@ -11,10 +11,12 @@ import ec.edu.ista.springgc1.repository.PeriodoRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 
 @Service
-public class PeriodosServiceImp extends GenericServiceImpl<Periodo>{
-	  @Autowired
-	    private PeriodoRepository  peridoRepository;
-	    public Optional<Periodo> findByNombre(String nombre){
-	        return peridoRepository.findByNombre(nombre);
-	    }
+public class PeriodosServiceImp extends GenericServiceImpl<Periodo> {
+
+    @Autowired
+    private PeriodoRepository peridoRepository;
+
+    public Optional<Periodo> findByNombre(String nombre) {
+        return peridoRepository.findByNombre(nombre);
+    }
 }

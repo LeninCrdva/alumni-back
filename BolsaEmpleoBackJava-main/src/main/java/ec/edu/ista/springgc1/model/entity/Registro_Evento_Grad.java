@@ -1,14 +1,7 @@
 package ec.edu.ista.springgc1.model.entity;
 
-import java.time.LocalDate;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import java.time.LocalDateTime;
+import javax.persistence.*;
 
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,5 +24,5 @@ public class Registro_Evento_Grad {
 	private Evento evento;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fecha_registro;
+	private LocalDateTime fechaRegistro;
 }

@@ -23,11 +23,11 @@ public class Persona {
 	@Pattern(regexp = "\\d+", message = "La cédula debe contener solo dígitos")
 	private String cedula;
 
-	private String primer_nombre;
+	private String primerNombre;
 
-	private String segundo_nombre;
+	private String segundoNombre;
 
-	@Column(name = "fechaNacimiento", nullable = false)
+	@Column(name = "fecha_nacimiento", nullable = false)
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
 	private LocalDate fechaNacimiento;
 
@@ -35,9 +35,9 @@ public class Persona {
 	@Pattern(regexp = "\\d+", message = "El número de celular debe contener solo dígitos")
 	private String telefono;
 
-	private String apellido_paterno;
+	private String apellidoPaterno;
 
-	private String apellido_materno;
+	private String apellidoMaterno;
 
 	@Enumerated(EnumType.STRING)
 	private Sex sexo;

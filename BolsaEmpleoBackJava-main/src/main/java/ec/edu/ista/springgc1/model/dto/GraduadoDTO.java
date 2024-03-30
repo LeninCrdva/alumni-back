@@ -25,15 +25,15 @@ public class GraduadoDTO implements Serializable {
 	private String ciudad;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
-	private LocalDate año_graduacion;
+	private LocalDate anioGraduacion;
 
 	@NotEmpty
-	private String email_personal;
+	private String emailPersonal;
 
 	@NotEmpty
-	private String estadocivil;
+	private String estadoCivil;
 
-	private String ruta_pdf;
+	private String rutaPdf;
 
-	private String url_pdf;
+	private String urlPdf;
 }

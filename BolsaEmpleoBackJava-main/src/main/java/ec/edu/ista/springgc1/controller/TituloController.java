@@ -68,14 +68,14 @@ public class TituloController {
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TituloDTO e) {
         TituloDTO tituloFromDb = tituloService.findByIdToDTO(id);
 
-        tituloFromDb.setFecha_emision(e.getFecha_emision());
-        tituloFromDb.setFecha_registro(e.getFecha_registro());
-        tituloFromDb.setIdgraduado(e.getIdgraduado());
+        tituloFromDb.setFechaEmision(e.getFechaEmision());
+        tituloFromDb.setFechaRegistro(e.getFechaRegistro());
+        tituloFromDb.setIdGraduado(e.getIdGraduado());
         tituloFromDb.setInstitucion(e.getInstitucion());
         tituloFromDb.setNivel(e.getInstitucion());
-        tituloFromDb.setNombre_titulo(e.getNombre_titulo());
-        tituloFromDb.setNombrecarrera(e.getNombrecarrera());
-        tituloFromDb.setNum_registro(e.getNum_registro());
+        tituloFromDb.setNombreTitulo(e.getNombreTitulo());
+        tituloFromDb.setNombreCarrera(e.getNombreCarrera());
+        tituloFromDb.setNumRegistro(e.getNumRegistro());
         tituloFromDb.setTipo(e.getTipo());
 
         // Utiliza el método update del servicio para actualizar la instancia existente

@@ -10,10 +10,12 @@ import ec.edu.ista.springgc1.repository.CarreraRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 
 @Service
-public class CarreraServiceImp  extends GenericServiceImpl<Carrera>{
-	  @Autowired
-	    private CarreraRepository carreraRepository;
-	    public Optional<Carrera> findByNombre(String nombre){
-	        return carreraRepository.findByNombre(nombre);
-	    }
+public class CarreraServiceImp extends GenericServiceImpl<Carrera> {
+
+    @Autowired
+    private CarreraRepository carreraRepository;
+
+    public Optional<Carrera> findByNombre(String nombre) {
+        return carreraRepository.findByNombre(nombre);
+    }
 }

@@ -1,11 +1,11 @@
 package ec.edu.ista.springgc1.repository;
 
-import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.Postulacion;
 import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostulacionRepository extends GenericRepository<Postulacion> {
@@ -16,7 +16,7 @@ public interface PostulacionRepository extends GenericRepository<Postulacion> {
 
     List<Postulacion> findAllByGraduadoUsuarioNombreUsuario(String nombreUsuario);
 
-    Integer countPostulacionByFechaPostulacionIsStartingWith(LocalDate fechaPostulacion);
+    Integer countPostulacionByFechaPostulacionIsStartingWith(LocalDateTime fechaPostulacion);
 
     Integer countByGraduadoIdAndOfertaLaboralId(Long idGraduado, Long idOfertaLaboral);
 

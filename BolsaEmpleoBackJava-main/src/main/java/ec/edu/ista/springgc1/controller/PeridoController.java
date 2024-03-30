@@ -62,8 +62,8 @@ public class PeridoController {
             throw new AppException(HttpStatus.BAD_REQUEST, "Ya se encuentra registrado el Periodo");
         }
         periodoFromDb.setNombre(p.getNombre());
-        periodoFromDb.setFecha_fin(p.getFecha_fin());
-        periodoFromDb.setFecha_inicio(p.getFecha_inicio());
+        periodoFromDb.setFechaFin(p.getFechaFin());
+        periodoFromDb.setFechaInicio(p.getFechaInicio());
         periodoFromDb.setEstado(p.getEstado());
         periodoFromDb.setCarreras(p.getCarreras());
         return ResponseEntity.status(HttpStatus.CREATED).body(periodoService.save(periodoFromDb));

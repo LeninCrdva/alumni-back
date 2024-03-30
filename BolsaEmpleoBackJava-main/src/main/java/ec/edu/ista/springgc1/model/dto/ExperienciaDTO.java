@@ -13,7 +13,7 @@ public class ExperienciaDTO implements Serializable {
 	private String cedulaGraduado;
 
 	@NotEmpty
-	private String area_trabajo;
+	private String areaTrabajo;
 
 	@NotEmpty
 	private String institucionNombre;

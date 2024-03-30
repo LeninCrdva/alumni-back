@@ -27,7 +27,7 @@ public class UsuarioDTO implements Serializable {
     @NotNull
     private boolean estado;
 
-    private String ruta_imagen;
+    private String rutaImagen;
 
-    private String url_imagen;
+    private String urlImagen;
 }

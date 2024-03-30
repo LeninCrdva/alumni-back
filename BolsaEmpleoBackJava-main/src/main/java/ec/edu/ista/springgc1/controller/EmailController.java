@@ -114,10 +114,10 @@ public class EmailController {
 
     private String getFullName(Usuario usuario) {
 
-        return usuario.getPersona().getPrimer_nombre()
-                + " " + usuario.getPersona().getSegundo_nombre()
-                + " " + usuario.getPersona().getApellido_paterno()
-                + " " + usuario.getPersona().getApellido_materno();
+        return usuario.getPersona().getPrimerNombre()
+                + " " + usuario.getPersona().getSegundoNombre()
+                + " " + usuario.getPersona().getApellidoPaterno()
+                + " " + usuario.getPersona().getApellidoMaterno();
     }
 
     private ResponseEntity<?> createResponse(Usuario usuario, MailRequest request) {

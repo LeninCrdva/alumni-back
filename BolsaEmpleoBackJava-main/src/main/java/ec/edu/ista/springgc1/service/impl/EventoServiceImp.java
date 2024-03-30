@@ -44,8 +44,8 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 		evento.setAdmin(administrador);
 		evento.setNombreEvento(eventoDTO.getNombreEvento());
 		evento.setLugar(eventoDTO.getLugar());
-		evento.setHora_inicio(LocalTime.parse(eventoDTO.getHoraInicio()));
-		evento.setHora_fin(LocalTime.parse(eventoDTO.getHoraInicio()));
+		evento.setHoraInicio(LocalTime.parse(eventoDTO.getHoraInicio()));
+		evento.setHoraFin(LocalTime.parse(eventoDTO.getHoraInicio()));
 		evento.setFecha(eventoDTO.getFecha());
 		evento.setDescripcion(eventoDTO.getDescripcion());
 
@@ -68,8 +68,8 @@ public class EventoServiceImp extends GenericServiceImpl<Evento> implements Mapp
 		eventoDTO.setCedula(evento.getAdmin().getUsuario().getPersona().getCedula());
 		eventoDTO.setNombreEvento(evento.getNombreEvento());
 		eventoDTO.setFecha(evento.getFecha());
-		eventoDTO.setHoraInicio(String.valueOf(evento.getHora_inicio()));
-		eventoDTO.setHoraFin(String.valueOf(evento.getHora_inicio()));
+		eventoDTO.setHoraInicio(String.valueOf(evento.getHoraInicio()));
+		eventoDTO.setHoraFin(String.valueOf(evento.getHoraInicio()));
 		eventoDTO.setLugar(evento.getLugar());
 		eventoDTO.setDescripcion(evento.getDescripcion());
 		return eventoDTO;

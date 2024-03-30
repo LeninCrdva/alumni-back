@@ -13,6 +13,7 @@ public class RolServiceImpl extends GenericServiceImpl<Rol> {
 
     @Autowired
     private RolRepository rolRepository;
+
     public Optional<Rol> findByNombre(String nombre){
         return rolRepository.findByNombre(nombre);
     }

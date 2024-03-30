@@ -2,20 +2,17 @@ package ec.edu.ista.springgc1.model.dto;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-
-import ec.edu.ista.springgc1.model.entity.Graduado;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 public class TituloDTO implements Serializable {
+
     private Long id;
 
     @NotNull
-    private Long idgraduado;
+    private Long idGraduado;
 
     @NotNull
     private String tipo;
@@ -27,19 +24,19 @@ public class TituloDTO implements Serializable {
     private String institucion;
 
     @NotNull
-    private String nombre_titulo;
+    private String nombreTitulo;
 
     @NotNull
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
-    private LocalDate fecha_emision;
+    private LocalDate fechaEmision;
 
     @NotNull
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
-    private LocalDate fecha_registro;
+    private LocalDate fechaRegistro;
 
     @NotNull
-    private String num_registro;
+    private String numRegistro;
 
     @NotNull
-    private String nombrecarrera;
+    private String nombreCarrera;
 }

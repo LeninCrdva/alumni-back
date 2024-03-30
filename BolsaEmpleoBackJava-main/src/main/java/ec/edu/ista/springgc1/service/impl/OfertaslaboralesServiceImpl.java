@@ -1,21 +1,17 @@
 package ec.edu.ista.springgc1.service.impl;
 
-import java.io.IOException;
+import java.time.LocalDateTime;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
-import ec.edu.ista.springgc1.model.dto.GraduadoDTO;
 import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
@@ -23,9 +19,8 @@ import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
 @Service
-public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLaborales>
-        implements Mapper<OfertasLaborales, OfertasLaboralesDTO> {
-	private DataCompression dataCompression = new DataCompression();
+public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLaborales> implements Mapper<OfertasLaborales, OfertasLaboralesDTO> {
+
     @Autowired
     private OfertaslaboralesRepository ofertasLaboralesRepository;
 
@@ -46,19 +41,19 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         OfertasLaborales ofertaLaboral = new OfertasLaborales();
         ofertaLaboral.setId(dto.getId());
         ofertaLaboral.setSalario(dto.getSalario());
-        ofertaLaboral.setFecha_cierre(dto.getFechaCierre());
-        ofertaLaboral.setFecha_apertura(dto.getFechaApertura());
+        ofertaLaboral.setFechaCierre(dto.getFechaCierre());
+        ofertaLaboral.setFechaApertura(dto.getFechaApertura());
         ofertaLaboral.setCargo(dto.getCargo());
         ofertaLaboral.setExperiencia(dto.getExperiencia());
         ofertaLaboral.setFechaPublicacion(dto.getFechaPublicacion());
-        ofertaLaboral.setArea_conocimiento(dto.getAreaConocimiento());
+        ofertaLaboral.setAreaConocimiento(dto.getAreaConocimiento());
         ofertaLaboral.setEstado(dto.getEstado());
         Empresa emp = empresarepository.findByNombre(dto.getNombreEmpresa())
                 .orElseThrow(() -> new ResourceNotFoundException("Empresa", dto.getNombreEmpresa()));
 
         ofertaLaboral.setEmpresa(emp);
         ofertaLaboral.setTipo(dto.getTipo());
-        ofertaLaboral.setFoto_portada(dto.getFoto_portada());
+        ofertaLaboral.setFotoPortada(dto.getFotoPortada());
         ofertaLaboral.setTiempo(dto.getTiempo());
 
         return ofertaLaboral;
@@ -69,58 +64,44 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         OfertasLaboralesDTO dto = new OfertasLaboralesDTO();
         dto.setId(entity.getId());
         dto.setSalario(entity.getSalario());
-        dto.setFechaCierre(entity.getFecha_cierre());
+        dto.setFechaCierre(entity.getFechaCierre());
         dto.setFechaPublicacion(entity.getFechaPublicacion());
         dto.setCargo(entity.getCargo());
         dto.setExperiencia(entity.getExperiencia());
-        dto.setFechaApertura(entity.getFecha_apertura());
-        dto.setAreaConocimiento(entity.getArea_conocimiento());
+        dto.setFechaApertura(entity.getFechaApertura());
+        dto.setAreaConocimiento(entity.getAreaConocimiento());
         dto.setEstado(entity.getEstado());
         dto.setNombreEmpresa(entity.getEmpresa().getNombre());
         dto.setTipo(entity.getTipo());
-        dto.setFoto_portada(entity.getFoto_portada());
+        dto.setFotoPortada(entity.getFotoPortada());
         dto.setTiempo(entity.getTiempo());
+
         return dto;
     }
 
-    /*@Override
-    public List<OfertasLaboralesDTO> findAll() {
-        return ofertasLaboralesRepository.findAll().stream().map(c -> mapToDTO(c)).collect(Collectors.toList());
-    }*/
     @Override
     public List<OfertasLaboralesDTO> findAll() {
-        return ofertasLaboralesRepository.findAll().stream().map(oferta -> {
-            OfertasLaboralesDTO dto = mapToDTO(oferta);
-            String fotoBase64 = oferta.getFoto_portada();
-            dto.setFoto_portada(fotoBase64);
-            return dto;
-        }).collect(Collectors.toList());
+        return ofertasLaboralesRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-
-
-
 
     @Override
     public OfertasLaborales save(Object entity) {
         return ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
     }
-    
-    
- 
 
     public OfertasLaboralesDTO update(Long id, OfertasLaboralesDTO updatedOfertaLaboralDTO) {
         OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
 
         existingOfertaLaboral.setSalario(updatedOfertaLaboralDTO.getSalario());
-        existingOfertaLaboral.setFecha_cierre(updatedOfertaLaboralDTO.getFechaCierre());
-        existingOfertaLaboral.setFecha_apertura(updatedOfertaLaboralDTO.getFechaApertura());
+        existingOfertaLaboral.setFechaCierre(updatedOfertaLaboralDTO.getFechaCierre());
+        existingOfertaLaboral.setFechaApertura(updatedOfertaLaboralDTO.getFechaApertura());
         existingOfertaLaboral.setCargo(updatedOfertaLaboralDTO.getCargo());
         existingOfertaLaboral.setExperiencia(updatedOfertaLaboralDTO.getExperiencia());
         existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
-        existingOfertaLaboral.setArea_conocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
+        existingOfertaLaboral.setAreaConocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
         existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
-        existingOfertaLaboral.setFoto_portada(updatedOfertaLaboralDTO.getFoto_portada());
+        existingOfertaLaboral.setFotoPortada(updatedOfertaLaboralDTO.getFotoPortada());
         existingOfertaLaboral.setTipo(updatedOfertaLaboralDTO.getTipo());
         existingOfertaLaboral.setTiempo(updatedOfertaLaboralDTO.getTiempo());
         Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa()).orElseThrow(
@@ -131,23 +112,12 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
     }
 
-    /*public OfertasLaboralesDTO findByIdToDTO(Long id) {
-        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
-        return mapToDTO(ofertaLaboral);
-    }*/
-  
     public OfertasLaboralesDTO findByIdToDTO(Long id) {
         OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
-        
-        OfertasLaboralesDTO dto = mapToDTO(ofertaLaboral);
-        String fotoBase64 = ofertaLaboral.getFoto_portada();
-        dto.setFoto_portada(fotoBase64);
-        
-        return dto;
-    }
 
+        return mapToDTO(ofertaLaboral);
+    }
 
     public void delete(Long id) {
         ofertasLaboralesRepository.deleteById(id);
@@ -168,10 +138,10 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         Map<LocalDate, Long> postulacionesPorDia = new HashMap<>();
 
         for (OfertasLaborales oferta : ofertasLaborales) {
-            LocalDate fechaPublicacion = oferta.getFechaPublicacion();
+            LocalDateTime fechaPublicacion = oferta.getFechaPublicacion();
 
             if (fechaPublicacion != null) {
-                postulacionesPorDia.merge(fechaPublicacion, 1L, Long::sum);
+                postulacionesPorDia.merge(LocalDate.from(fechaPublicacion), 1L, Long::sum);
             }
         }
 

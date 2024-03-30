@@ -91,6 +91,6 @@ public class PostulacionController {
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/count-by-date/{date}")
     public ResponseEntity<?> countPostulacionesByFechaPostulacion(@PathVariable String date) {
-        return ResponseEntity.ok(postulacionService.countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDate.parse(date)));
+        return ResponseEntity.ok(postulacionService.countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDate.parse(date).atStartOfDay()));
     }
 }

@@ -27,10 +27,10 @@ public class PersonaServiceImp extends GenericServiceImpl<Persona> {
         Persona persona = new Persona();
 
         persona.setCedula(usuarioDTO.getCedula());
-        persona.setPrimer_nombre(usuarioDTO.getPrimerNombre());
-        persona.setSegundo_nombre(usuarioDTO.getSegundoNombre());
-        persona.setApellido_paterno(usuarioDTO.getApellidoPaterno());
-        persona.setApellido_materno(usuarioDTO.getApellidoMaterno());
+        persona.setPrimerNombre(usuarioDTO.getPrimerNombre());
+        persona.setSegundoNombre(usuarioDTO.getSegundoNombre());
+        persona.setApellidoPaterno(usuarioDTO.getApellidoPaterno());
+        persona.setApellidoMaterno(usuarioDTO.getApellidoMaterno());
         persona.setFechaNacimiento(usuarioDTO.getFechaNacimiento());
         persona.setTelefono(usuarioDTO.getTelefono());
         persona.setSexo(usuarioDTO.getSexo());

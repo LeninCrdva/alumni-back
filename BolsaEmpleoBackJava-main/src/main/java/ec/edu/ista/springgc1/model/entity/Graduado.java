@@ -53,7 +53,7 @@ public class Graduado {
 
 	@JsonView(View.Base.class)
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
-	private LocalDate año_graduacion;
+	private LocalDate anioGraduacion;
 
 	@JsonView(View.Base.class)
 	@Email(message = "Debe ser una dirección de correo electrónico válida.")
@@ -62,11 +62,11 @@ public class Graduado {
 
 	@ColumnTransformer(write = "UPPER(?)")
 	@JsonView(View.Base.class)
-	private String estadocivil;
+	private String estadoCivil;
 
 	@JsonView(View.Base.class)
-	private String ruta_pdf;
+	private String rutaPdf;
 
 	@Transient
-	private String url_pdf;
+	private String urlPdf;
 }

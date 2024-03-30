@@ -6,6 +6,7 @@ import javax.persistence.*;
 
 import lombok.Data;
 
+@Deprecated
 @Entity
 @Data
 @Table(name = "contrataciones")

@@ -9,7 +9,6 @@ import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,8 +20,10 @@ import ec.edu.ista.springgc1.model.dto.*;
 
 @Service
 public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements Mapper<Graduado, GraduadoDTO> {
+
     @Autowired
     private GraduadoRepository graduadoRepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -48,16 +49,15 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudiante.setId(estudianteDTO.getId());
         estudiante.setUsuario(usuario);
         estudiante.setCiudad(ciudad);
-        estudiante.setAño_graduacion(estudianteDTO.getAño_graduacion());
-        estudiante.setEmailPersonal(estudianteDTO.getEmail_personal());
-        estudiante.setEstadocivil(estudianteDTO.getEstadocivil());
-        estudiante.setRuta_pdf(estudianteDTO.getRuta_pdf());
-        estudiante.setUrl_pdf(
-                estudianteDTO.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudianteDTO.getRuta_pdf()));
+        estudiante.setAnioGraduacion(estudianteDTO.getAnioGraduacion());
+        estudiante.setEmailPersonal(estudianteDTO.getEmailPersonal());
+        estudiante.setEstadoCivil(estudianteDTO.getEstadoCivil());
+        estudiante.setRutaPdf(estudianteDTO.getRutaPdf());
+        estudiante.setUrlPdf(
+                estudianteDTO.getRutaPdf() == null ? null : s3Service.getObjectUrl(estudianteDTO.getRutaPdf()));
 
         return estudiante;
     }
-
 
     @Override
     public GraduadoDTO mapToDTO(Graduado estudiante) {
@@ -66,12 +66,11 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudianteDTO.setId(estudiante.getId());
         estudianteDTO.setUsuario(estudiante.getUsuario().getNombreUsuario());
         estudianteDTO.setCiudad(estudiante.getCiudad().getNombre());
-        estudianteDTO.setAño_graduacion(estudiante.getAño_graduacion());
-        estudianteDTO.setEmail_personal(estudiante.getEmailPersonal());
-        estudianteDTO.setEstadocivil(estudiante.getEstadocivil());
-        estudianteDTO.setRuta_pdf(estudiante.getRuta_pdf());
-        estudianteDTO.setUrl_pdf(estudiante.getUrl_pdf());
-        List<Long> idOfertas = new ArrayList<>();
+        estudianteDTO.setAnioGraduacion(estudiante.getAnioGraduacion());
+        estudianteDTO.setEmailPersonal(estudiante.getEmailPersonal());
+        estudianteDTO.setEstadoCivil(estudiante.getEstadoCivil());
+        estudianteDTO.setRutaPdf(estudiante.getRutaPdf());
+        estudianteDTO.setUrlPdf(estudiante.getUrlPdf());
 
         return estudianteDTO;
     }
@@ -79,8 +78,8 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     @Override
     public List findAll() {
         return graduadoRepository.findAll().stream()
-                .peek(e -> e.setUrl_pdf(e.getRuta_pdf() == null ? null : s3Service.getObjectUrl(e.getRuta_pdf())))
-                .map(e -> mapToDTO(e)).collect(Collectors.toList());
+                .peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf())))
+                .map(this::mapToDTO).collect(Collectors.toList());
     }
 
     public GraduadoDTO findByIdToDTO(Long id) {
@@ -95,7 +94,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         Graduado estudiante = graduadoRepository.findByUsuarioId(id_usuario)
                 .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
         estudiante
-                .setUrl_pdf(estudiante.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudiante.getRuta_pdf()));
+                .setUrlPdf(estudiante.getRutaPdf() == null ? null : s3Service.getObjectUrl(estudiante.getRutaPdf()));
         return mapToDTO(estudiante);
     }
 
@@ -128,14 +127,14 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         graduadoFromDb.setUsuario(usuarioRepository.findBynombreUsuario(estudianteDTO.getUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", estudianteDTO.getUsuario())));
 
-        graduadoFromDb.setAño_graduacion(estudianteDTO.getAño_graduacion());
+        graduadoFromDb.setAnioGraduacion(estudianteDTO.getAnioGraduacion());
         graduadoFromDb.setCiudad(ciudadRepository.findByNombre(estudianteDTO.getCiudad())
                 .orElseThrow(() -> new ResourceNotFoundException("Ciudad", estudianteDTO.getCiudad())));
 
-        graduadoFromDb.setEmailPersonal(estudianteDTO.getEmail_personal());
-        graduadoFromDb.setEstadocivil(estudianteDTO.getEstadocivil());
-        graduadoFromDb.setRuta_pdf(estudianteDTO.getRuta_pdf());
-        graduadoFromDb.setUrl_pdf(estudianteDTO.getUrl_pdf());
+        graduadoFromDb.setEmailPersonal(estudianteDTO.getEmailPersonal());
+        graduadoFromDb.setEstadoCivil(estudianteDTO.getEstadoCivil());
+        graduadoFromDb.setRutaPdf(estudianteDTO.getRutaPdf());
+        graduadoFromDb.setUrlPdf(estudianteDTO.getUrlPdf());
 
         return mapToDTO(graduadoRepository.save(graduadoFromDb));
     }
@@ -155,7 +154,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
     public List<Graduado> findAllGraduados() {
         return graduadoRepository.findAll().stream()
-                .peek(e -> e.setUrl_pdf(e.getRuta_pdf() == null ? null : s3Service.getObjectUrl(e.getRuta_pdf())))
+                .peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf())))
                 .collect(Collectors.toList());
     }
 

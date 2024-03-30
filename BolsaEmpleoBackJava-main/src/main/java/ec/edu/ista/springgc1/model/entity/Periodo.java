@@ -1,18 +1,10 @@
 package ec.edu.ista.springgc1.model.entity;
 
-import java.time.LocalDate;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+import javax.persistence.*;
 import javax.persistence.Id;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.HashSet;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinTable;
-import javax.persistence.JoinColumn;
-import javax.persistence.Table;
 
 import org.hibernate.annotations.ColumnTransformer;
 
@@ -29,10 +21,10 @@ public class Periodo {
     private Long id;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDate fecha_inicio;
+    private LocalDateTime fechaInicio;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDate fecha_fin;
+    private LocalDateTime fechaFin;
 
     private Boolean estado = true;
 

@@ -1,23 +1,11 @@
 package ec.edu.ista.springgc1.model.entity;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonView;
 
 import ec.edu.ista.springgc1.view.View;
@@ -38,12 +26,11 @@ public class OfertasLaborales {
 	
 	@JsonView(View.Base.class)
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fecha_cierre;
-	
-	@Column(name = "fechaPublicacion")
+	private LocalDateTime fechaCierre;
+
 	@JsonView(View.Base.class)
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fechaPublicacion;
+	private LocalDateTime fechaPublicacion;
 	
 	@ColumnTransformer(write = "UPPER(?)")
 	@JsonView(View.Base.class)
@@ -59,10 +46,10 @@ public class OfertasLaborales {
 	
 	@JsonView(View.Base.class)
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fecha_apertura;
+	private LocalDateTime fechaApertura;
 	
 	@JsonView(View.Base.class)
-	private String area_conocimiento;
+	private String areaConocimiento;
 	
 	@JsonView(View.Base.class)
 	private Boolean estado;
@@ -78,5 +65,5 @@ public class OfertasLaborales {
 	
 	@Column(name = "foto_portada", columnDefinition = "TEXT")
 	@JsonView(View.Base.class)
-	private String foto_portada;
+	private String fotoPortada;
 }

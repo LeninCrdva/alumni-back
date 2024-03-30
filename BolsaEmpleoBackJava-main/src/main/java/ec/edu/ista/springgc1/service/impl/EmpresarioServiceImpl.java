@@ -23,11 +23,12 @@ import ec.edu.ista.springgc1.service.map.Mapper;
 
 @Service
 public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implements Mapper<Empresario, EmpresarioDTO> {
+
     @Autowired
     private EmpresarioRepository empresariorepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
-
 
     @Override
     public Empresario mapToEntity(EmpresarioDTO empresarioDTO) {

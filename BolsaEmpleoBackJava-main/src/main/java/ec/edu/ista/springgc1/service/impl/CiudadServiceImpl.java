@@ -35,7 +35,6 @@ public class CiudadServiceImpl extends GenericServiceImpl<Ciudad> implements Map
         ciudad.setProvincia(provincia);
 
         return ciudad;
-
     }
 
     @Override
@@ -44,6 +43,7 @@ public class CiudadServiceImpl extends GenericServiceImpl<Ciudad> implements Map
         ciudadDTO.setId(ciudad.getId());
         ciudadDTO.setNombre(ciudad.getNombre());
         ciudadDTO.setProvincia(ciudad.getProvincia().getNombre());
+
         return ciudadDTO;
     }
 
@@ -68,6 +68,4 @@ public class CiudadServiceImpl extends GenericServiceImpl<Ciudad> implements Map
     public Optional<Ciudad> findByNombre(String nombre){
         return ciudadRepository.findByNombre(nombre);
     }
-
-
 }

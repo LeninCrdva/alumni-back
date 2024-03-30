@@ -26,10 +26,10 @@ public class Evento {
     private Boolean estado = true;
 
     @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime hora_inicio;
+    private LocalTime horaInicio;
 
     @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime hora_fin;
+    private LocalTime horaFin;
 
     @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
     private LocalDate fecha;

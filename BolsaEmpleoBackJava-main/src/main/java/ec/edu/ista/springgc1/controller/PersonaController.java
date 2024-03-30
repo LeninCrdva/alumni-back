@@ -70,11 +70,11 @@ public class PersonaController {
             throw new AppException(HttpStatus.BAD_REQUEST, "Ya se encuentra registrado la cedula, no es posible actualizar");
         }
         pFromDb.setCedula(p.getCedula());
-        pFromDb.setApellido_materno(p.getApellido_materno());
-        pFromDb.setApellido_paterno(p.getApellido_paterno());
+        pFromDb.setApellidoMaterno(p.getApellidoMaterno());
+        pFromDb.setApellidoPaterno(p.getApellidoPaterno());
         pFromDb.setFechaNacimiento(p.getFechaNacimiento());
-        pFromDb.setPrimer_nombre(p.getPrimer_nombre());
-        pFromDb.setSegundo_nombre(p.getSegundo_nombre());
+        pFromDb.setPrimerNombre(p.getPrimerNombre());
+        pFromDb.setSegundoNombre(p.getSegundoNombre());
         pFromDb.setTelefono(p.getTelefono());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(personaService.save(pFromDb));

@@ -23,10 +23,10 @@ public class Capacitacion {
 	private Graduado graduado;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
-	private LocalDate fecha_inicio;
+	private LocalDate fechaInicio;
 
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
-	private LocalDate fecha_fin;
+	private LocalDate fechaFin;
 
 	@ColumnTransformer(write = "UPPER(?)")
 	private String nombre;
@@ -37,6 +37,6 @@ public class Capacitacion {
 	private Integer horas;
 
 	@ColumnTransformer(write = "UPPER(?)")
-	private String tipo_certificado;
+	private String tipoCertificado;
 
 }

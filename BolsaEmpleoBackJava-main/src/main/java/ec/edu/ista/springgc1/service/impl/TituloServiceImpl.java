@@ -28,101 +28,103 @@ import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
 @Service
-public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Mapper<Titulo, TituloDTO>{
-	  private boolean includeGraduadoInfo = false;
-	 @Autowired
-	    private GraduadoRepository graduadoRepository;
-	 @Autowired
-	 private TituloRepository titulorepository;
-	 @Autowired
-	 private CarreraRepository carrerarepository;
-	@Override
-	public Titulo mapToEntity(TituloDTO d) {
-		Titulo t= new Titulo();
-	    Graduado g= graduadoRepository.findById(d.getIdgraduado())
-	    .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", d.getIdgraduado()));
-	    Carrera c =  carrerarepository.findByNombre(d.getNombrecarrera())
-	 .orElseThrow(() -> new ResourceNotFoundException("carrera:", d.getNombrecarrera()));
-		t.setFecha_emision(d.getFecha_emision());
-		t.setFecha_registro(d.getFecha_registro());
-		t.setInstitucion(d.getInstitucion());
-		t.setNivel(d.getNivel());
-		t.setNombre_titulo(d.getNombre_titulo());
-		t.setTipo(d.getTipo());
-		t.setNum_registro(d.getNum_registro());
-		t.setCarrera(c);
-		t.setGraduado(g);
-		return t;
-	}
+public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Mapper<Titulo, TituloDTO> {
 
-	@Override
-	public TituloDTO mapToDTO(Titulo e) {
-		TituloDTO d= new TituloDTO ();
-		d.setId(e.getId());
-		d.setIdgraduado(e.getGraduado().getId());
-		  
-		d.setFecha_emision(e.getFecha_emision());
-		d.setFecha_registro(e.getFecha_registro());
-		d.setInstitucion(e.getInstitucion());
-		d.setNivel(e.getNivel());
-		d.setNombre_titulo(e.getNombre_titulo());
-		d.setNombrecarrera(e.getCarrera().getNombre());
-		d.setNum_registro(e.getNum_registro());
-		d.setTipo(e.getTipo());
-		return d;
-	}
+    private boolean includeGraduadoInfo = false;
 
-	@Override
-	public List<TituloDTO> findAll() {
-		includeGraduadoInfo = true; 
-		List<TituloDTO> titulosDTO = titulorepository.findAll()
-			.stream()
-			.map(titulo -> mapToDTO(titulo))
-			.collect(Collectors.toList());
-	
-		return titulosDTO;
-	}
-	
+    @Autowired
+    private GraduadoRepository graduadoRepository;
 
-	  public TituloDTO findByIdToDTO(Long id) {
-	    	Titulo t = titulorepository.findById(id)
-	                .orElseThrow(() -> new ResourceNotFoundException("id", id));
+    @Autowired
+    private TituloRepository titulorepository;
 
-	        return mapToDTO(t);
-	    }
+    @Autowired
+    private CarreraRepository carrerarepository;
 
-	  public Titulo update(long id, TituloDTO e) {
-	        Titulo tituloFromDb = titulorepository.findById(id)
-	                .orElseThrow(() -> new ResourceNotFoundException("id", id));
+    @Override
+    public Titulo mapToEntity(TituloDTO d) {
+        Titulo t = new Titulo();
+        Graduado g = graduadoRepository.findById(d.getIdGraduado())
+                .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", d.getIdGraduado()));
+        Carrera c = carrerarepository.findByNombre(d.getNombreCarrera())
+                .orElseThrow(() -> new ResourceNotFoundException("carrera:", d.getNombreCarrera()));
+        t.setFechaEmision(d.getFechaEmision());
+        t.setFechaRegistro(d.getFechaRegistro());
+        t.setInstitucion(d.getInstitucion());
+        t.setNivel(d.getNivel());
+        t.setNombreTitulo(d.getNombreTitulo());
+        t.setTipo(d.getTipo());
+        t.setNumRegistro(d.getNumRegistro());
+        t.setCarrera(c);
+        t.setGraduado(g);
 
-	        Graduado graduado = graduadoRepository.findById(e.getIdgraduado())
-	                .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", e.getIdgraduado()));
-	        Carrera carrera = carrerarepository.findByNombre(e.getNombrecarrera())
-	                .orElseThrow(() -> new ResourceNotFoundException("carrera:", e.getNombrecarrera()));
+        return t;
+    }
 
-	        tituloFromDb.setGraduado(graduado);
-	        tituloFromDb.setCarrera(carrera);
-	        tituloFromDb.setFecha_emision(e.getFecha_emision());
-	        tituloFromDb.setFecha_registro(e.getFecha_registro());
-	        tituloFromDb.setInstitucion(e.getInstitucion());
-	        tituloFromDb.setNivel(e.getNivel());
-	        tituloFromDb.setNombre_titulo(e.getNombre_titulo());
-	        tituloFromDb.setNum_registro(e.getNum_registro());
-	        tituloFromDb.setTipo(e.getTipo());
+    @Override
+    public TituloDTO mapToDTO(Titulo e) {
+        TituloDTO d = new TituloDTO();
+        d.setId(e.getId());
+        d.setIdGraduado(e.getGraduado().getId());
 
-	        return titulorepository.save(tituloFromDb);
-	    }
-   
+        d.setFechaEmision(e.getFechaEmision());
+        d.setFechaRegistro(e.getFechaRegistro());
+        d.setInstitucion(e.getInstitucion());
+        d.setNivel(e.getNivel());
+        d.setNombreTitulo(e.getNombreTitulo());
+        d.setNombreCarrera(e.getCarrera().getNombre());
+        d.setNumRegistro(e.getNumRegistro());
+        d.setTipo(e.getTipo());
+        return d;
+    }
+
+    @Override
+    public List<TituloDTO> findAll() {
+        includeGraduadoInfo = true;
+        List<TituloDTO> titulosDTO = titulorepository.findAll()
+                .stream()
+                .map(titulo -> mapToDTO(titulo))
+                .collect(Collectors.toList());
+
+        return titulosDTO;
+    }
+
+    public TituloDTO findByIdToDTO(Long id) {
+        Titulo t = titulorepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("id", id));
+
+        return mapToDTO(t);
+    }
+
+    public Titulo update(long id, TituloDTO e) {
+        Titulo tituloFromDb = titulorepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("id", id));
+
+        Graduado graduado = graduadoRepository.findById(e.getIdGraduado())
+                .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", e.getIdGraduado()));
+        Carrera carrera = carrerarepository.findByNombre(e.getNombreCarrera())
+                .orElseThrow(() -> new ResourceNotFoundException("carrera:", e.getNombreCarrera()));
+
+        tituloFromDb.setGraduado(graduado);
+        tituloFromDb.setCarrera(carrera);
+        tituloFromDb.setFechaEmision(e.getFechaEmision());
+        tituloFromDb.setFechaRegistro(e.getFechaRegistro());
+        tituloFromDb.setInstitucion(e.getInstitucion());
+        tituloFromDb.setNivel(e.getNivel());
+        tituloFromDb.setNombreTitulo(e.getNombreTitulo());
+        tituloFromDb.setNumRegistro(e.getNumRegistro());
+        tituloFromDb.setTipo(e.getTipo());
+
+        return titulorepository.save(tituloFromDb);
+    }
 
     @Override
     public Titulo save(Object entity) {
-    	 includeGraduadoInfo = false;
+        includeGraduadoInfo = false;
         return titulorepository.save(mapToEntity((TituloDTO) entity));
     }
 
-    public Long counttitulo(){
+    public Long counttitulo() {
         return titulorepository.count();
     }
-   
-
 }

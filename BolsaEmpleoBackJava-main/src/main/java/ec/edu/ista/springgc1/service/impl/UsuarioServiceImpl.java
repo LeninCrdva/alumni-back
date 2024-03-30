@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements Mapper<Usuario, UsuarioDTO> {
+
     @Autowired
     private PersonaRepository personaRepository;
 
@@ -37,6 +38,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
     @Autowired
     private S3Service s3Service;
 
@@ -52,9 +54,9 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         Persona p = personaRepository.findBycedula(usuarioDTO.getCedula())
                 .orElseThrow(() -> new ResourceNotFoundException("cedula", usuarioDTO.getCedula()));
 
-        usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
+        usuario.setRutaImagen(usuarioDTO.getRutaImagen());
         usuario.setEstado(usuarioDTO.isEstado());
-        usuario.setUrl_imagen(usuarioDTO.getUrl_imagen() == null ? null : s3Service.getObjectUrl(usuarioDTO.getRuta_imagen()));
+        usuario.setUrlImagen(usuarioDTO.getUrlImagen() == null ? null : s3Service.getObjectUrl(usuarioDTO.getRutaImagen()));
         usuario.setPersona(p);
         usuario.setRol(rol);
 
@@ -67,8 +69,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuarioDTO.setId(usuario.getId());
         usuarioDTO.setClave(usuario.getClave());
         usuarioDTO.setNombreUsuario(usuario.getNombreUsuario());
-        usuarioDTO.setRuta_imagen(usuario.getRuta_imagen());
-        usuarioDTO.setUrl_imagen(usuario.getUrl_imagen());
+        usuarioDTO.setRutaImagen(usuario.getRutaImagen());
+        usuarioDTO.setUrlImagen(usuario.getUrlImagen());
 
         usuarioDTO.setCedula(usuario.getPersona().getCedula());
         usuarioDTO.setEstado(usuario.getEstado());
@@ -79,8 +81,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     @Override
     public List findAll() {
         return usuarioRepository.findAll().stream()
-                .peek(u -> u.setUrl_imagen(u.getRuta_imagen() == null ? null : s3Service.getObjectUrl(u.getRuta_imagen())))
-                .map(e -> mapToDTO(e))
+                .peek(u -> u.setUrlImagen(u.getRutaImagen() == null ? null : s3Service.getObjectUrl(u.getRutaImagen())))
+                .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
 
@@ -96,7 +98,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     public Usuario findByUsername2(String username) {
         return usuarioRepository.findBynombreUsuario(username)
                 .map(u -> {
-                    u.setUrl_imagen(u.getRuta_imagen() == null ? null : s3Service.getObjectUrl(u.getRuta_imagen()));
+                    u.setUrlImagen(u.getRutaImagen() == null ? null : s3Service.getObjectUrl(u.getRutaImagen()));
                     return u;
                 })
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado con nombre de usuario: " + username));
@@ -120,8 +122,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
 
         usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
 
-        usuario.setUrl_imagen(usuarioDTO.getUrl_imagen());
-        usuario.setRuta_imagen(usuarioDTO.getRuta_imagen());
+        usuario.setUrlImagen(usuarioDTO.getUrlImagen());
+        usuario.setRutaImagen(usuarioDTO.getRutaImagen());
 
         usuario.setEstado(usuarioDTO.isEstado());
         usuario.setPersona(p);
@@ -132,8 +134,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
 
     public Usuario updatePhoto(long id, String ruta) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User NOT FOUND", id));
-        usuario.setRuta_imagen(ruta);
-        usuario.setUrl_imagen(s3Service.getObjectUrl(ruta));
+        usuario.setRutaImagen(ruta);
+        usuario.setUrlImagen(s3Service.getObjectUrl(ruta));
         return usuarioRepository.save(usuario);
     }
 
@@ -167,8 +169,8 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         user.setClave(usuarioDTO.getClave());
         user.setRol(usuarioDTO.getRol());
         user.setEstado(usuarioDTO.isEstado());
-        user.setRuta_imagen(usuarioDTO.getRutaImagen());
-        user.setUrl_imagen(usuarioDTO.getUrlImagen());
+        user.setRutaImagen(usuarioDTO.getRutaImagen());
+        user.setUrlImagen(usuarioDTO.getUrlImagen());
 
         save(user);
     }
