@@ -17,7 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +40,7 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
     @Autowired
     private OfertaslaboralesServiceImpl ofertasLaboralesService;
 
-    public Integer countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDate fechaPostulacion) {
+    public Integer countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDateTime fechaPostulacion) {
         return postulacionRepository.countPostulacionByFechaPostulacionIsStartingWith(fechaPostulacion);
     }
 
