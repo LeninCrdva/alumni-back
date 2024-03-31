@@ -70,7 +70,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         usuarioDTO.setClave(usuario.getClave());
         usuarioDTO.setNombreUsuario(usuario.getNombreUsuario());
         usuarioDTO.setRutaImagen(usuario.getRutaImagen());
-        usuarioDTO.setUrlImagen(usuario.getUrlImagen());
+        usuarioDTO.setUrlImagen(s3Service.getObjectUrl(usuario.getRutaImagen()));
 
         usuarioDTO.setCedula(usuario.getPersona().getCedula());
         usuarioDTO.setEstado(usuario.getEstado());
@@ -84,6 +84,15 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
                 .peek(u -> u.setUrlImagen(u.getRutaImagen() == null ? null : s3Service.getObjectUrl(u.getRutaImagen())))
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Usuario findById(long id) {
+        return usuarioRepository.findById(id).map(u -> {
+            u.setUrlImagen(s3Service.getObjectUrl(u.getRutaImagen()));
+
+            return u;
+        }).orElseThrow(() -> new ResourceNotFoundException("id", id));
     }
 
     public UsuarioDTO findByIdToDTO(long id) {

@@ -1,5 +1,7 @@
 package ec.edu.ista.springgc1.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -12,31 +14,37 @@ import org.springframework.lang.Nullable;
 @Entity
 @Table(name = "usuario")
 public class Usuario {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_usuario")
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_usuario")
+    @JsonView(View.Public.class)
+    private Long id;
 
-	private String clave;
+    private String clave;
 
-	@Column(name = "nombre_usuario", unique = true)
-	 @ColumnTransformer(write = "UPPER(?)")
-	private String nombreUsuario;
+    @Column(name = "nombre_usuario", unique = true)
+    @ColumnTransformer(write = "UPPER(?)")
+	@JsonView(View.Public.class)
+    private String nombreUsuario;
 
-	@NotNull
-	private Boolean estado;
+	@JsonView(View.Public.class)
+    @NotNull
+    private Boolean estado;
 
-	@OneToOne
-	@NotNull
-	@JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
-	private Rol rol;
+    @OneToOne
+    @NotNull
+    @JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
+	@JsonView(View.Public.class)
+    private Rol rol;
 
-	private String rutaImagen;
+    private String rutaImagen;
 
-	@Transient
-	private String urlImagen;
-	
-	@ManyToOne
-	@JoinColumn(referencedColumnName = "cod_perso")
-	Persona persona;
+    @Transient
+	@JsonView(View.Public.class)
+    private String urlImagen;
+
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "cod_perso")
+	@JsonView(View.Public.class)
+    Persona persona;
 }

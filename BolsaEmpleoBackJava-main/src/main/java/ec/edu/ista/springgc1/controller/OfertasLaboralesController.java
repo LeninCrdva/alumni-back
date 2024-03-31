@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,26 +54,30 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<OfertasLaboralesDTO>> list() {
         return ResponseEntity.ok(ofertasLaboralesService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/ofertas-sin-postular/{id}")
+    @JsonView(View.Public.class)
     public ResponseEntity<?> getOfertasSinPostularPorGraduado(@PathVariable Long id) {
         List<OfertasLaboralesDTO> ofertasSinPostularPorGraduado = ofertasLaboralesService.getOfertasSinPostulacion(id);
 
         return ResponseEntity.ok(ofertasSinPostularPorGraduado);
     }
 
-   @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(ofertasLaboralesService.findById(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("dto/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<OfertasLaboralesDTO> findByIdDTO(@PathVariable Long id) {
         return ResponseEntity.ok(ofertasLaboralesService.findByIdToDTO(id));
     }
@@ -98,6 +104,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/usuario/{nombreUsuario}")
+    @JsonView(View.Public.class)
     ResponseEntity<List<OfertasLaboralesDTO>> findByNombreUsuario(@PathVariable("nombreUsuario") String nombreUsuario) {
         List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findByNombreUsuario(nombreUsuario);
         return ResponseEntity.ok(referencias);
@@ -105,6 +112,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/postulaciones-por-dia")
+    @JsonView(View.Public.class)
     public ResponseEntity<Map<String, Long>> calcularPostulacionesPorDia() {
         Map<LocalDate, Long> postulacionesPorDia = ofertasLaboralesService.calcularPostulacionesPorDia();
 
@@ -119,6 +127,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/empresario/{nombreUsuario}")
+    @JsonView(View.Public.class)
     ResponseEntity<List<OfertasLaboralesDTO>> findEmpresarioByNombreUsuario(
             @PathVariable("nombreUsuario") String nombreUsuario) {
         List<OfertasLaboralesDTO> referencias = ofertasLaboralesService.findEmpresarioByNombreUsuario(nombreUsuario);
@@ -127,6 +136,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/cargos-con-ofertas")
+    @JsonView(View.Public.class)
     ResponseEntity<Map<String, Long>> getCargosConOfertas() {
         List<OfertasLaboralesDTO> ofertasLaboralesDTOList = ofertasLaboralesService.findAll();
         Map<String, Long> cargosConOfertas = new HashMap<>();
@@ -141,12 +151,14 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @GetMapping("/graduados/{ofertaId}")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findGraduadosByOfertaId(@PathVariable Long ofertaId) {
         return ResponseEntity.ok(ofertasLaboralesService.findGraduadosByOfertaId(ofertaId));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/empresa/{nombreEmpresa}")
+    @JsonView(View.Public.class)
     ResponseEntity<List<OfertasLaborales>> findOfertasByNombreEmpresa(@PathVariable String nombreEmpresa) {
         return ResponseEntity.ok(ofertasLaboralesService.findOfertasByNombreEmpresa(nombreEmpresa));
     }
@@ -165,6 +177,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA','ADMINISTRADOR')")
     @GetMapping("/contrataciones")
+    @JsonView(View.Public.class)
     public ResponseEntity<List<Contratacion>> getAllContrataciones() {
         List<Contratacion> contrataciones = contratacionRepository.findAll();
         return ResponseEntity.ok(contrataciones);
@@ -172,6 +185,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/contrataciones/{id}")
+    @JsonView(View.Public.class)
     public ResponseEntity<Contratacion> getContratacionById(@PathVariable Long id) {
         Contratacion contratacion = contratacionRepository.findById(id)
                 .orElseThrow(() -> new ec.edu.ista.springgc1.exception.ResourceNotFoundException("Contratacion", String.valueOf(id)));
@@ -191,11 +205,15 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'REPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @GetMapping("/ofertaLaboral/{ofertaLaboralId}")
+    @JsonView(View.Public.class)
     public ResponseEntity<List<Contratacion>> getContratacionesPorOfertaLaboral(@PathVariable Long ofertaLaboralId) {
         List<Contratacion> contrataciones = ofertasLaboralesService.getContratacionesPorOfertaLaboral(ofertaLaboralId);
         return ResponseEntity.ok(contrataciones);
     }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/foto-portada/{id}")
+    @JsonView(View.Public.class)
     public ResponseEntity<byte[]> getFotoPortadaById(@PathVariable Long id) {
         OfertasLaboralesDTO ofertaLaboralDTO = ofertasLaboralesService.findByIdToDTO(id);
         

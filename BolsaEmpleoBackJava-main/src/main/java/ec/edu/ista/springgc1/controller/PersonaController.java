@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,18 +33,21 @@ public class PersonaController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Base.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(personaService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Base.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(personaService.findById(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("cedula/{cedula}")
+    @JsonView(View.Base.class)
     ResponseEntity<?> findByCedula(@PathVariable String cedula) {
         return ResponseEntity.ok(personaService.findBycedula(cedula));
     }

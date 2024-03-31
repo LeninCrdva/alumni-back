@@ -9,6 +9,7 @@ import javax.transaction.Transactional;
 
 import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.repository.*;
+import ec.edu.ista.springgc1.service.bucket.S3Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     @Autowired
     private PostulacionRepository postulacionRepository;
+
+    @Autowired
+    private S3Service s3Service;
 
     @Override
     public OfertasLaborales mapToEntity(OfertasLaboralesDTO dto) {
@@ -166,7 +170,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
     public List<Graduado> findGraduadosByOfertaId(Long ofertaId) {
         List<Postulacion> postulaciones = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
 
-        return postulaciones.stream().map(Postulacion::getGraduado).collect(Collectors.toList());
+        return postulaciones.stream().map(Postulacion::getGraduado).collect(Collectors.toList()).stream().peek(g -> g.getUsuario().setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()))).collect(Collectors.toList());
     }
 
     public List<OfertasLaborales> findOfertasByNombreEmpresa(String nombreEmpresa) {

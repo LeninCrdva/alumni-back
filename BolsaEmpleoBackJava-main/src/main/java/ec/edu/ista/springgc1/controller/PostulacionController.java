@@ -22,30 +22,35 @@ public class PostulacionController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/all")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> getAllPostulaciones() {
         return ResponseEntity.ok(postulacionService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/all-postulations-by-graduado/{id}")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> getAllPostulacioneByGraduadoId(@PathVariable Long id) {
         return ResponseEntity.ok(postulacionService.findOfertasLaboralesByGraduadoId(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/by-id/{id}")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> getById(@PathVariable Long id) {
         return ResponseEntity.ok(postulacionService.findById(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/all-by-oferta-laboral/{id}")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> getAllPostulacionesByOfertaLaboralId(@PathVariable Long id) {
         return ResponseEntity.ok(postulacionService.findGraduadosByOfertaLaboralId(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/all-sin-postulacion")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> getAllGraduadosSinPostulacion() {
         return ResponseEntity.ok(postulacionService.findGraduadosSinPostulacion());
     }
@@ -84,12 +89,14 @@ public class PostulacionController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/count")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> countPostulaciones() {
         return ResponseEntity.ok(postulacionService.count());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/count-by-date/{date}")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> countPostulacionesByFechaPostulacion(@PathVariable String date) {
         return ResponseEntity.ok(postulacionService.countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDate.parse(date).atStartOfDay()));
     }

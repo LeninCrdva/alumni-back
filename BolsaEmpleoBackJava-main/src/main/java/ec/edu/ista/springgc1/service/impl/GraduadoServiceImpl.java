@@ -1,10 +1,7 @@
 package ec.edu.ista.springgc1.service.impl;
 
 import ec.edu.ista.springgc1.model.entity.*;
-import ec.edu.ista.springgc1.repository.CiudadRepository;
-import ec.edu.ista.springgc1.repository.GraduadoRepository;
-import ec.edu.ista.springgc1.repository.OfertaslaboralesRepository;
-import ec.edu.ista.springgc1.repository.UsuarioRepository;
+import ec.edu.ista.springgc1.repository.*;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
@@ -31,7 +28,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     private CiudadRepository ciudadRepository;
 
     @Autowired
-    private OfertaslaboralesRepository ofertasRepository;
+    private PostulacionRepository postulacionRepository;
 
     @Autowired
     private S3Service s3Service;
@@ -70,7 +67,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudianteDTO.setEmailPersonal(estudiante.getEmailPersonal());
         estudianteDTO.setEstadoCivil(estudiante.getEstadoCivil());
         estudianteDTO.setRutaPdf(estudiante.getRutaPdf());
-        estudianteDTO.setUrlPdf(estudiante.getUrlPdf());
+        estudianteDTO.setUrlPdf(s3Service.getObjectUrl(estudiante.getRutaPdf()));
 
         return estudianteDTO;
     }
@@ -92,14 +89,20 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     public GraduadoDTO findByUsuario(long id_usuario) {
 
         Graduado estudiante = graduadoRepository.findByUsuarioId(id_usuario)
-                .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
-        estudiante
-                .setUrlPdf(estudiante.getRutaPdf() == null ? null : s3Service.getObjectUrl(estudiante.getRutaPdf()));
+                .map(e -> {
+                    e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf()));
+                    return e;
+                }).orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
+
         return mapToDTO(estudiante);
     }
 
     public Graduado findByIdUsuario(long id_usuario) {
         return graduadoRepository.findByUsuarioId(id_usuario)
+                .map(e -> {
+                    e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf()));
+                    return e;
+                })
                 .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
     }
 
@@ -109,11 +112,12 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     }
 
     public List<OfertasLaborales> findByUsuarioNombreUsuario(String username) {
-        Graduado graduado = graduadoRepository.findByUsuarioNombreUsuario(username)
-                .orElseThrow(() -> new ResourceNotFoundException("usuario", username));
-        return null;
-    }
+        List<Postulacion> postulacion = postulacionRepository.findAllByGraduadoUsuarioNombreUsuario(username);
 
+        return postulacion.stream()
+                .map(Postulacion::getOfertaLaboral)
+                .collect(Collectors.toList());
+    }
 
     @Override
     public Graduado save(Object entity) {

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,12 +35,14 @@ public class EmpresaController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(empresaService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(empresaService.findById(id));
     }
@@ -76,6 +79,7 @@ public class EmpresaController {
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
     @GetMapping("/by-usuario/{nombreUsuario}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByNombreUsuario(@PathVariable String nombreUsuario) {
         Set<EmpresaDTO> empresas = empresaService.findByNombreUsuario(nombreUsuario);
         return ResponseEntity.ok(empresas);
@@ -83,6 +87,7 @@ public class EmpresaController {
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/sin-oferta-laboral")
+    @JsonView(View.Public.class)
     public Set<EmpresaDTO> obtenerEmpresasSinOfertaLaboral() {
         return empresaService.findEmpresasSinOfertaLaboral();
     }

@@ -38,35 +38,35 @@ public class Graduado {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "graduado_id")
-	@JsonView(View.Base.class)
+	@JsonView({View.Public.class, View.Postulacion.class})
 	private Long id;
 
 	@OneToOne
 	@JoinColumn(referencedColumnName = "id_usuario")
-	@JsonView(View.Base.class)
+	@JsonView(View.Public.class)
 	private Usuario usuario;
 
 	@ManyToOne
 	@JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
-	@JsonView(View.Base.class)
+	@JsonView(View.Public.class)
 	private Ciudad ciudad;
 
-	@JsonView(View.Base.class)
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
+	@JsonView(View.Public.class)
 	private LocalDate anioGraduacion;
 
-	@JsonView(View.Base.class)
 	@Email(message = "Debe ser una dirección de correo electrónico válida.")
 	@Column(name = "email_personal", nullable = false, length = 255, unique = true)
+	@JsonView(View.Public.class)
 	private String emailPersonal;
 
 	@ColumnTransformer(write = "UPPER(?)")
-	@JsonView(View.Base.class)
+	@JsonView(View.Public.class)
 	private String estadoCivil;
 
-	@JsonView(View.Base.class)
 	private String rutaPdf;
 
+	@JsonView(View.Public.class)
 	@Transient
 	private String urlPdf;
 }

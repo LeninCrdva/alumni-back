@@ -40,37 +40,42 @@ public class GraduadoController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(estudianteService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findById(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/resumen/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByIdResumen(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findByIdToDTO(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/usuario/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findByUsuario(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/user/{username}")
-    @JsonView(View.City.class) 
+    @JsonView(View.Public.class)
     ResponseEntity<List<OfertasLaborales>> findByUserName(@PathVariable("username") String username){
         return ResponseEntity.ok(estudianteService.findByUsuarioNombreUsuario(username));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/total")
+    @JsonView(View.Public.class)
     ResponseEntity<?> countEstudiantes() {
         return ResponseEntity.ok(Collections.singletonMap("total:", estudianteService.count()));
     }
@@ -99,30 +104,35 @@ public class GraduadoController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/without-oferta")
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> listWithOut() {
         return ResponseEntity.ok(estudianteService.findGRaduadoWithOutOfertas());
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO', 'GRADUADO')")
     @GetMapping("/all")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduados() {
         return ResponseEntity.ok(estudianteService.findAllGraduados());
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/count-sex")
+    @JsonView(View.Public.class)
     public ResponseEntity<?> countSex(){
         return ResponseEntity.ok(estudianteService.countBySex());
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/with-oferta")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduadosConOfertas() {
         return ResponseEntity.ok(estudianteService.findGraduadosWithOfertas());
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/sin-experiencia")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduadosSinExperiencia() {
         return ResponseEntity.ok(estudianteService.findGraduadosSinExperiencia());
     }

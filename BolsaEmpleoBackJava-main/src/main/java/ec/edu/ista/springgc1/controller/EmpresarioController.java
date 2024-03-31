@@ -5,6 +5,8 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,18 +35,21 @@ public class EmpresarioController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(emprendimientoService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(emprendimientoService.findById(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/usuario/{usuario}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByUserUsername(@PathVariable String usuario) {
         return ResponseEntity.ok(emprendimientoService.findByUsuario(usuario));
     }

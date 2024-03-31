@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,18 +34,21 @@ public class AdministradorController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(adminService.findAll());
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.findById(id));
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/usuario/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.findByUsuario(id));
     }
@@ -78,6 +83,7 @@ public class AdministradorController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/todos")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Administrador>> findAllAdministradores() {
         return ResponseEntity.ok(adminService.findAllAdministradores());
     }
