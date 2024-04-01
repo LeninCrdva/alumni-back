@@ -17,6 +17,7 @@ public class Ciudad {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_ciudad")
+    @JsonView(View.Public.class)
     private Long id;
 
     @Column(unique = true)
