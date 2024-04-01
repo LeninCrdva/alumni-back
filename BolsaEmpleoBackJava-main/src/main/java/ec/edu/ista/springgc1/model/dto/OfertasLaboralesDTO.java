@@ -25,7 +25,7 @@ public class OfertasLaboralesDTO implements Serializable {
     @JsonView({View.Postulacion.class, View.Public.class})
     private LocalDateTime fechaPublicacion;
 
-    @JsonView(View.Postulacion.class)
+    @JsonView({View.Postulacion.class, View.Public.class})
     private String cargo;
 
     @JsonView({View.Postulacion.class, View.Public.class})
