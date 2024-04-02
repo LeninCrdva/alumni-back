@@ -66,9 +66,4 @@ public class OfertasLaborales {
 	@Column(name = "foto_portada", columnDefinition = "TEXT")
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private String fotoPortada;
-
-	@PrePersist
-	public void prePersist() {
-		fechaPublicacion = LocalDateTime.now();
-	}
 }
