@@ -65,5 +65,5 @@ public class OfertasLaborales {
 	
 	@Column(name = "foto_portada", columnDefinition = "TEXT")
 	@JsonView({View.Postulacion.class, View.Public.class})
-	private String fotoPortada;
+	private String foto_portada;
 }

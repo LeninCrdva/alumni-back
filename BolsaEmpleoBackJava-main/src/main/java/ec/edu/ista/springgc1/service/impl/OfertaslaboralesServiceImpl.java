@@ -57,7 +57,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
         ofertaLaboral.setEmpresa(emp);
         ofertaLaboral.setTipo(dto.getTipo());
-        ofertaLaboral.setFotoPortada(dto.getFotoPortada());
+        ofertaLaboral.setFoto_portada(dto.getFoto_portada());
         ofertaLaboral.setTiempo(dto.getTiempo());
 
         return ofertaLaboral;
@@ -77,7 +77,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         dto.setEstado(entity.getEstado());
         dto.setNombreEmpresa(entity.getEmpresa().getNombre());
         dto.setTipo(entity.getTipo());
-        dto.setFotoPortada(entity.getFotoPortada());
+        dto.setFoto_portada(entity.getFoto_portada());
         dto.setTiempo(entity.getTiempo());
 
         return dto;
@@ -85,8 +85,18 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     @Override
     public List<OfertasLaboralesDTO> findAll() {
-        return ofertasLaboralesRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+        return ofertasLaboralesRepository.findAll().stream().map(c -> mapToDTO(c)).collect(Collectors.toList());
     }
+    /*@Override
+    public List<OfertasLaboralesDTO> findAll() {
+        return ofertasLaboralesRepository.findAll().stream().map(oferta -> {
+            OfertasLaboralesDTO dto = mapToDTO(oferta);
+            String fotoBase64 = oferta.getFoto_portada();
+            dto.setFoto_portada(fotoBase64);
+            return dto;
+        }).collect(Collectors.toList());
+    }*/
+
 
     @Override
     public OfertasLaborales save(Object entity) {
@@ -105,7 +115,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
         existingOfertaLaboral.setAreaConocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
         existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
-        existingOfertaLaboral.setFotoPortada(updatedOfertaLaboralDTO.getFotoPortada());
+        existingOfertaLaboral.setFoto_portada(updatedOfertaLaboralDTO.getFoto_portada());
         existingOfertaLaboral.setTipo(updatedOfertaLaboralDTO.getTipo());
         existingOfertaLaboral.setTiempo(updatedOfertaLaboralDTO.getTiempo());
         Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa()).orElseThrow(
@@ -116,12 +126,23 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
     }
 
-    public OfertasLaboralesDTO findByIdToDTO(Long id) {
-        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+    /*public OfertasLaboralesDTO findByIdToDTO(Long id) {
+    OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+    return mapToDTO(ofertaLaboral);
+}*/
 
-        return mapToDTO(ofertaLaboral);
-    }
+public OfertasLaboralesDTO findByIdToDTO(Long id) {
+    OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+    
+    OfertasLaboralesDTO dto = mapToDTO(ofertaLaboral);
+    String fotoBase64 = ofertaLaboral.getFoto_portada();
+    dto.setFoto_portada(fotoBase64);
+    
+    return dto;
+}
+
 
     public void delete(Long id) {
         ofertasLaboralesRepository.deleteById(id);
