@@ -21,7 +21,7 @@ public class SectorEmpresarialController {
     @Autowired
     private SectorEmpresarialServiceImpl empresarialService;
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PreAuthorize("permitAll()")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(empresarialService.findAll());
