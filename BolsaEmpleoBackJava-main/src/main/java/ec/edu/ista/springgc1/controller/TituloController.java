@@ -75,7 +75,7 @@ public class TituloController {
         tituloFromDb.setFechaRegistro(e.getFechaRegistro());
         tituloFromDb.setIdGraduado(e.getIdGraduado());
         tituloFromDb.setInstitucion(e.getInstitucion());
-        tituloFromDb.setNivel(e.getInstitucion());
+        tituloFromDb.setNivel(e.getNivel());
         tituloFromDb.setNombreTitulo(e.getNombreTitulo());
         tituloFromDb.setNombreCarrera(e.getNombreCarrera());
         tituloFromDb.setNumRegistro(e.getNumRegistro());

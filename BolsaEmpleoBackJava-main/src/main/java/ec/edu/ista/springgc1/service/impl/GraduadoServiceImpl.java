@@ -97,6 +97,10 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         return mapToDTO(estudiante);
     }
 
+    public List<Graduado> findAllGraduadosNotIn(Long id){
+        return graduadoRepository.findByUsuarioIdNot(id);
+    }
+
     public Graduado findByIdUsuario(long id_usuario) {
         return graduadoRepository.findByUsuarioId(id_usuario)
                 .map(e -> {

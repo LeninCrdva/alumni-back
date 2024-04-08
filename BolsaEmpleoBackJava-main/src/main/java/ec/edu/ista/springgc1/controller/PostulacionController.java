@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.time.LocalDate;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -57,7 +58,7 @@ public class PostulacionController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PostMapping("")
-    public ResponseEntity<?> createPostulacion(@RequestBody PostulacionDto postulacionDto) {
+    public ResponseEntity<?> createPostulacion(@RequestBody PostulacionDto postulacionDto) throws IOException {
         return ResponseEntity.ok(postulacionService.savePostulacion(postulacionDto));
     }
 

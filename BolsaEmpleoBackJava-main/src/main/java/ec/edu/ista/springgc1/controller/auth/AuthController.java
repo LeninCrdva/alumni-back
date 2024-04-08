@@ -78,7 +78,7 @@ public class AuthController {
 
     @PreAuthorize("permitAll()")
     @PostMapping("/signup")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegistroDTO usuarioDTO, @RequestBody(required = false) Empresa empresa, @RequestBody(required = false)SectorEmpresarial sectorEmpresarial){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegistroDTO usuarioDTO, @RequestBody(required = false) Empresa empresa, @RequestBody(required = false) Graduado graduado, @RequestBody(required = false) Empresario empresario){
 
         if (usuarioService.existsByUsername(usuarioDTO.getNombreUsuario())){
             throw new AppException(HttpStatus.BAD_REQUEST,"Ya se encuentra registrado el nombre de usuario");

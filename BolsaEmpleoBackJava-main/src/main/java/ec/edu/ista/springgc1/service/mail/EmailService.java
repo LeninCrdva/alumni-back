@@ -3,10 +3,13 @@ package ec.edu.ista.springgc1.service.mail;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import javax.mail.util.ByteArrayDataSource;
 
+import ec.edu.ista.springgc1.model.entity.Graduado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -22,6 +25,7 @@ import ec.edu.ista.springgc1.model.entity.Usuario;
 import ec.edu.ista.springgc1.service.impl.AdministradorServiceImpl;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.service.impl.RecoveryTokenServiceImpl;
+import org.springframework.util.StringUtils;
 import org.thymeleaf.ITemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -55,6 +59,41 @@ public class EmailService {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());
+
+            getHtml(request, model, response, message, helper);
+        } catch (MessagingException | IOException e) {
+            response.setMessage("Fallo al enviar email: " + e.getMessage());
+            response.setStatus(Boolean.FALSE);
+        }
+
+        return response;
+    }
+
+    public void sendEmail(MailRequest request, Map<String, Object> model, String[] emails) {
+        MimeMessage message = sender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+
+            getHtml(request, model, emails, message, helper);
+        } catch (MessagingException | IOException e) {
+            System.out.println(("Fallo al enviar email: " + e.getMessage()));
+        }
+    }
+
+    public MailResponse sendEmailWithPDF(MailRequest request, Map<String, Object> model, byte[] pdfBytes) {
+        MailResponse response = new MailResponse();
+        MimeMessage message = sender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+
+            if (StringUtils.hasText(request.getCaseEmail()) && request.getCaseEmail().equals("cv-graduate")) {
+                Graduado graduado = model.get("graduado") != null ? (Graduado) model.get("graduado") : null;
+                ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfBytes, "application/pdf");
+                String docName = "curriculum_" + graduado.getUsuario().getPersona().getCedula() + ".pdf";
+                helper.addAttachment(docName, dataSource);
+            }
 
             getHtml(request, model, response, message, helper);
         } catch (MessagingException | IOException e) {
@@ -103,6 +142,19 @@ public class EmailService {
         response.setStatus(Boolean.TRUE);
     }
 
+    private void getHtml(MailRequest request, Map<String, Object> model, String[] emails, MimeMessage message, MimeMessageHelper helper) throws IOException, MessagingException {
+        Context context = new Context();
+        context.setVariables(model);
+
+        String html = templateEngine.process(getTemplate(request.getCaseEmail()), context);
+
+        helper.setTo(emails);
+        helper.setText(html, true);
+        helper.setSubject(request.getSubject());
+        helper.setFrom(request.getFrom());
+        sender.send(message);
+    }
+
     private static String getTemplate(String emailCase) {
         String t;
 
@@ -121,6 +173,12 @@ public class EmailService {
                 break;
             case "list-postulates":
                 t = "businessman/email-template-list-postulates";
+                break;
+            case "cv-graduate":
+                t = "businessman/email-template-alert-postulate";
+                break;
+            case "new-offer":
+                t = "businessman/email-template-alert-offer";
                 break;
             default:
                 t = "graduate/email-template-contact-us";

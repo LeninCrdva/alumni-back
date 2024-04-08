@@ -7,6 +7,7 @@ import java.util.Set;
 
 import ec.edu.ista.springgc1.model.entity.Persona;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import ec.edu.ista.springgc1.model.entity.Graduado;
@@ -37,4 +38,7 @@ public interface GraduadoRepository extends GenericRepository<Graduado> {
 
     @Query("SELECT g FROM Graduado g WHERE g NOT IN (SELECT e.cedulaGraduado FROM Experiencia e)")
     List<Graduado> findAllGraduadosSinExperiencia();
+
+    @Query("SELECT g FROM Graduado g WHERE g.usuario.id <> :idUsuario")
+    List<Graduado> findByUsuarioIdNot(@Param("idUsuario") long idUsuario);
 }

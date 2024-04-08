@@ -7,10 +7,13 @@ import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import ec.edu.ista.springgc1.model.dto.MailRequest;
 import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.repository.*;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
+import ec.edu.ista.springgc1.service.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +24,9 @@ import ec.edu.ista.springgc1.service.map.Mapper;
 
 @Service
 public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLaborales> implements Mapper<OfertasLaborales, OfertasLaboralesDTO> {
+
+    @Value("${spring.mail.username}")
+    private String from;
 
     @Autowired
     private OfertaslaboralesRepository ofertasLaboralesRepository;
@@ -40,6 +46,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
     @Autowired
     private S3Service s3Service;
 
+    @Autowired
+    private EmailService emailService;
+
     @Override
     public OfertasLaborales mapToEntity(OfertasLaboralesDTO dto) {
         OfertasLaborales ofertaLaboral = new OfertasLaborales();
@@ -57,7 +66,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
         ofertaLaboral.setEmpresa(emp);
         ofertaLaboral.setTipo(dto.getTipo());
-        ofertaLaboral.setFoto_portada(dto.getFoto_portada());
+        ofertaLaboral.setFotoPortada(dto.getFotoPortada());
         ofertaLaboral.setTiempo(dto.getTiempo());
 
         return ofertaLaboral;
@@ -77,7 +86,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         dto.setEstado(entity.getEstado());
         dto.setNombreEmpresa(entity.getEmpresa().getNombre());
         dto.setTipo(entity.getTipo());
-        dto.setFoto_portada(entity.getFoto_portada());
+        dto.setFotoPortada(entity.getFotoPortada());
         dto.setTiempo(entity.getTiempo());
 
         return dto;
@@ -85,22 +94,16 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     @Override
     public List<OfertasLaboralesDTO> findAll() {
-        return ofertasLaboralesRepository.findAll().stream().map(c -> mapToDTO(c)).collect(Collectors.toList());
+        return ofertasLaboralesRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
-    /*@Override
-    public List<OfertasLaboralesDTO> findAll() {
-        return ofertasLaboralesRepository.findAll().stream().map(oferta -> {
-            OfertasLaboralesDTO dto = mapToDTO(oferta);
-            String fotoBase64 = oferta.getFoto_portada();
-            dto.setFoto_portada(fotoBase64);
-            return dto;
-        }).collect(Collectors.toList());
-    }*/
-
 
     @Override
     public OfertasLaborales save(Object entity) {
-        return ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
+        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
+
+        createRequestAndSendEmailWithOutPDF(ofertaLaboral);
+
+        return ofertaLaboral;
     }
 
     public OfertasLaboralesDTO update(Long id, OfertasLaboralesDTO updatedOfertaLaboralDTO) {
@@ -115,7 +118,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
         existingOfertaLaboral.setAreaConocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
         existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
-        existingOfertaLaboral.setFoto_portada(updatedOfertaLaboralDTO.getFoto_portada());
+        existingOfertaLaboral.setFotoPortada(updatedOfertaLaboralDTO.getFotoPortada());
         existingOfertaLaboral.setTipo(updatedOfertaLaboralDTO.getTipo());
         existingOfertaLaboral.setTiempo(updatedOfertaLaboralDTO.getTiempo());
         Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa()).orElseThrow(
@@ -126,23 +129,12 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
     }
 
-    /*public OfertasLaboralesDTO findByIdToDTO(Long id) {
-    OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
-    return mapToDTO(ofertaLaboral);
-}*/
+    public OfertasLaboralesDTO findByIdToDTO(Long id) {
+        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
 
-public OfertasLaboralesDTO findByIdToDTO(Long id) {
-    OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
-    
-    OfertasLaboralesDTO dto = mapToDTO(ofertaLaboral);
-    String fotoBase64 = ofertaLaboral.getFoto_portada();
-    dto.setFoto_portada(fotoBase64);
-    
-    return dto;
-}
-
+        return mapToDTO(ofertaLaboral);
+    }
 
     public void delete(Long id) {
         ofertasLaboralesRepository.deleteById(id);
@@ -221,5 +213,24 @@ public OfertasLaboralesDTO findByIdToDTO(Long id) {
         Graduado graduado = graduadoRepository.findByUsuarioId(id).orElseThrow(() -> new ResourceNotFoundException("Graduado no encontrado con el id de usuario: ", String.valueOf(id)));
 
         return ofertasLaboralesRepository.findOfertasWithOutPostulacionByGraduadoId(graduado.getId()).stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    private MailRequest createMailRequest(String subject, String mailCase) {
+        return new MailRequest(from, subject, mailCase);
+    }
+
+    private void createRequestAndSendEmailWithOutPDF(OfertasLaborales offer) {
+        Map<String, Object> model = new HashMap<>();
+        List<Graduado> graduado = graduadoRepository.findAll();
+        String[] emails = graduado.stream().map(Graduado::getEmailPersonal).toArray(String[]::new);
+
+        model.put("oferta", offer);
+
+        String subject = "¡Nuevo oferta laboral disponible!";
+        String mailCase = "new-offer";
+
+        MailRequest request = createMailRequest(subject, mailCase);
+
+        emailService.sendEmail(request, model, emails);
     }
 }

@@ -63,7 +63,7 @@ public class OfertasLaborales {
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private String tipo;
 	
-	@Column(name = "foto_portada", columnDefinition = "TEXT")
+	@Column(name = "foto_portada", columnDefinition = "LONGBLOB")
 	@JsonView({View.Postulacion.class, View.Public.class})
-	private String foto_portada;
+	private String fotoPortada;
 }

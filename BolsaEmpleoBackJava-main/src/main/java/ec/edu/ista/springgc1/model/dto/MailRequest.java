@@ -16,4 +16,10 @@ public class MailRequest {
 	private String subject;
 
 	private String caseEmail;
+
+	public MailRequest(String from, String subject, String caseEmail) {
+		this.from = from;
+		this.subject = subject;
+		this.caseEmail = caseEmail;
+	}
 }

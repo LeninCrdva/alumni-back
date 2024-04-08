@@ -53,6 +53,13 @@ public class GraduadoController {
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/otros-graduados/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findOtrosGraduados(@PathVariable Long id) {
+        return ResponseEntity.ok(estudianteService.findAllGraduadosNotIn(id));
+    }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/resumen/{id}")
     @JsonView(View.Public.class)
     ResponseEntity<?> findByIdResumen(@PathVariable Long id) {
