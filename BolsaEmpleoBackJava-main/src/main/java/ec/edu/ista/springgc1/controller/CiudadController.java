@@ -20,7 +20,7 @@ public class CiudadController {
     @Autowired
     private CiudadServiceImpl ciudadService;
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PreAuthorize("permitAll()")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(ciudadService.findAll());
