@@ -1,6 +1,7 @@
 package ec.edu.ista.springgc1.service.impl;
 
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,11 @@ public class RecoveryTokenServiceImpl extends GenericServiceImpl<RecoveryToken>{
 	}
 	
 	public RecoveryToken findByToken(String token) {
-		RecoveryToken tokenFound = tokenRepository.findByToken(token)
-				.orElseThrow(() -> new ResourceNotFoundException("Token no encontrado", token));
-		return tokenFound;
+        return tokenRepository.findByToken(token)
+				.orElse(new RecoveryToken());
+	}
+
+	public List<RecoveryToken> findByUsuarioId(Long idUsuario) {
+        return tokenRepository.findByUsuarioId(idUsuario);
 	}
 }

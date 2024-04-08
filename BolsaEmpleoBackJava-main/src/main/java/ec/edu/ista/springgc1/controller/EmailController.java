@@ -124,6 +124,8 @@ public class EmailController {
         Map<String, Object> model = new HashMap<>();
         model.put("fullName", getFullName(usuario));
 
+        service.validateRequest(usuario);
+
         MailResponse response = service.sendRecoveryEmail(request, model);
 
         if (response.getMessage().contains("Fallo al enviar email:") ){

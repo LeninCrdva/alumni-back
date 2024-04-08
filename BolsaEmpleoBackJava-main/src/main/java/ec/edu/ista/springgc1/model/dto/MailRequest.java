@@ -2,9 +2,11 @@ package ec.edu.ista.springgc1.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @Data
+@NoArgsConstructor
 public class MailRequest {
 	
 	private String name;

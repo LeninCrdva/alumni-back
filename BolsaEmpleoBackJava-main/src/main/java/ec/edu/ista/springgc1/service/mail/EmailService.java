@@ -9,9 +9,11 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
 
+import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -124,6 +126,18 @@ public class EmailService {
         }
 
         return response;
+    }
+
+    public void validateRequest(Usuario usuario){
+
+        List<RecoveryToken> recoveryToken = tokenService.findByUsuarioId(usuario.getId());
+
+        recoveryToken.stream().filter(RecoveryToken::getActive)
+                .filter(token -> token.getExpiration().compareTo(new Date()) > 0)
+                .findAny()
+                .ifPresent(token -> {
+                    throw new AppException(HttpStatus.CONFLICT,"El usuario ya contiene un token de recuperación activo");
+                });
     }
 
     private void getHtml(MailRequest request, Map<String, Object> model, MailResponse response, MimeMessage message, MimeMessageHelper helper) throws IOException, MessagingException {
