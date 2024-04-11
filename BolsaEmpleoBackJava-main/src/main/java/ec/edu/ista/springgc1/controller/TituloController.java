@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.controller;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
@@ -19,9 +20,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ista.springgc1.model.dto.TituloDTO;
+import ec.edu.ista.springgc1.model.entity.Persona;
 import ec.edu.ista.springgc1.model.entity.Titulo;
 import ec.edu.ista.springgc1.service.impl.TituloServiceImpl;
 
@@ -94,5 +97,20 @@ public class TituloController {
        
     	tituloService.delete(tituloFromDb.getId());
         return ResponseEntity.noContent().build();
+    }
+    
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-por-sexo")
+    public ResponseEntity<Map<Persona.Sex, Integer>> obtenerGraduadosPorSexo(
+            @RequestParam("nombreCarrera") String nombreCarrera) {
+        Map<Persona.Sex, Integer> conteoPorSexo = tituloService.contarGraduadosPorSexo(nombreCarrera);
+        return ResponseEntity.ok(conteoPorSexo);
+    }
+    
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-por-sexo-por-carrera-automatic")
+    public ResponseEntity<Map<String, Map<Persona.Sex, Long>>> obtenerGraduadosPorSexoPorCarrera() {
+        Map<String, Map<Persona.Sex, Long>> conteoPorCarrera = tituloService.contarGraduadosPorSexoPorCarrera();
+        return ResponseEntity.ok(conteoPorCarrera);
     }
 }

@@ -4,6 +4,11 @@ import ec.edu.ista.springgc1.model.enums.QuestionType;
 import lombok.Data;
 
 import javax.persistence.*;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -21,7 +26,10 @@ public class Question {
 
     @ManyToOne
     @JoinColumn(name = "survey_id")
+    @JsonIgnoreProperties("questions")// Evita la serialización recursiva desde Survey a Question
     private Survey survey;
+
+  
 
     @ElementCollection
     private List<String> options;

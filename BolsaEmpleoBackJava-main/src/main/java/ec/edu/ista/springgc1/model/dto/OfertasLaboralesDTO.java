@@ -3,6 +3,8 @@ package ec.edu.ista.springgc1.model.dto;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
+
 import com.fasterxml.jackson.annotation.JsonView;
 import ec.edu.ista.springgc1.view.View;
 import lombok.Data;
@@ -48,6 +50,7 @@ public class OfertasLaboralesDTO implements Serializable {
     private String nombreEmpresa;
 
     @JsonView({View.Postulacion.class, View.Public.class})
+	@Column(length = 20485760)
     private String fotoPortada;
 
     @JsonView({View.Postulacion.class, View.Public.class})

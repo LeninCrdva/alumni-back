@@ -211,7 +211,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(contrataciones);
     }
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
+    
     @GetMapping("/foto-portada/{id}")
     @JsonView(View.Public.class)
     public ResponseEntity<byte[]> getFotoPortadaById(@PathVariable Long id) {

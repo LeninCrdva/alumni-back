@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.EmpresarioDTO;
-import ec.edu.ista.springgc1.model.dto.SuperAdminDTO;
 import ec.edu.ista.springgc1.model.entity.Empresario;
 import ec.edu.ista.springgc1.model.entity.Usuario;
 import ec.edu.ista.springgc1.repository.EmpresarioRepository;

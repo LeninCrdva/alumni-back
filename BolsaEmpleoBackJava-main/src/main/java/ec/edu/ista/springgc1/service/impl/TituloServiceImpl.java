@@ -1,6 +1,8 @@
 package ec.edu.ista.springgc1.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +12,12 @@ import org.springframework.stereotype.Service;
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.GraduadoDTO;
-import ec.edu.ista.springgc1.model.dto.SuperAdminDTO;
 import ec.edu.ista.springgc1.model.dto.TituloDTO;
 import ec.edu.ista.springgc1.model.dto.UsuarioDTO;
 import ec.edu.ista.springgc1.model.entity.Carrera;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.Persona;
 import ec.edu.ista.springgc1.model.entity.Rol;
-import ec.edu.ista.springgc1.model.entity.SuperAdmin;
 import ec.edu.ista.springgc1.model.entity.Titulo;
 import ec.edu.ista.springgc1.model.entity.Usuario;
 import ec.edu.ista.springgc1.repository.CarreraRepository;
@@ -129,5 +129,38 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
 
     public Long counttitulo() {
         return titulorepository.count();
+    }
+    
+    public Map<Persona.Sex, Integer> contarGraduadosPorSexo(String nombreCarrera) {
+        List<Graduado> graduados = titulorepository.findAllGraduadosByNombreCarrera(nombreCarrera);
+
+        Map<Persona.Sex, Integer> conteoPorSexo = new HashMap<>();
+        conteoPorSexo.put(Persona.Sex.MASCULINO, 0);
+        conteoPorSexo.put(Persona.Sex.FEMENINO, 0);
+        conteoPorSexo.put(Persona.Sex.OTRO, 0);
+
+        for (Graduado graduado : graduados) {
+            Persona.Sex sexo = graduado.getUsuario().getPersona().getSexo();
+            if (conteoPorSexo.containsKey(sexo)) {
+                conteoPorSexo.put(sexo, conteoPorSexo.get(sexo) + 1);
+            }
+        }
+
+        return conteoPorSexo;
+    }
+    
+    public Map<String, Map<Persona.Sex, Long>> contarGraduadosPorSexoPorCarrera() {
+        List<Object[]> results = titulorepository.contarGraduadosPorSexoPorCarrera();
+        Map<String, Map<Persona.Sex, Long>> conteoPorCarrera = new HashMap<>();
+        for (Object[] result : results) {
+            String nombreCarrera = (String) result[0];
+            Persona.Sex sexo = (Persona.Sex) result[1];
+            Long cantidad = (Long) result[2];
+            conteoPorCarrera.putIfAbsent(nombreCarrera, new HashMap<>());
+            Map<Persona.Sex, Long> conteoPorSexo = conteoPorCarrera.get(nombreCarrera);
+            conteoPorSexo.put(sexo, conteoPorSexo.getOrDefault(sexo, 0L) + cantidad);
+        }
+
+        return conteoPorCarrera;
     }
 }
