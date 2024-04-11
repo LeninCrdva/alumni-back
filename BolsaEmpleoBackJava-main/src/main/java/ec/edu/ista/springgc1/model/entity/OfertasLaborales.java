@@ -1,7 +1,7 @@
 package ec.edu.ista.springgc1.model.entity;
 
 import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import javax.persistence.*;
 
 import com.fasterxml.jackson.annotation.JsonView;
@@ -24,11 +24,11 @@ public class OfertasLaborales {
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private double salario;
 
-	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private LocalDateTime fechaCierre;
 
-	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private LocalDateTime fechaPublicacion;
 	
@@ -44,7 +44,7 @@ public class OfertasLaborales {
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private String experiencia;
 
-	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
+	@JsonFormat(pattern = "YYYY-MM-dd HH:mm:ss")
 	@JsonView({View.Postulacion.class, View.Public.class})
 	private LocalDateTime fechaApertura;
 
