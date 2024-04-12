@@ -61,7 +61,6 @@ public class CapacitacionController {
 	public ResponseEntity<?> updateTraining(@PathVariable("id") Long id,
 			@Valid @RequestBody CapacitacionDTO capacitacion) {
 		CapacitacionDTO capacitacionDb = capacitacionService.findTrainingByIdToDTO(id);
-		System.out.println("This is the ID: " + capacitacionDb.getId());
 		
 		capacitacionDb.setInstitucion(capacitacion.getInstitucion());
 		capacitacionDb.setTipoCertificado(capacitacion.getTipoCertificado());

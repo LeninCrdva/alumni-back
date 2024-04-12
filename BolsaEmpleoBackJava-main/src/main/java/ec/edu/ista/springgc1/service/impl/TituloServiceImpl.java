@@ -43,7 +43,6 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
 
     @Override
     public Titulo mapToEntity(TituloDTO d) {
-        System.out.println("DTO: " + d);
         Titulo t = new Titulo();
         Graduado g = graduadoRepository.findById(d.getIdGraduado())
                 .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", d.getIdGraduado()));
@@ -58,8 +57,6 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
         t.setNumRegistro(d.getNumRegistro());
         t.setCarrera(c);
         t.setGraduado(g);
-
-        System.out.println("Entity: " + t);
 
         return t;
     }

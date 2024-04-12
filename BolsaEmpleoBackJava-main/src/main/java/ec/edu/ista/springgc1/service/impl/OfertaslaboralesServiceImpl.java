@@ -1,26 +1,31 @@
 package ec.edu.ista.springgc1.service.impl;
 
-import java.time.LocalDateTime;
-import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.transaction.Transactional;
 
+import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.dto.MailRequest;
 import ec.edu.ista.springgc1.model.entity.*;
+import ec.edu.ista.springgc1.model.enums.EstadoOferta;
+import ec.edu.ista.springgc1.model.enums.EstadoPostulacion;
 import ec.edu.ista.springgc1.repository.*;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
+import ec.edu.ista.springgc1.service.generatorpdf.ImageOptimizer;
 import ec.edu.ista.springgc1.service.mail.EmailService;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
+import org.springframework.util.StringUtils;
 
 @Service
 public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLaborales> implements Mapper<OfertasLaborales, OfertasLaboralesDTO> {
@@ -48,6 +53,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private ImageOptimizer imageOptimizer;
 
     @Override
     public OfertasLaborales mapToEntity(OfertasLaboralesDTO dto) {
@@ -97,11 +105,15 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return ofertasLaboralesRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
+    public List<OfertasLaboralesDTO> findOfertasLaboralesWithOutEstadoFinalizado() {
+        return ofertasLaboralesRepository.findOfertasLaboralesWithOutEstadoFinalizado().stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
     @Override
     public OfertasLaborales save(Object entity) {
         OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
 
-        createRequestAndSendEmailWithOutPDF(ofertaLaboral);
+        createRequestAndSendEmailWithPDF(ofertaLaboral);
 
         return ofertaLaboral;
     }
@@ -110,21 +122,42 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
 
-        existingOfertaLaboral.setSalario(updatedOfertaLaboralDTO.getSalario());
-        existingOfertaLaboral.setFechaCierre(updatedOfertaLaboralDTO.getFechaCierre());
-        existingOfertaLaboral.setFechaApertura(updatedOfertaLaboralDTO.getFechaApertura());
+        if (existingOfertaLaboral.getEstado().equals(EstadoOferta.CANCELADA)) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede actualizar una oferta laboral que ha sido cancelada");
+        }
+
+        if (existingOfertaLaboral.getEstado().equals(EstadoOferta.FINALIZADA)) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede actualizar una oferta laboral que ha sido finalizada");
+        }
+
+        existingOfertaLaboral.setSalario(ObjectUtils.isEmpty(updatedOfertaLaboralDTO.getSalario()) ? existingOfertaLaboral.getSalario() : updatedOfertaLaboralDTO.getSalario());
+        existingOfertaLaboral.setFechaCierre(ObjectUtils.isEmpty(updatedOfertaLaboralDTO.getFechaCierre()) ? existingOfertaLaboral.getFechaCierre() : updatedOfertaLaboralDTO.getFechaCierre());
+        existingOfertaLaboral.setFechaApertura(ObjectUtils.isEmpty(updatedOfertaLaboralDTO.getFechaApertura()) ?  existingOfertaLaboral.getFechaApertura() : updatedOfertaLaboralDTO.getFechaApertura());
         existingOfertaLaboral.setCargo(updatedOfertaLaboralDTO.getCargo());
         existingOfertaLaboral.setExperiencia(updatedOfertaLaboralDTO.getExperiencia());
-        existingOfertaLaboral.setFechaPublicacion(updatedOfertaLaboralDTO.getFechaPublicacion());
         existingOfertaLaboral.setAreaConocimiento(updatedOfertaLaboralDTO.getAreaConocimiento());
-        existingOfertaLaboral.setEstado(updatedOfertaLaboralDTO.getEstado());
         existingOfertaLaboral.setFotoPortada(updatedOfertaLaboralDTO.getFotoPortada());
         existingOfertaLaboral.setTipo(updatedOfertaLaboralDTO.getTipo());
-        existingOfertaLaboral.setTiempo(updatedOfertaLaboralDTO.getTiempo());
+        existingOfertaLaboral.setTiempo(ObjectUtils.isEmpty(updatedOfertaLaboralDTO.getTiempo()) ? existingOfertaLaboral.getTiempo() : updatedOfertaLaboralDTO.getTiempo());
         Empresa empresa = empresarepository.findByNombre(updatedOfertaLaboralDTO.getNombreEmpresa()).orElseThrow(
                 () -> new ResourceNotFoundException("Empresa", updatedOfertaLaboralDTO.getNombreEmpresa()));
 
         existingOfertaLaboral.setEmpresa(empresa);
+
+        return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
+    }
+
+    public OfertasLaboralesDTO actualizarEstadoOferta(Long id, String estado) {
+        OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+
+        try {
+            existingOfertaLaboral.setEstado(EstadoOferta.valueOf(estado));
+
+            createRequestAndSendEmailWithPDF(existingOfertaLaboral);
+        } catch (IllegalArgumentException e) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Estado de oferta laboral no válido: " + estado);
+        }
 
         return mapToDTO(ofertasLaboralesRepository.save(existingOfertaLaboral));
     }
@@ -149,20 +182,11 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return referencias.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    public Map<LocalDate, Long> calcularPostulacionesPorDia() {
-        List<OfertasLaborales> ofertasLaborales = ofertasLaboralesRepository.findAll();
+    public List<Map.Entry<String, Long>> calcularPostulacionesPorDia() {
 
-        Map<LocalDate, Long> postulacionesPorDia = new HashMap<>();
-
-        for (OfertasLaborales oferta : ofertasLaborales) {
-            LocalDateTime fechaPublicacion = oferta.getFechaPublicacion();
-
-            if (fechaPublicacion != null) {
-                postulacionesPorDia.merge(LocalDate.from(fechaPublicacion), 1L, Long::sum);
-            }
-        }
-
-        return postulacionesPorDia;
+        return postulacionRepository.countPostulacionesPorDia().stream()
+                .map(t -> new AbstractMap.SimpleEntry<>((String) t.get(0), (Long) t.get(1)))
+                .collect(Collectors.toList());
     }
 
     public List<OfertasLaboralesDTO> findEmpresarioByNombreUsuario(String nombreUsuario) {
@@ -175,21 +199,91 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
         return ofertasLaboralesDTOList.stream()
                 .collect(Collectors.groupingBy(
-                        oferta -> oferta.getCargo().toLowerCase().trim(),
+                        oferta -> StringUtils.hasText(oferta.getCargo()) ?  oferta.getCargo().toLowerCase().trim(): "Sin cargo especificado por estilo",
                         Collectors.counting()
                 ));
     }
 
     public List<Graduado> findGraduadosByOfertaId(Long ofertaId) {
-        List<Postulacion> postulaciones = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
+        List<Postulacion> postulantes = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
 
-        return postulaciones.stream().map(Postulacion::getGraduado).collect(Collectors.toList()).stream().peek(g -> g.getUsuario().setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()))).collect(Collectors.toList());
+        return postulantes
+                .stream()
+                .map(Postulacion::getGraduado)
+                .collect(Collectors.toList())
+                .stream()
+                .peek(g -> {
+                    g.getUsuario()
+                            .setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()));
+                    g.setUrlPdf(s3Service.getObjectUrl(g.getRutaPdf()));
+                }).collect(Collectors.toList());
+    }
+
+    public List<Graduado> findGraduadosConPostulacionActivaByOfertaId(Long ofertaId) {
+        List<Postulacion> postulantes = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
+
+        return postulantes
+                .stream()
+                .filter(postulacion -> postulacion.getEstado().equals(EstadoPostulacion.APLICANDO))
+                .map(Postulacion::getGraduado)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .stream()
+                .peek(g -> {
+                    if (g != null) {
+                        g.getUsuario()
+                                .setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()));
+                        g.setUrlPdf(s3Service.getObjectUrl(g.getRutaPdf()));
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Graduado> findGraduadosConPostulacionCanceladaByOfertaId(Long ofertaId) {
+        List<Postulacion> postulantes = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
+
+        return postulantes
+                .stream()
+                .filter(postulacion -> postulacion.getEstado().equals(EstadoPostulacion.CANCELADA_POR_GRADUADO) || postulacion.getEstado().equals(EstadoPostulacion.CANCELADA_POR_ADMINISTRADOR))
+                .map(Postulacion::getGraduado)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .stream()
+                .peek(g -> {
+                    if (g != null) {
+                        g.getUsuario()
+                                .setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()));
+                        g.setUrlPdf(s3Service.getObjectUrl(g.getRutaPdf()));
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<Graduado> findGraduadosSeleccionadosByOfertaId(Long ofertaId) {
+        List<Postulacion> postulantes = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
+
+        return postulantes
+                .stream()
+                .filter(postulacion -> postulacion.getEstado().equals(EstadoPostulacion.ACEPTADO))
+                .map(Postulacion::getGraduado)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .stream()
+                .peek(g -> {
+                    if (g != null) {
+                        g.getUsuario()
+                                .setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()));
+                        g.setUrlPdf(s3Service.getObjectUrl(g.getRutaPdf()));
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public List<OfertasLaborales> findOfertasByNombreEmpresa(String nombreEmpresa) {
         return ofertasLaboralesRepository.findOfertasByNombreEmpresa(nombreEmpresa);
     }
 
+    @Deprecated
     @Modifying
     @Transactional
     public Contratacion seleccionarContratados(Long ofertaId, List<Long> graduadosIds) { // Do not use this method
@@ -205,6 +299,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return contratacionRepository.save(contratacion);
     }
 
+    @Deprecated
     public List<Contratacion> getContratacionesPorOfertaLaboral(Long ofertaLaboralId) { // Do not use this method
         return contratacionRepository.findByOfertaLaboralId(ofertaLaboralId);
     }
@@ -219,18 +314,34 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return new MailRequest(from, subject, mailCase);
     }
 
-    private void createRequestAndSendEmailWithOutPDF(OfertasLaborales offer) {
+    private void createRequestAndSendEmailWithPDF(OfertasLaborales oferta) {
         Map<String, Object> model = new HashMap<>();
         List<Graduado> graduado = graduadoRepository.findAll();
         String[] emails = graduado.stream().map(Graduado::getEmailPersonal).toArray(String[]::new);
+        byte[] imageBytes = StringUtils.hasText(oferta.getFotoPortada()) ? imageOptimizer.convertBase64ToBytes(oferta.getFotoPortada()) : new byte[0];
 
-        model.put("oferta", offer);
+        model.put("oferta", oferta);
+        model.put("fotoPortada", imageBytes);
 
-        String subject = "¡Nuevo oferta laboral disponible!";
-        String mailCase = "new-offer";
+        String subject = getMailSubject(oferta.getEstado().name());
+        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "offer-finished" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : "offer-selection";
 
         MailRequest request = createMailRequest(subject, mailCase);
 
-        emailService.sendEmail(request, model, emails);
+        emailService.sendEmailWithPDF(request, model, emails);
+    }
+
+    private String getMailSubject(String estado) {
+        if (estado.equals(EstadoOferta.EN_CONVOCATORIA.name())) {
+            return "¡Nuevo oferta laboral disponible!";
+        } else if (estado.equals(EstadoOferta.CANCELADA.name())) {
+            return "Oferta laboral cancelada";
+        } else if (estado.equals(EstadoOferta.FINALIZADA.name())) {
+            return "Oferta laboral finalizada";
+        } else if (estado.equals(EstadoOferta.REACTIVADA.name())) {
+            return "Oferta laboral reactivada";
+        } else {
+            return "Oferta laboral en selección";
+        }
     }
 }

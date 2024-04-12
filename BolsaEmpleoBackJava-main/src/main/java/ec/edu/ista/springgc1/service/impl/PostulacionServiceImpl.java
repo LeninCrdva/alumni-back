@@ -4,6 +4,8 @@ import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.dto.MailRequest;
 import ec.edu.ista.springgc1.model.dto.PostulacionDto;
 import ec.edu.ista.springgc1.model.entity.*;
+import ec.edu.ista.springgc1.model.enums.EstadoOferta;
+import ec.edu.ista.springgc1.model.enums.EstadoPostulacion;
 import ec.edu.ista.springgc1.repository.*;
 import ec.edu.ista.springgc1.service.generatorpdf.PDFGeneratorService;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
@@ -20,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> implements Mapper<Postulacion, PostulacionDto> {
@@ -84,7 +87,7 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         Map<String, Object> model = getPreviousRequest(postulacion.getGraduado());
 
         if (((List<?>) model.get("titulos")).isEmpty()) {
-            throw new AppException(HttpStatus.BAD_REQUEST,"No se puede postular sin tener al menos un título registrado.");
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular sin tener al menos un título registrado.");
         }
 
         if (((List<?>) model.get("referencias")).isEmpty()) {
@@ -93,6 +96,18 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
 
         if (((List<?>) model.get("referenciasProfesionales")).isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular sin tener al menos una referencia profesional registrada.");
+        }
+
+        if (postulacion.getOfertaLaboral().getEstado().equals(EstadoOferta.FINALIZADA) || postulacion.getOfertaLaboral().getFechaCierre().isBefore(LocalDateTime.now())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular a una oferta laboral ya finalizada.");
+        }
+
+        if (postulacion.getOfertaLaboral().getEstado().equals(EstadoOferta.CANCELADA) || postulacion.getOfertaLaboral().getFechaCierre().isBefore(LocalDateTime.now())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular a una oferta laboral que ha sido cancelada.");
+        }
+
+        if (postulacion.getOfertaLaboral().getEstado().equals(EstadoOferta.EN_SELECCION) || postulacion.getOfertaLaboral().getFechaCierre().isBefore(LocalDateTime.now())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular a una oferta laboral que ya ha finalizado su proceso de convocatoria.");
         }
 
         byte[] pdfBytes = getAllDateForCurriculum(model);
@@ -111,6 +126,19 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         sendEmailWithOutPDF(postulacion);
 
         return postulacionRepository.save(postulacion);
+    }
+
+    public void seleccionarPostulantes(Long idOferta, List<Long> postulantes) {
+        List<Postulacion> postulacion = postulacionRepository.findAllByOfertaLaboralId(idOferta)
+                .stream()
+                .filter(p -> postulantes.contains(p.getGraduado().getId()))
+                .peek(p -> {
+                    p.setEstado(EstadoPostulacion.ACEPTADO);
+                    sendEmailWithOutPDF(p);
+                })
+                .collect(Collectors.toList());
+
+        postulacionRepository.saveAll(postulacion);
     }
 
     @Override
@@ -236,6 +264,8 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
                 return "¡Tu postulación se ha cancelado!";
             case "cv-graduate":
                 return "¡Ha recibido un interesado en la oferta laboral!";
+            case "accept-postulate":
+                return "¡Tu postulación ha sido aceptada!";
             default:
                 return "¡Not have a case!";
         }
@@ -248,6 +278,8 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
             case "CANCELADA_POR_GRADUADO":
             case "CANCELADA_POR_ADMINISTRADOR":
                 return "remove-postulate";
+            case "ACEPTADO":
+                return "accept-postulate";
             default:
                 return "¡Not have a case!";
         }

@@ -2,7 +2,7 @@ package ec.edu.ista.springgc1.model.entity;
 
 import javax.persistence.*;
 import javax.persistence.Id;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.HashSet;
 
@@ -20,11 +20,11 @@ public class Periodo {
     @Column(name = "id_periodo")
     private Long id;
 
-	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDateTime fechaInicio;
+	@DateTimeFormat(pattern = "YYYY-MM-dd")
+    private LocalDate fechaInicio;
 
-	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDateTime fechaFin;
+	@DateTimeFormat(pattern = "YYYY-MM-dd")
+    private LocalDate fechaFin;
 
     private Boolean estado = true;
 

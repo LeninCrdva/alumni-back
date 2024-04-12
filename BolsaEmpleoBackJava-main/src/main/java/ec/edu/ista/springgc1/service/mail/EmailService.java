@@ -106,6 +106,28 @@ public class EmailService {
         return response;
     }
 
+    public void sendEmailWithPDF(MailRequest request, Map<String, Object> model, String[] emails) {
+        MailResponse response = new MailResponse();
+        MimeMessage message = sender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+
+            byte[] imgBytes = (byte[]) model.get("fotoPortada");
+
+            if (imgBytes.length > 0) {
+                ByteArrayDataSource dataSource = new ByteArrayDataSource(imgBytes, "image/png");
+                String docName = "Oferta Imagen.png";
+                helper.addAttachment(docName, dataSource);
+            }
+
+            getHtml(request, model, emails, message, helper);
+        } catch (MessagingException | IOException e) {
+            response.setMessage("Fallo al enviar email: " + e.getMessage());
+            response.setStatus(Boolean.FALSE);
+        }
+    }
+
     public MailResponse sendRecoveryEmail(MailRequest request, Map<String, Object> model) {
         MailResponse response = new MailResponse();
         MimeMessage message = sender.createMimeMessage();
@@ -193,6 +215,13 @@ public class EmailService {
                 break;
             case "new-offer":
                 t = "businessman/email-template-alert-offer";
+                break;
+            case "offer-finished":
+            case "offer-canceled":
+                t = "businessman/email-template-alert-cancel-or-finish-offer";
+                break;
+            case "reject-postulate":
+                t = "graduate/email-template-rejected-postulate";
                 break;
             default:
                 t = "graduate/email-template-contact-us";

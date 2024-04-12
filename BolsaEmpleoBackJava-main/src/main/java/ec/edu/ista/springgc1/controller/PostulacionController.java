@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:4200")
 @RestController
@@ -58,12 +59,14 @@ public class PostulacionController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PostMapping("")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> createPostulacion(@RequestBody PostulacionDto postulacionDto) throws IOException {
         return ResponseEntity.ok(postulacionService.savePostulacion(postulacionDto));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PutMapping("/update/{id}")
+    @JsonView(View.Postulacion.class)
     public ResponseEntity<?> updatePostulacion(@PathVariable Long id, @RequestBody PostulacionDto postulacionDto) {
         Postulacion postulacionFromDb = postulacionService.findById(id);
         Postulacion postulacionFromService = postulacionService.mapToEntity(postulacionDto);
@@ -79,6 +82,14 @@ public class PostulacionController {
     @PutMapping("/update-estado/{id}")
     public ResponseEntity<?> updateEstado(@PathVariable Long id, @RequestBody PostulacionDto postulacionDto) {
         return ResponseEntity.ok(postulacionService.updateEstado(id, postulacionDto));
+    }
+
+    @PreAuthorize("hasAnyRole('RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PutMapping("/actualizar-estado-por-empresario/{id}")
+    public ResponseEntity<?> seleccionarPostulante(@PathVariable Long id, @RequestBody List<Long> postulantes) {
+        postulacionService.seleccionarPostulantes(id, postulantes);
+
+        return ResponseEntity.noContent().build();
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")

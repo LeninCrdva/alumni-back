@@ -10,21 +10,13 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.service.generatorpdf.ImageOptimizer;
 import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.amazonaws.services.sns.model.ResourceNotFoundException;
 
@@ -50,7 +42,7 @@ public class OfertasLaboralesController {
     private OfertaslaboralesServiceImpl ofertasLaboralesService;
 
     @Autowired
-    private GraduadoServiceImpl graduadoService;
+    private ImageOptimizer imageOptimizer;
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
@@ -96,6 +88,12 @@ public class OfertasLaboralesController {
     }
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
+    @PutMapping("/cancelar-oferta/{id}")
+    ResponseEntity<OfertasLaboralesDTO> cancelarOferta(@PathVariable Long id, @RequestParam("estado") String estado) {
+        return ResponseEntity.ok(ofertasLaboralesService.actualizarEstadoOferta(id, estado));
+    }
+
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
     @DeleteMapping("/{id}")
     ResponseEntity<?> delete(@PathVariable Long id) {
         ofertasLaboralesService.delete(id);
@@ -113,16 +111,10 @@ public class OfertasLaboralesController {
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/postulaciones-por-dia")
     @JsonView(View.Public.class)
-    public ResponseEntity<Map<String, Long>> calcularPostulacionesPorDia() {
-        Map<LocalDate, Long> postulacionesPorDia = ofertasLaboralesService.calcularPostulacionesPorDia();
+    public ResponseEntity<?> calcularPostulacionesPorDia() {
+        List<Map.Entry<String, Long>> postulacionesPorDia = ofertasLaboralesService.calcularPostulacionesPorDia();
 
-        // Convertir las claves (LocalDate) a cadenas
-        Map<String, Long> postulacionesPorDiaStringKey = new HashMap<>();
-        for (Map.Entry<LocalDate, Long> entry : postulacionesPorDia.entrySet()) {
-            postulacionesPorDiaStringKey.put(entry.getKey().toString(), entry.getValue());
-        }
-
-        return ResponseEntity.ok(postulacionesPorDiaStringKey);
+        return ResponseEntity.ok(postulacionesPorDia);
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
@@ -138,15 +130,9 @@ public class OfertasLaboralesController {
     @GetMapping("/cargos-con-ofertas")
     @JsonView(View.Public.class)
     ResponseEntity<Map<String, Long>> getCargosConOfertas() {
-        List<OfertasLaboralesDTO> ofertasLaboralesDTOList = ofertasLaboralesService.findAll();
-        Map<String, Long> cargosConOfertas = new HashMap<>();
+        Map<String, Long> ofertasLaboralesDTOList = ofertasLaboralesService.getCargosConOfertas();
 
-        for (OfertasLaboralesDTO ofertaLaboralDTO : ofertasLaboralesDTOList) {
-            String cargo = ofertaLaboralDTO.getCargo().toLowerCase().trim();
-            cargosConOfertas.merge(cargo, 1L, Long::sum);
-        }
-
-        return ResponseEntity.ok(cargosConOfertas);
+        return ResponseEntity.ok(ofertasLaboralesDTOList);
     }
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
@@ -156,6 +142,27 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(ofertasLaboralesService.findGraduadosByOfertaId(ofertaId));
     }
 
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-postulantes-activos/{ofertaId}")
+    @JsonView(View.Public.class)
+    ResponseEntity<List<Graduado>> findGraduadosWithActivePostulationByOfertaId(@PathVariable Long ofertaId) {
+        return ResponseEntity.ok(ofertasLaboralesService.findGraduadosConPostulacionActivaByOfertaId(ofertaId));
+    }
+
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-postulantes-seleccionados/{ofertaId}")
+    @JsonView(View.Public.class)
+    ResponseEntity<List<Graduado>> findGraduadosAceptedByOfertaId(@PathVariable Long ofertaId) {
+        return ResponseEntity.ok(ofertasLaboralesService.findGraduadosSeleccionadosByOfertaId(ofertaId));
+    }
+
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-postulantes-inactivos/{ofertaId}")
+    @JsonView(View.Public.class)
+    ResponseEntity<List<Graduado>> findGraduadosWithCancelPostulationByOfertaId(@PathVariable Long ofertaId) {
+        return ResponseEntity.ok(ofertasLaboralesService.findGraduadosConPostulacionCanceladaByOfertaId(ofertaId));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/empresa/{nombreEmpresa}")
     @JsonView(View.Public.class)
@@ -163,6 +170,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(ofertasLaboralesService.findOfertasByNombreEmpresa(nombreEmpresa));
     }
 
+    @Deprecated
     @PreAuthorize("hasRole('EMPRESARIO')")
     @PostMapping("/seleccionar-contratados/{ofertaId}")
     public ResponseEntity<Contratacion> seleccionarContratados(@PathVariable Long ofertaId, @RequestBody List<Long> graduadosIds) {
@@ -175,6 +183,7 @@ public class OfertasLaboralesController {
         }
     }
 
+    @Deprecated
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA','ADMINISTRADOR')")
     @GetMapping("/contrataciones")
     @JsonView(View.Public.class)
@@ -183,6 +192,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(contrataciones);
     }
 
+    @Deprecated
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/contrataciones/{id}")
     @JsonView(View.Public.class)
@@ -192,6 +202,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(contratacion);
     }
 
+    @Deprecated
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @DeleteMapping("/contrataciones/{id}")
     public ResponseEntity<String> deleteContratacionById(@PathVariable Long id) {
@@ -203,6 +214,7 @@ public class OfertasLaboralesController {
         }
     }
 
+    @Deprecated
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'REPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @GetMapping("/ofertaLaboral/{ofertaLaboralId}")
     @JsonView(View.Public.class)
@@ -211,7 +223,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(contrataciones);
     }
 
-    
+    @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/foto-portada/{id}")
     @JsonView(View.Public.class)
     public ResponseEntity<byte[]> getFotoPortadaById(@PathVariable Long id) {
@@ -219,7 +231,7 @@ public class OfertasLaboralesController {
         
         String fotoBase64 = ofertaLaboralDTO.getFotoPortada();
         
-        byte[] fotoBytes = Base64.getDecoder().decode(fotoBase64.split(",")[1]); 
+        byte[] fotoBytes = imageOptimizer.convertBase64ToBytes(fotoBase64);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.IMAGE_JPEG); 

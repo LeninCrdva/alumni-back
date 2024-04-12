@@ -38,8 +38,6 @@ public class ReferenciaProfesionalServiceImp extends GenericServiceImpl<Referenc
 		referenciaProfesional.setInstitucion(referenciaProfesionalDTO.getInstitucion());
 		referenciaProfesional.setEmail(referenciaProfesionalDTO.getEmail());
 
-		System.out.println(referenciaProfesionalDTO.getInstitucion());
-
 		return referenciaProfesional;
 
 	}

@@ -14,6 +14,10 @@
             color: black;
         }
 
+        li {
+            text-align: left;
+        }
+
     </style>
 </head>
 
@@ -35,30 +39,37 @@
                             <p>Estimado usuario del sistema</p>
                             <br>
 
-                            <p th:if="${oferta.cargo}">Se ha detectado la publicación de una oferta laboral con cargo de <strong th:text="${oferta.cargo}"></strong>
+                            <p th:if="${oferta.cargo}">Se ha detectado que la publicación de la oferta laboral con cargo de <strong th:text="${oferta.cargo}"></strong>
                                 publicada el día
                                 <strong th:text="${#temporals.day(oferta.fechaPublicacion)}"></strong> de
                                 <strong th:text="${#temporals.monthName(oferta.fechaPublicacion)}"></strong> del año
                                 <strong th:text="${#temporals.year(oferta.fechaPublicacion)}"></strong> a las
                                 <strong th:text="${#temporals.format(oferta.fechaPublicacion, 'HH:mm')}"></strong>
-                                . Por favor, revise la plataforma para más detalles.
+                                ha sido cancelada o finalizada.
                             </p>
-                            <p th:unless="${oferta.cargo}">Se ha detectado la publicación de una oferta laboral
+                            <p th:unless="${oferta.cargo}">Se ha detectado que la publicación de una oferta laboral
                                 publicada el día
                                 <strong th:text="${#temporals.day(oferta.fechaPublicacion)}"></strong> de
                                 <strong th:text="${#temporals.monthName(oferta.fechaPublicacion)}"></strong> del año
                                 <strong th:text="${#temporals.year(oferta.fechaPublicacion)}"></strong> a las
                                 <strong th:text="${#temporals.format(oferta.fechaPublicacion, 'HH:mm')}"></strong>
-                                . Por favor, revise la plataforma para más detalles.
+                                ha sido cancelada o finalizada.
                             </p>
                             <br>
-                            <div th:if="${oferta.fotoPortada}">
-                                <p>Se ha adjuntado una imagen para la publicación de la oferta por elección del empresario.</p>
-                                <br>
-                                <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
-                            </div>
+                            <p>Recuerde que al haber finalizado o sido cancelado este proceso con la oferta laboral, no se puede realizar ninguna de las siguientes acciones:</p>
+                            <ol>
+                                <li><strong>Postular a esta oferta laboral.</strong></li>
+                                <li><strong>Cancelar la postulación (si contaba con una) en esta oferta laboral.</strong></li>
+                                <li><strong>Volver a postular en caso de contar con el estado cancelado a esta oferta laboral.</strong></li>
+                            </ol>
+                            <p>Además, todas las postulaciones existentes a esta oferta laboral pasaran a ser rechazadas automáticamente.</p>
 
                             <br>
+                            <div th:if="${oferta.fotoPortada}">
+                                <p>Se ha adjuntado la imagen de la oferta cancelada o finalizada proporcionada por el empresario.</p>
+                                <br>
+                            </div>
+
                             <p>Este mensaje es totalmente automático, por favor, no responder.</p>
                             <br>
                             <p>¡Gracias por confiar en nosotros!</p>

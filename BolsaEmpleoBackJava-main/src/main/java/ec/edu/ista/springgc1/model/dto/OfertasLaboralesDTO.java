@@ -3,9 +3,8 @@ package ec.edu.ista.springgc1.model.dto;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-import javax.persistence.Column;
-
 import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.model.enums.EstadoOferta;
 import ec.edu.ista.springgc1.view.View;
 import lombok.Data;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -44,13 +43,12 @@ public class OfertasLaboralesDTO implements Serializable {
     private String areaConocimiento;
 
     @JsonView({View.Postulacion.class, View.Public.class})
-    private Boolean estado;
+    private EstadoOferta estado;
 
     @JsonView({View.Postulacion.class, View.Public.class})
     private String nombreEmpresa;
 
     @JsonView({View.Postulacion.class, View.Public.class})
-	@Column(length = 20485760)
     private String fotoPortada;
 
     @JsonView({View.Postulacion.class, View.Public.class})

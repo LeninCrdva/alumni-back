@@ -30,6 +30,9 @@ public interface OfertaslaboralesRepository extends GenericRepository<OfertasLab
     @Query("UPDATE OfertasLaborales o SET o.graduados = :graduados WHERE o.id = :ofertaId")
     void seleccionarContratados(@Param("ofertaId") Long ofertaId, @Param("graduados") List<Graduado> graduados);*/
 
-    @Query("SELECT o FROM OfertasLaborales o WHERE o NOT IN (SELECT p.ofertaLaboral FROM Postulacion p WHERE p.graduado.id = :id)")
+    @Query("SELECT o FROM OfertasLaborales o WHERE o NOT IN (SELECT p.ofertaLaboral FROM Postulacion p WHERE p.graduado.id = :id) AND (o.estado = 'EN_CONVOCATORIA' OR o.estado = 'REACTIVADA') AND o.fechaCierre >= CURRENT_TIMESTAMP")
     List<OfertasLaborales> findOfertasWithOutPostulacionByGraduadoId(@Param("id") Long id);
+
+    @Query("SELECT o FROM OfertasLaborales o WHERE o.estado != 'FINALIZADA'")
+    List<OfertasLaborales> findOfertasLaboralesWithOutEstadoFinalizado();
 }
