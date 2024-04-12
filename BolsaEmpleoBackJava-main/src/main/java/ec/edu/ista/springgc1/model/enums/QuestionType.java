@@ -5,5 +5,6 @@ public enum QuestionType {
     OPCION_MULTIPLE,
     CALIFICACION_1_5,
     CALIFICACION_1_10,
-    SI_NO
+    SI_NO,
+    OPCION_MULTIPLEUNICO
 }
