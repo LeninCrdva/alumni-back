@@ -42,6 +42,7 @@ public class Empresa {
 
     @JsonView({View.Public.class, View.Postulacion.class})
     @ColumnTransformer(write = "UPPER(?)")
+    @Column(name = "nombre_empresa", unique = true)
     private String nombre;
 
     @ColumnTransformer(write = "UPPER(?)")

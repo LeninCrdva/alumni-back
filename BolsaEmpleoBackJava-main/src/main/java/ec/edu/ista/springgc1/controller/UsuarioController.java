@@ -54,10 +54,28 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PutMapping("/state-update/{id}")
+    public ResponseEntity<?> updateState(@PathVariable Long id, @RequestParam Boolean state) {
+        try {
+            Boolean isOk = usuarioService.updateState(id, state);
+            return ResponseEntity.status(HttpStatus.OK).body(isOk);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PutMapping("/photo/{id}/{url_imagen}")
     public ResponseEntity<?> updatePhoto(@PathVariable Long id, @PathVariable String url_imagen) {
         Usuario usuario = usuarioService.updatePhoto(id, url_imagen);
+        return ResponseEntity.status(HttpStatus.OK).body(usuario);
+    }
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PutMapping("/some-data/{id}")
+    public ResponseEntity<?> updateSomeData(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
+        Usuario usuario = usuarioService.updateSomeData(id, usuarioDTO);
         return ResponseEntity.status(HttpStatus.OK).body(usuario);
     }
 

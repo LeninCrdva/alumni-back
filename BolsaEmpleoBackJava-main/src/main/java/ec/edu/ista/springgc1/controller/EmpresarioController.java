@@ -54,6 +54,13 @@ public class EmpresarioController {
         return ResponseEntity.ok(emprendimientoService.findByUsuario(usuario));
     }
 
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/user-data/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findByUserUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(emprendimientoService.findByIdToDTO(id));
+    }
+
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO') or isAnonymous()") // <--Change this, it's not possible to create an admin if you are not logged in...
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody EmpresarioDTO empresarioDTO) {

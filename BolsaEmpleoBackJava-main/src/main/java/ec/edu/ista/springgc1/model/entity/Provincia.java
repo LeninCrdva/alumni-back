@@ -27,4 +27,12 @@ public class Provincia {
     @Column(nullable = false, length = 50)
     @JsonView(View.Base.class)
     private String pais;
+
+    public Provincia() {
+
+    }
+    public Provincia(String nombre) {
+        this.nombre = nombre;
+    }
+
 }

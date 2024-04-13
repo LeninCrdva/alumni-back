@@ -73,6 +73,13 @@ public class GraduadoController {
         return ResponseEntity.ok(estudianteService.findByUsuario(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    @GetMapping("/user-id/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findToDTOByUserId(@PathVariable long id) {
+        return ResponseEntity.ok(estudianteService.findDTOByUserId(id));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/user/{username}")
     @JsonView(View.Public.class)

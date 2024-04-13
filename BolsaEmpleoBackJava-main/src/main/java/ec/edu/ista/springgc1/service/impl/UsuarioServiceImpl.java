@@ -2,11 +2,8 @@ package ec.edu.ista.springgc1.service.impl;
 
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
-import ec.edu.ista.springgc1.model.dto.RegistroDTO;
-import ec.edu.ista.springgc1.model.dto.UsuarioDTO;
-import ec.edu.ista.springgc1.model.entity.Persona;
-import ec.edu.ista.springgc1.model.entity.Rol;
-import ec.edu.ista.springgc1.model.entity.Usuario;
+import ec.edu.ista.springgc1.model.dto.*;
+import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.repository.PersonaRepository;
 import ec.edu.ista.springgc1.repository.RolRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
@@ -20,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.amazonaws.services.kms.model.NotFoundException;
+import org.springframework.util.ObjectUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +30,15 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private GraduadoServiceImpl graduadoService;
+
+    @Autowired
+    private EmpresaServiceImpl empresaService;
+
+    @Autowired
+    private EmpresarioServiceImpl empresarioService;
 
     @Autowired
     private RolRepository rolRepository;
@@ -141,6 +148,21 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         return usuarioRepository.save(usuario);
     }
 
+    public Usuario updateSomeData(long id, UsuarioDTO usuarioDTO) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User NOT FOUND", id));
+        usuario.setNombreUsuario(usuarioDTO.getNombreUsuario());
+        usuario.setRol(rolRepository.findByNombre(usuarioDTO.getRol())
+                .orElseThrow(() -> new ResourceNotFoundException("Rol NOT FOUND", usuarioDTO.getRol())));
+        return usuarioRepository.save(usuario);
+    }
+
+    public Boolean updateState(long id, boolean state) {
+        Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User NOT FOUND", id));
+        usuario.setEstado(state);
+        usuarioRepository.save(usuario);
+        return true;
+    }
+
     public Usuario updatePhoto(long id, String ruta) {
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User NOT FOUND", id));
         usuario.setRutaImagen(ruta);
@@ -170,7 +192,7 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     }
 
     @Transactional
-    public void registerUserAndPerson(Persona persona, RegistroDTO usuarioDTO) {
+    public UsuarioDTO registerUserAndPerson(Persona persona, RegistroDTO usuarioDTO) {
 
         UsuarioDTO user = new UsuarioDTO();
         user.setNombreUsuario(usuarioDTO.getNombreUsuario());
@@ -182,5 +204,39 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         user.setUrlImagen(usuarioDTO.getUrlImagen());
 
         save(user);
+        return user;
+    }
+
+    @Transactional
+    public void controlCase(Usuario usuario, EmpresarioDTO empresarioDTO, EmpresaDTO empresaDTO, GraduadoDTO graduadoDTO) {
+        String role = usuario.getRol().getNombre();
+        switch (role) {
+            case "GRADUADO":
+                graduadoDTO.setUsuario(usuario.getNombreUsuario());
+                graduadoService.save(graduadoDTO);
+                break;
+            case "EMPRESARIO":
+                Empresario empresario = saveEmpresario(usuario, empresarioDTO);
+                if (!ObjectUtils.isEmpty(empresario) && empresaDTO.getEmpresario() != null) {
+                    saveEmpresa(empresarioDTO, empresaDTO);
+                }
+                break;
+            case "RESPONSABLE_CARRERA":
+                break;
+            default:
+                throw new AppException(HttpStatus.BAD_REQUEST, "El rol ingresado no es válido");
+        }
+    }
+
+    public Empresario saveEmpresario(Usuario usuario, EmpresarioDTO empresarioDTO) {
+        empresarioDTO.setUsuario(usuario.getNombreUsuario());
+        return empresarioService.save(empresarioDTO);
+    }
+
+    public void saveEmpresa(EmpresarioDTO empresarioDTO, EmpresaDTO empresaDTO) {
+        if (empresaDTO.getEmpresario() != null) {
+            empresaDTO.setEmpresario(empresarioDTO.getUsuario());
+            empresaService.save(empresaDTO);
+        }
     }
 }
