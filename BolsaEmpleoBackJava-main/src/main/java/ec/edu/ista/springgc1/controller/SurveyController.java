@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import ec.edu.ista.springgc1.model.entity.Question;
@@ -19,14 +20,14 @@ public class SurveyController {
     @Autowired
     private SurveyServiceImp surveyService;
 
-   
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
     public ResponseEntity<Survey> saveOrUpdateSurvey(@RequestBody Survey survey) {
         Survey savedSurvey = surveyService.saveSurvey(survey);
         return new ResponseEntity<>(savedSurvey, HttpStatus.OK);
     }
 
-   
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/{surveyId}")
     public ResponseEntity<Survey> findSurveyById(@PathVariable Long surveyId) {
         Optional<Survey> survey = surveyService.findSurveyById(surveyId);
@@ -34,27 +35,37 @@ public class SurveyController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-  
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{surveyId}")
-    public ResponseEntity<Void> deleteSurveyById(@PathVariable Long surveyId) {
-        surveyService.deleteSurveyById(surveyId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    public ResponseEntity<String> deleteSurveyById(@PathVariable Long surveyId) {
+        try {
+            surveyService.deleteSurveyById(surveyId);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (IllegalArgumentException e) {
+           
+            String errorMessage = "No se puede eliminar la encuesta porque tiene respuestas asociadas.";
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(errorMessage);
+        }
     }
 
- 
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping("/{surveyId}/questions")
     public ResponseEntity<Question> addQuestionToSurvey(@PathVariable Long surveyId, @RequestBody Question question) {
         Question savedQuestion = surveyService.addQuestionToSurvey(surveyId, question);
         return new ResponseEntity<>(savedQuestion, HttpStatus.OK);
     }
 
-   
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @DeleteMapping("/{surveyId}/related")
     public ResponseEntity<Void> deleteSurveyAndRelated(@PathVariable Long surveyId) {
         surveyService.deleteSurveyAndRelated(surveyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
+    
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @GetMapping("/withQuestionsAndOptions")
     public ResponseEntity<?> getAllSurveysWithQuestionsAndOptions() {
         try {
@@ -64,7 +75,7 @@ public class SurveyController {
         }
     }
     
-    
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{surveyId}")
     public ResponseEntity<Survey> updateSurvey(@PathVariable Long surveyId, @RequestBody Survey updatedSurvey) {
         Optional<Survey> existingSurveyOptional = surveyService.findSurveyById(surveyId);
@@ -103,6 +114,18 @@ public class SurveyController {
             }
         } else {
             return ResponseEntity.notFound().build(); // La encuesta no se encontró
+        }
+    }
+    
+    
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PutMapping("/{surveyId}/updateState")
+    public ResponseEntity<Survey> updateSurveyState(@PathVariable Long surveyId, @RequestParam Boolean newEstado) {
+        try {
+            Survey updatedSurvey = surveyService.updateSurveyState(surveyId, newEstado);
+            return ResponseEntity.ok(updatedSurvey);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().body(null); 
         }
     }
   

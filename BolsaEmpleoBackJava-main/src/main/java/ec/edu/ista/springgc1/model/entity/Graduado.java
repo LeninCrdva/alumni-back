@@ -63,7 +63,7 @@ public class Graduado {
 	@ColumnTransformer(write = "UPPER(?)")
 	@JsonView(View.Public.class)
 	private String estadoCivil;
-
+	@JsonView(View.Public.class)
 	private String rutaPdf;
 
 	@JsonView(View.Public.class)

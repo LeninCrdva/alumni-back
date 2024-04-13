@@ -36,7 +36,8 @@ public class Usuario {
     @JoinColumn(name = "id_rol", referencedColumnName = "id_rol", nullable = false)
 	@JsonView(View.Public.class)
     private Rol rol;
-
+    
+    @JsonView(View.Public.class)
     private String rutaImagen;
 
     @Transient

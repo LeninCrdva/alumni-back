@@ -23,4 +23,5 @@ public class Survey {
     @OneToMany(mappedBy = "survey", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @JsonIgnoreProperties("survey")
     private List<Question> questions;
+    private Boolean estado;
 }

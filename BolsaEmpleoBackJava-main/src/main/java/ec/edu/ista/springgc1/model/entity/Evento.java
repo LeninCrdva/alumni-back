@@ -1,46 +1,46 @@
 package ec.edu.ista.springgc1.model.entity;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 import javax.persistence.*;
 
-import org.hibernate.annotations.ColumnTransformer;
+import com.fasterxml.jackson.annotation.JsonView;
 
+import ec.edu.ista.springgc1.view.View;
 import lombok.Data;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Data
 @Entity
-@Table(name = "evento")
 public class Evento {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_evento")
-    private Long id;
+	 @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    @Column(name = "id_prom")
+	    @JsonView(View.Public.class)
+	    private Long id_prom;
 
-    @Column(unique = true)
-    @ColumnTransformer(write = "UPPER(?)")
-    private String nombreEvento;
+	    @Column(name = "titulo")
+	    @JsonView(View.Public.class)
+	    private String titulo;
 
-    private Boolean estado = true;
+	    @Column(name = "subTitulo")
+	    @JsonView(View.Public.class)
+	    private String subTitulo;
 
-    @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime horaInicio;
+	    @Lob
+	    @Column(name = "resumen", length = 10485760)
+	    @JsonView(View.Public.class)
+	    private String resumen;
 
-    @DateTimeFormat(pattern = "HH:mm:ss")
-    private LocalTime horaFin;
+	    @Column(name = "colorFondo")
+	    @JsonView(View.Public.class)
+	    private String colorFondo;
 
-    @DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-    private LocalDate fecha;
+	    @Lob
+	    @Column(name = "foto_portada", columnDefinition = "LONGBLOB")
+	    @JsonView(View.Public.class)
+	    private byte[] foto_portada;
+	
+	    @ManyToOne
+	    @JoinColumn(name = "id_componentxml", referencedColumnName = "id_componentxml")
+	    @JsonView(View.Public.class)
+	    private Componentexml tipoxml;
 
-    @ColumnTransformer(write = "UPPER(?)")
-    private String lugar;
-
-    @ColumnTransformer(write = "UPPER(?)")
-    private String descripcion;
-
-    @ManyToOne
-    @JoinColumn(name = "id_admi", referencedColumnName = "id_admi", nullable = true)
-    private Administrador admin;
 }

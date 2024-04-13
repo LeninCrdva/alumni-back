@@ -72,7 +72,8 @@ public class ExperienciaController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PreAuthorize("hasRole('ADMINISTRADOR')")
+	//@PreAuthorize("hasRole('ADMINISTRADOR')")
+	@PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
 	@GetMapping("/graduados-con-experiencia")
 	ResponseEntity<?> getGraduadosConExperiencia() {
 		List<Graduado> graduadosConExperiencia = experienciaServiceImp.findGraduadosConExperiencia();

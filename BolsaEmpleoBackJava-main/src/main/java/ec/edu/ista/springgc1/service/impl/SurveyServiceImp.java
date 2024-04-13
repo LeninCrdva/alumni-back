@@ -56,17 +56,59 @@ public class SurveyServiceImp {
 	    
 	    public Survey updateSurvey(Survey updatedSurvey) {
 	        Long surveyId = updatedSurvey.getId();
+
+	    
 	        if (hasAnswersForSurvey(surveyId)) {
 	            throw new IllegalArgumentException("No se puede editar la encuesta porque ya tiene respuestas asociadas.");
+	            
 	        }
 
+	      
 	        String newTitle = updatedSurvey.getTitle();
-
 	        if (titleChangedAndAlreadyInUse(surveyId, newTitle)) {
 	            throw new IllegalArgumentException("El título '" + newTitle + "' ya está en uso por otra encuesta.");
 	        }
 
-	        return surveyRepository.save(updatedSurvey);
+	        
+	        Optional<Survey> existingSurveyOptional = surveyRepository.findById(surveyId);
+	        if (existingSurveyOptional.isPresent()) {
+	            Survey existingSurvey = existingSurveyOptional.get();
+
+	           
+	            existingSurvey.setTitle(updatedSurvey.getTitle());
+	            existingSurvey.setDescription(updatedSurvey.getDescription());
+
+	          
+	            List<Question> existingQuestions = existingSurvey.getQuestions();
+	            List<Question> updatedQuestions = updatedSurvey.getQuestions();
+
+	            for (Question updatedQuestion : updatedQuestions) {
+	                Long questionId = updatedQuestion.getId();
+	                if (questionId != null) {
+	                   
+	                    Optional<Question> existingQuestionOptional = existingQuestions.stream()
+	                            .filter(q -> q.getId().equals(questionId))
+	                            .findFirst();
+
+	                    if (existingQuestionOptional.isPresent()) {
+	                       
+	                        Question existingQuestion = existingQuestionOptional.get();
+	                        existingQuestion.setText(updatedQuestion.getText());
+	                        existingQuestion.setType(updatedQuestion.getType());
+	                        existingQuestion.setOptions(updatedQuestion.getOptions());
+	                    }
+	                } else {
+	                    
+	                    updatedQuestion.setSurvey(existingSurvey);
+	                    existingQuestions.add(updatedQuestion);
+	                }
+	            }
+
+	           
+	            return surveyRepository.save(existingSurvey);
+	        } else {
+	            throw new IllegalArgumentException("No se encontró la encuesta con ID: " + surveyId);
+	        }
 	    }
 
 	    private boolean hasAnswersForSurvey(Long surveyId) {
@@ -90,6 +132,10 @@ public class SurveyServiceImp {
 	    }
 	    
 	    public void deleteSurveyById(Long surveyId) {
+	        if (hasAnswersForSurvey(surveyId)) {
+	            throw new IllegalArgumentException("No se puede eliminar la encuesta porque ya tiene respuestas asociadas.");
+	        }
+
 	        surveyRepository.deleteById(surveyId);
 	    }
 	    
@@ -136,6 +182,16 @@ public class SurveyServiceImp {
 	    }
 	    
 
-	   
+	    public Survey updateSurveyState(Long surveyId, Boolean newEstado) {
+	        Optional<Survey> existingSurveyOptional = surveyRepository.findById(surveyId);
+
+	        if (existingSurveyOptional.isPresent()) {
+	            Survey existingSurvey = existingSurveyOptional.get();
+	            existingSurvey.setEstado(newEstado); // Actualizar solo el estado
+	            return surveyRepository.save(existingSurvey);
+	        } else {
+	            throw new IllegalArgumentException("No se encontró la encuesta con ID: " + surveyId);
+	        }
+	    }
 
 }

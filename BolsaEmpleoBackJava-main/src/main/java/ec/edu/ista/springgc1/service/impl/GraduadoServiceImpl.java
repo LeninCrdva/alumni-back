@@ -97,9 +97,33 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         return mapToDTO(estudiante);
     }
 
-    public List<Graduado> findAllGraduadosNotIn(Long id) {
+    /*public List<Graduado> findAllGraduadosNotIn(Long id) {
         return graduadoRepository.findByUsuarioIdNot(id);
+    }*/
+    public List<Graduado> findAllGraduadosNotIn(Long id) {
+        List<Graduado> graduados = graduadoRepository.findByUsuarioIdNot(id);
+        setUrlForGraduados(graduados);
+        return graduados;
     }
+    private void setUrlForGraduados(List<Graduado> graduados) {
+        for (Graduado graduado : graduados) {
+            Usuario usuario = graduado.getUsuario();
+
+            if (usuario != null) {
+                String imageUrl = usuario.getRutaImagen();
+                if (imageUrl != null && !imageUrl.isEmpty()) {             
+                    String publicUrl = s3Service.getObjectUrl(imageUrl);
+                    usuario.setUrlImagen(publicUrl);
+                    graduado.setUsuario(usuario);
+                }
+            }
+
+            if (graduado.getRutaPdf() != null && !graduado.getRutaPdf().isEmpty()) {
+                graduado.setUrlPdf(s3Service.getObjectUrl(graduado.getRutaPdf()));
+            }
+        }
+    }
+
 
     public Graduado findByIdUsuario(long id_usuario) {
         return graduadoRepository.findByUsuarioId(id_usuario)
