@@ -70,7 +70,7 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
     }
 
     public EmpresarioDTO findByIdToDTO(Long id) {
-        Empresario empresario = empresariorepository.findById(id)
+        Empresario empresario = empresariorepository.findByUsuarioId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("id", id));
 
         return mapToDTO(empresario);

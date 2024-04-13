@@ -3,6 +3,7 @@ package ec.edu.ista.springgc1.repository;
 import java.util.List;
 import java.util.Optional;
 
+import ec.edu.ista.springgc1.model.dto.EmpresarioDTO;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -16,4 +17,6 @@ public interface EmpresarioRepository extends GenericRepository<Empresario> {
     Optional<Empresario> findByUsuarioNombreUsuarioIgnoreCase(String nombreUsuario);
 
     Optional<Empresario> findByEmail(String email);
+
+    Optional<Empresario> findByUsuarioId(Long id);
 }
