@@ -11,10 +11,12 @@ import org.springframework.web.multipart.MultipartFile;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.ComponenteXMLDTO;
 import ec.edu.ista.springgc1.model.dto.Evento_MDTO;
+import ec.edu.ista.springgc1.model.entity.Ciudad;
 import ec.edu.ista.springgc1.model.entity.Componentexml;
 import ec.edu.ista.springgc1.model.entity.DataCompression;
 import ec.edu.ista.springgc1.model.entity.Evento;
 import ec.edu.ista.springgc1.model.entity.Usuario;
+import ec.edu.ista.springgc1.repository.CiudadRepository;
 import ec.edu.ista.springgc1.repository.ComponentexmlRepository;
 import ec.edu.ista.springgc1.repository.Evento_MRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
@@ -29,6 +31,8 @@ public class EventoServiceImpl extends GenericServiceImpl<Evento> implements Map
     private Evento_MRepository programasMRepository;
     @Autowired
     private ComponentexmlRepository componentexmlRepository;
+    @Autowired
+    private CiudadRepository ciudadRepository;
 
     public Evento mapToEntity(Evento_MDTO programasMdto) {
     	Evento programas_m = new Evento();
@@ -40,6 +44,9 @@ public class EventoServiceImpl extends GenericServiceImpl<Evento> implements Map
         programas_m.setFoto_portada(programasMdto.getFoto_portada());
         Componentexml componentexml = componentexmlRepository.findByTipo(programasMdto.getTipoxml())
                 .orElseThrow(() -> new ResourceNotFoundException("Componentexml", programasMdto.getTipoxml()));
+        Ciudad ciudad = ciudadRepository.findByNombre(programasMdto.getNombreciudad())
+                .orElseThrow(() -> new ResourceNotFoundException("ciudad", "Cuenca"));
+        programas_m.setCiudad(ciudad);
         programas_m.setTipoxml(componentexml);
 
         return programas_m;
@@ -56,6 +63,7 @@ public class EventoServiceImpl extends GenericServiceImpl<Evento> implements Map
         programas_mdto.setFoto_portada(programasM.getFoto_portada());
         programas_mdto.setColorFondo(programasM.getColorFondo());
         programas_mdto.setTipoxml(programasM.getTipoxml().getTipo());
+        programas_mdto.setNombreciudad("CUENCA");
 
         return programas_mdto;
     }
@@ -96,6 +104,7 @@ public class EventoServiceImpl extends GenericServiceImpl<Evento> implements Map
             programas_mdto.setResumen(resumen);
             programas_mdto.setTipoxml(tipoxml);
             programas_mdto.setColorFondo(colorFondo);
+            programas_mdto.setNombreciudad("CUENCA");
 
             byte[] imagenBytes = foto_portada.getBytes();
             byte[] imagenComprimida = dataCompression.compress(imagenBytes, 1000);
@@ -118,7 +127,10 @@ public class EventoServiceImpl extends GenericServiceImpl<Evento> implements Map
             programas_m.setColorFondo(colorFondo);
             Componentexml componentexml = componentexmlRepository.findByTipo(tipoxml)
                     .orElseThrow(() -> new ResourceNotFoundException("Componentexml:", tipoxml));
-
+            Ciudad ciudad = ciudadRepository.findByNombre("CUENCA")
+                    .orElseThrow(() -> new ResourceNotFoundException("ciudad","Cuenca"));
+            
+            programas_m.setCiudad(ciudad);
             programas_m.setTipoxml(componentexml);
 
             if (foto_portada != null && !foto_portada.isEmpty())

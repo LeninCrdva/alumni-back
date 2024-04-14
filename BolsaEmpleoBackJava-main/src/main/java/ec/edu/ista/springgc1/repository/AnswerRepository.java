@@ -19,4 +19,7 @@ public interface AnswerRepository extends GenericRepository<Answer>{
 	 
 	 @Query("SELECT a FROM Answer a WHERE :questionId IN (SELECT KEY(resp) FROM a.answers resp)")
 	    List<Answer> findByQuestionId(@Param("questionId") Long questionId);
+	 
+	 @Query(value = "SELECT * FROM answer WHERE survey_id = :surveyId AND graduado_id = :graduadoId", nativeQuery = true)
+	    List<Answer> findBySurveyIdAndGraduadoId(@Param("surveyId") Long surveyId, @Param("graduadoId") Long graduadoId);
 }

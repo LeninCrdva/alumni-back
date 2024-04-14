@@ -19,6 +19,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "http://localhost:4200")
@@ -29,7 +30,7 @@ public class EventosController {
 
 	    @Autowired
 	    private EventoServiceImpl programasMService;
-
+	    @PreAuthorize("permitAll()")
 	    @GetMapping("/list")
 	    public ResponseEntity<List<Evento_MDTO>> list() {
 	        try {
@@ -39,7 +40,7 @@ public class EventosController {
 	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	        }
 	    }
-
+	    @PreAuthorize("hasRole('ADMINISTRADOR')")
 	    @GetMapping("/findbyId/{id}")
 	    public ResponseEntity<?> getById(@PathVariable("id") Integer id) {
 	        try {
@@ -63,7 +64,7 @@ public class EventosController {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
 	        }
 	    }
-
+	    @PreAuthorize("hasRole('ADMINISTRADOR')")
 	    @PostMapping(value = "/create", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	    public ResponseEntity<?> save(@RequestParam("foto_portada") MultipartFile foto_portada,
 	                                  @RequestParam("titulo") String titulo,
@@ -78,6 +79,7 @@ public class EventosController {
 	            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 	        }
 	    }
+	    @PreAuthorize("hasRole('ADMINISTRADOR')")
 
 	    @PutMapping(value = "/update/{id}", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
 	    public ResponseEntity<?> updateConfigById(@PathVariable long id,
@@ -95,6 +97,7 @@ public class EventosController {
 	        }
 	    }
 
+	    @PreAuthorize("hasRole('ADMINISTRADOR')")
 	    @DeleteMapping("/delete/{id}")
 	    public ResponseEntity<Evento> delete(@PathVariable Integer id) {
 	        programasMService.delete(id);

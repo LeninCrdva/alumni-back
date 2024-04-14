@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ec.edu.ista.springgc1.model.dto.AnswerSearchDTO;
-
+import ec.edu.ista.springgc1.model.dto.GraduadoWithUnansweredSurveysDTO;
 import ec.edu.ista.springgc1.model.dto.QuestionWithAnswersDTO;
 import ec.edu.ista.springgc1.model.dto.SurveyQuestionsAnswersDTO;
 import ec.edu.ista.springgc1.model.entity.Answer;
@@ -21,6 +21,7 @@ import ec.edu.ista.springgc1.model.entity.Carrera;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.Question;
 import ec.edu.ista.springgc1.model.entity.Survey;
+import ec.edu.ista.springgc1.model.entity.Usuario;
 import ec.edu.ista.springgc1.repository.AnswerRepository;
 import ec.edu.ista.springgc1.repository.CarreraRepository;
 import ec.edu.ista.springgc1.repository.GraduadoRepository;
@@ -152,8 +153,48 @@ public class AnswerServiceImp {
 
 	        return surveyQuestionsAnswersList;
 	    }
+	    
+	    
+	    //Lista de graduados
+	    public List<GraduadoWithUnansweredSurveysDTO> getGraduadosWithUnansweredSurveys() {
+	        List<Graduado> graduados = graduadoRepository.findAll();
+	        List<GraduadoWithUnansweredSurveysDTO> result = new ArrayList<>();
 
+	        for (Graduado graduado : graduados) {
+	            GraduadoWithUnansweredSurveysDTO dto = buildGraduadoDTO(graduado);
+	            result.add(dto);
+	        }
 
+	        return result;
+	    }
+
+	    private GraduadoWithUnansweredSurveysDTO buildGraduadoDTO(Graduado graduado) {
+	        Usuario usuario = graduado.getUsuario();
+	        List<Survey> allSurveys = surveyRepository.findAll();
+	        List<String> encuestasNoContestadas = new ArrayList<>();
+
+	        for (Survey survey : allSurveys) {
+	            if (survey.getEstado()) { 
+	                if (!isSurveyAnswered(survey, graduado)) {
+	                    encuestasNoContestadas.add(survey.getTitle());
+	                }
+	            }
+	        }
+
+	        GraduadoWithUnansweredSurveysDTO dto = new GraduadoWithUnansweredSurveysDTO();
+	        dto.setNombres(usuario.getPersona().getPrimerNombre()+" "+usuario.getPersona().getSegundoNombre());
+	        dto.setApellidos(usuario.getPersona().getApellidoPaterno()+" "+usuario.getPersona().getApellidoMaterno());
+	        dto.setCedula(usuario.getPersona().getCedula());
+	        dto.setEmail(graduado.getEmailPersonal());
+	        dto.setEncuestasNoContestadas(encuestasNoContestadas);
+
+	        return dto;
+	    }
+
+	    private boolean isSurveyAnswered(Survey survey, Graduado graduado) {
+	        List<Answer> answers = answerRepository.findBySurveyIdAndGraduadoId(survey.getId(), graduado.getId());
+	        return !answers.isEmpty();
+	    }
 	   
 	   
 }

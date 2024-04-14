@@ -16,11 +16,17 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AnswerSearchDTO implements Serializable {
+	@JsonView(View.Public.class)
 	 private Long id;
+	@JsonView(View.Public.class)
 	    private String graduadoEmail;
+	@JsonView(View.Public.class)
 	    private String carreraNombre;
-	    private String surveyTitle; 
-	    private Map<Long, String> questionResponses; 
+	@JsonView(View.Public.class)
+	    private String surveyTitle;
+	@JsonView(View.Public.class)
+	    private Map<Long, String> questionResponses;
+	@JsonView(View.Public.class)
 	    private String openAnswer;
 
 }

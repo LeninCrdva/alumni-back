@@ -42,5 +42,10 @@ public class Evento {
 	    @JoinColumn(name = "id_componentxml", referencedColumnName = "id_componentxml")
 	    @JsonView(View.Public.class)
 	    private Componentexml tipoxml;
+	    
+	    @ManyToOne
+		@JoinColumn(name = "id_ciudad", referencedColumnName = "id_ciudad")
+		@JsonView(View.Public.class)
+		private Ciudad ciudad;
 
 }
