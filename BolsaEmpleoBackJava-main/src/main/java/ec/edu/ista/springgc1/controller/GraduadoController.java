@@ -36,7 +36,7 @@ import ec.edu.ista.springgc1.view.View;
 @RequestMapping("/graduados")
 public class GraduadoController {
 
-	@Autowired
+    @Autowired
     private GraduadoServiceImpl estudianteService;
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
@@ -91,7 +91,7 @@ public class GraduadoController {
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/user/{username}")
     @JsonView(View.Public.class)
-    ResponseEntity<List<OfertasLaborales>> findByUserName(@PathVariable("username") String username){
+    ResponseEntity<List<OfertasLaborales>> findByUserName(@PathVariable("username") String username) {
         return ResponseEntity.ok(estudianteService.findByUsuarioNombreUsuario(username));
     }
 
@@ -113,7 +113,7 @@ public class GraduadoController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
-    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
@@ -141,7 +141,7 @@ public class GraduadoController {
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/count-sex")
     @JsonView(View.Public.class)
-    public ResponseEntity<?> countSex(){
+    public ResponseEntity<?> countSex() {
         return ResponseEntity.ok(estudianteService.countBySex());
     }
 
@@ -157,5 +157,17 @@ public class GraduadoController {
     @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduadosSinExperiencia() {
         return ResponseEntity.ok(estudianteService.findGraduadosSinExperiencia());
+    }
+
+    @GetMapping("/exists/email/{email}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(estudianteService.existsByEmailPersonalIgnoreCase(email));
+    }
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PutMapping("/without-title/{id}")
+    public ResponseEntity<?> controlCase(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.updateBasicData(id, estudianteDTO));
     }
 }

@@ -29,6 +29,8 @@ public interface GraduadoRepository extends GenericRepository<Graduado> {
 
     Integer countAllByUsuarioPersonaSexo(Persona.Sex usuario_persona_sexo);
 
+    boolean existsByEmailPersonalIgnoreCase(String emailPersonal);
+
     //@Query("SELECT g FROM Graduado g LEFT JOIN g.ofertas o WHERE o IS NULL")
     @Query("SELECT g FROM Graduado g WHERE NOT EXISTS (SELECT 1 FROM Postulacion p WHERE p.graduado = g)")
     List<Graduado> findAllGraduadosWithoutOfertas();

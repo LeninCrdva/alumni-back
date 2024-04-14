@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements Mapper<Graduado, GraduadoDTO> {
@@ -87,7 +88,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
                 .map(this::mapToDTO).collect(Collectors.toList());
     }
 
-    public PreviousDataForPdfDTO findByIdWithPdf(Long id){
+    public PreviousDataForPdfDTO findByIdWithPdf(Long id) {
         return graduadoRepository.findById(id)
                 .map(estudiante -> {
                     Usuario userFromGrad = estudiante.getUsuario();
@@ -156,6 +157,28 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         return postulacion.stream()
                 .map(Postulacion::getOfertaLaboral)
                 .collect(Collectors.toList());
+    }
+
+    public boolean existsByEmailPersonalIgnoreCase(String email) {
+        return graduadoRepository.existsByEmailPersonalIgnoreCase(email);
+    }
+
+    @Transactional
+    public GraduadoDTO updateBasicData(Long id, GraduadoDTO estudianteDTO) {
+        Graduado graduadoFromDb = graduadoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Graduado", id));
+
+        graduadoFromDb.setUsuario(usuarioRepository.findBynombreUsuario(estudianteDTO.getUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", estudianteDTO.getUsuario())));
+
+        graduadoFromDb.setAnioGraduacion(estudianteDTO.getAnioGraduacion());
+        graduadoFromDb.setCiudad(ciudadRepository.findByNombre(estudianteDTO.getCiudad())
+                .orElseThrow(() -> new ResourceNotFoundException("Ciudad", estudianteDTO.getCiudad())));
+
+        graduadoFromDb.setEmailPersonal(estudianteDTO.getEmailPersonal());
+        graduadoFromDb.setEstadoCivil(estudianteDTO.getEstadoCivil());
+
+        return mapToDTO(graduadoRepository.save(graduadoFromDb));
     }
 
     @Override
