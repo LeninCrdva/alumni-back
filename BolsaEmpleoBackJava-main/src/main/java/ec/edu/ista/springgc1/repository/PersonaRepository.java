@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface PersonaRepository extends GenericRepository<Persona>{
  public Optional<Persona> findBycedula(String cedula);
  public Boolean existsBycedula(String cedula);
+
+ public Boolean existsByTelefono(String telefono);
 }

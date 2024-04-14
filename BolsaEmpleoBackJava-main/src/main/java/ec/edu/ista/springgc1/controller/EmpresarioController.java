@@ -47,6 +47,13 @@ public class EmpresarioController {
         return ResponseEntity.ok(emprendimientoService.findById(id));
     }
 
+    @GetMapping("exists/email/{email}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByEmail(@PathVariable String email) {
+        System.out.println("Email: " + email);
+        return ResponseEntity.ok(emprendimientoService.existByEmail(email));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/usuario/{usuario}")
     @JsonView(View.Public.class)

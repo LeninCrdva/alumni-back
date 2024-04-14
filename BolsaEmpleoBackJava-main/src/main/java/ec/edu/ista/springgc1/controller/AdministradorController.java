@@ -53,6 +53,13 @@ public class AdministradorController {
         return ResponseEntity.ok(adminService.findByUsuario(id));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @GetMapping("exists/email/{email}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(adminService.existsByEmail(email));
+    }
+
     @PreAuthorize("hasRole('ADMINISTRADOR') or isAnonymous()") // <--Chane this, it's not possible to create an admin if you are not logged in...
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody AdminDTO adminDTO) {

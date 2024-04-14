@@ -47,6 +47,18 @@ public class EmpresaController {
         return ResponseEntity.ok(empresaService.findById(id));
     }
 
+    @GetMapping("exists/nombre/{nombre}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(empresaService.existsBynombre(nombre));
+    }
+
+    @GetMapping("exists/ruc/{ruc}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByRuc(@PathVariable String ruc) {
+        return ResponseEntity.ok(empresaService.existByRuc(ruc));
+    }
+
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody EmpresaDTO eDTO) {

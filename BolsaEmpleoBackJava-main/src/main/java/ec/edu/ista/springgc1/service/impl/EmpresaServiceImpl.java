@@ -101,7 +101,7 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
 
     @Transactional
     public Boolean existsBynombre(String name) {
-        return empresarepository.existsBynombre(name);
+        return empresarepository.existsByNombreIgnoreCase(name);
     }
 
     public EmpresaDTO update(Long id, EmpresaDTO updatedEmpresaDTO) {
@@ -143,4 +143,9 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
 		List<Empresa> empresasSinOferta = empresarepository.findEmpresasSinOfertas();
 		return empresasSinOferta.stream().map(this::mapToDTO).collect(Collectors.toSet());
 	}
+
+    @Transactional
+    public boolean existByRuc(String ruc) {
+        return empresarepository.existsByRuc(ruc);
+    }
 }

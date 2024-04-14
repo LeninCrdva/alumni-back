@@ -52,6 +52,18 @@ public class PersonaController {
         return ResponseEntity.ok(personaService.findBycedula(cedula));
     }
 
+    @GetMapping("exists/cedula/{cedula}")
+    @JsonView(View.Base.class)
+    ResponseEntity<?> existsByCedula(@PathVariable String cedula) {
+        return ResponseEntity.ok(personaService.existsByCedula(cedula));
+    }
+
+    @GetMapping("exists/telefono/{telefono}")
+    @JsonView(View.Base.class)
+    ResponseEntity<?> existsByTelefono(@PathVariable String telefono) {
+        return ResponseEntity.ok(personaService.existsByTelefono(telefono));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody Persona p) {

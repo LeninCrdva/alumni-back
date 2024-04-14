@@ -14,6 +14,7 @@ import ec.edu.ista.springgc1.repository.AdministradorRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> implements Mapper<Administrador, AdminDTO> {
@@ -91,5 +92,10 @@ public class AdministradorServiceImpl extends GenericServiceImpl<Administrador> 
 
         return adminrepository.findByEmail(email)
                 .orElse(new Administrador());
+    }
+
+    @Transactional
+    public Boolean existsByEmail(String email) {
+        return adminrepository.existsByEmailIgnoreCase(email);
     }
 }

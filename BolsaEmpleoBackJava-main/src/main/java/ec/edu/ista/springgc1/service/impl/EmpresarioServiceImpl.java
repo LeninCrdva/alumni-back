@@ -19,6 +19,7 @@ import ec.edu.ista.springgc1.repository.EmpresarioRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implements Mapper<Empresario, EmpresarioDTO> {
@@ -122,4 +123,10 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
     public Empresario findByEmail(String email) {
         return empresariorepository.findByEmail(email).orElse(new Empresario());
     }
+
+    @Transactional
+    public boolean existByEmail(String email) {
+        return empresariorepository.existsByEmailIgnoreCase(email);
+    }
+
 }

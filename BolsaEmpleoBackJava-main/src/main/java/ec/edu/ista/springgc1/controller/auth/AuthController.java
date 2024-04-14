@@ -91,6 +91,19 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("mensaje", "Usuario Registrado"));
     }
 
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PostMapping("/signup/admin")
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegistroDTO registroDTO) {
+
+        if (usuarioService.existsByUsername(registroDTO.getNombreUsuario())) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Ya se encuentra registrado el nombre de usuario");
+        }
+
+        usuarioService.registerUserAndPerson(personaServiceImp.getPersona(registroDTO), registroDTO);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(Collections.singletonMap("mensaje", "Usuario Registrado"));
+    }
+
     @PreAuthorize("permitAll()")
     @PutMapping("/login/recovery-password")
     public ResponseEntity<?> recoveryPassword(@RequestBody RecoveryDTO recovery) {

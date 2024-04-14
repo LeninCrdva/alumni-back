@@ -36,4 +36,14 @@ public class PersonaServiceImp extends GenericServiceImpl<Persona> {
         persona.setSexo(usuarioDTO.getSexo());
         return save(persona);
     }
+
+    @Transactional
+    public boolean existsByCedula(String cedula) {
+        return personarepository.existsBycedula(cedula);
+    }
+
+    @Transactional
+    public boolean existsByTelefono(String telefono) {
+        return personarepository.existsByTelefono(telefono);
+    }
 }

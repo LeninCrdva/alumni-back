@@ -46,6 +46,12 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.findByIdToDTO(id));
     }
 
+    @GetMapping("exists/username/{username}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByUsername(@PathVariable String username) {
+        return ResponseEntity.ok(usuarioService.existsByUsername(username.toUpperCase()));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'EMPRESARIO', 'ADMINISTRADOR')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody UsuarioDTO usuarioDTO) {
