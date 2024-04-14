@@ -22,14 +22,11 @@ public class PDFGeneratorService {
     private ITemplateEngine templateEngine;
 
     public byte[] generatePDF(Map<String, Object> data) throws AppException, IOException {
-        // Crear el contexto con las variables proporcionadas
         Context context = new Context();
         context.setVariables(data);
 
-        // Procesar la plantilla HTML
         String processedHtml = templateEngine.process(TEMPLATE_PATH, context);
 
-        // Convertir HTML a PDF
         ByteArrayOutputStream outputStream = null;
         PdfWriter writer = null;
         try {
@@ -44,8 +41,7 @@ public class PDFGeneratorService {
             if (outputStream != null) {
                 try {
                     outputStream.close();
-                } catch (IOException e) {
-                    // Manejar la excepción
+                } catch (IOException ignored) {
                 }
             }
         }

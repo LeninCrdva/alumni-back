@@ -23,7 +23,6 @@ import ec.edu.ista.springgc1.model.entity.Capacitacion;
 import ec.edu.ista.springgc1.service.impl.CapacitacionServiceImpl;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("capacitacion")
 public class CapacitacionController {
 

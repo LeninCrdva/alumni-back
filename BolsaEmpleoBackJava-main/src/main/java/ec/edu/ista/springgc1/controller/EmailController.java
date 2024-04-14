@@ -27,7 +27,7 @@ import ec.edu.ista.springgc1.service.mail.EmailService;
 
 @RestController
 @RequestMapping("/mail")
-@CrossOrigin(origins = "http://localhost:4200")
+
 public class EmailController {
 
     @Autowired

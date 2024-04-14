@@ -1,5 +1,6 @@
 package ec.edu.ista.springgc1.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,7 +31,7 @@ import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.view.View;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/graduados")
 public class GraduadoController {
@@ -50,6 +51,13 @@ public class GraduadoController {
     @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findById(id));
+    }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/with-pdf/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findWithPdfById(@PathVariable Long id) {
+        return ResponseEntity.ok(estudianteService.findByIdWithPdf(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")

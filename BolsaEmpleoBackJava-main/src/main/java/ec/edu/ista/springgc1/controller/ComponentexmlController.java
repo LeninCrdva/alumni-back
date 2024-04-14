@@ -13,7 +13,7 @@ import ec.edu.ista.springgc1.model.dto.ComponenteXMLDTO;
 import ec.edu.ista.springgc1.model.entity.Componentexml;
 import ec.edu.ista.springgc1.service.impl.ComponentexmlServiceImp;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/componentxml")
 public class ComponentexmlController {

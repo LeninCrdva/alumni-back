@@ -25,7 +25,6 @@ import ec.edu.ista.springgc1.repository.AnswerRepository;
 import ec.edu.ista.springgc1.repository.SurveyRepository;
 import ec.edu.ista.springgc1.service.impl.AnswerServiceImp;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/answer")
 public class AnswerController {

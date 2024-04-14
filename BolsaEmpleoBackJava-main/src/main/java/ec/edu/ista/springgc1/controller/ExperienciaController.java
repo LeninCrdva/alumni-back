@@ -25,7 +25,7 @@ import ec.edu.ista.springgc1.model.dto.ExperienciaDTO;
 import ec.edu.ista.springgc1.model.entity.Experiencia;
 import ec.edu.ista.springgc1.service.impl.ExperienciaServiceImp;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/experiencias")
 public class ExperienciaController {

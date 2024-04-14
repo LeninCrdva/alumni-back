@@ -17,7 +17,7 @@ import com.amazonaws.services.sns.model.ResourceNotFoundException;
 import javax.validation.Valid;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/usuarios")
 public class UsuarioController {

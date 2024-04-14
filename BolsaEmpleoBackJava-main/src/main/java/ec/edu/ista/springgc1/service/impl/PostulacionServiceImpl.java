@@ -21,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,28 +42,10 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
     private OfertaslaboralesServiceImpl ofertasLaboralesService;
 
     @Autowired
-    private CapacitacionRepository capacitacionRepository;
+    private PDFGeneratorService pdfGeneratorService;
 
     @Autowired
-    private ExperienciaRepository experienciaRepository;
-
-    @Autowired
-    private LogroRepository logroRepository;
-
-    @Autowired
-    private ReferenciaPersonalRepository referenciaPersonalRepository;
-
-    @Autowired
-    private ReferenciaProfesionalRepository referenciaProfesionalRepository;
-
-    @Autowired
-    private TituloRepository tituloRepository;
-
-    private final PDFGeneratorService pdfGeneratorService;
-
-    public PostulacionServiceImpl(PDFGeneratorService pdfGeneratorService) {
-        this.pdfGeneratorService = pdfGeneratorService;
-    }
+    private PreviousDataForPdfService previousDataForPdfService;
 
     public Integer countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDateTime fechaPostulacion) {
         return postulacionRepository.countPostulacionByFechaPostulacionIsStartingWith(fechaPostulacion);
@@ -84,7 +65,7 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
 
     public Postulacion savePostulacion(PostulacionDto postulacionDto) throws IOException {
         Postulacion postulacion = mapToEntity(postulacionDto);
-        Map<String, Object> model = getPreviousRequest(postulacion.getGraduado());
+        Map<String, Object> model = previousDataForPdfService.getPreviousRequestToGraduate(postulacion.getGraduado());
 
         if (((List<?>) model.get("titulos")).isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular sin tener al menos un título registrado.");
@@ -141,6 +122,10 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         postulacionRepository.saveAll(postulacion);
     }
 
+    public List<Postulacion> findAllByGraduadoUsuarioNombreUsuario(String username){
+        return postulacionRepository.findAllByGraduadoUsuarioNombreUsuario(username);
+    }
+
     @Override
     public Postulacion mapToEntity(PostulacionDto postulacionDto) {
         Postulacion postulacion = new Postulacion();
@@ -172,28 +157,6 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         return pdfGeneratorService.generatePDF(model);
     }
 
-    private Map<String, Object> getPreviousRequest(Graduado graduado) {
-        String fullName = getFullName(graduado.getUsuario());
-        List<Experiencia> experiencias = experienciaRepository.findAllByCedulaGraduado_Id(graduado.getId());
-        List<Logro> logros = logroRepository.findAllByGraduadoId(graduado.getId());
-        List<Capacitacion> capacitaciones = capacitacionRepository.findAllByGraduadoId(graduado.getId());
-        List<Referencia_Personal> referencias = referenciaPersonalRepository.findAllByGraduadoId(graduado.getId());
-        List<ReferenciaProfesional> referenciasProfesionales = referenciaProfesionalRepository.findAllByGraduadoId(graduado.getId());
-        List<Titulo> titulos = tituloRepository.findAllByGraduadoId(graduado.getId());
-
-        Map<String, Object> model = new HashMap<>();
-        model.put("fullName", fullName);
-        model.put("graduado", graduado);
-        model.put("experiencias", experiencias);
-        model.put("logros", logros);
-        model.put("capacitaciones", capacitaciones);
-        model.put("referencias", referencias);
-        model.put("referenciasProfesionales", referenciasProfesionales);
-        model.put("titulos", titulos);
-
-        return model;
-    }
-
     private void sendEmailWithPDF(Postulacion postulacion, byte[] pdfBytes) {
         Map<String, Object> model = new HashMap<>();
 
@@ -210,8 +173,8 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         Graduado graduado = postulacion.getGraduado();
         OfertasLaborales oferta = postulacion.getOfertaLaboral();
 
-        String fullName = getFullName(oferta.getEmpresa().getEmpresario().getUsuario());
-        String fullNameGraduado = getFullName(graduado.getUsuario());
+        String fullName = previousDataForPdfService.getFullName(oferta.getEmpresa().getEmpresario().getUsuario());
+        String fullNameGraduado = previousDataForPdfService.getFullName(graduado.getUsuario());
 
         model.put("fullName", fullName);
         model.put("fullNameGraduate", fullNameGraduado);
@@ -231,7 +194,7 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         Graduado graduado = postulacion.getGraduado();
         OfertasLaborales oferta = postulacion.getOfertaLaboral();
 
-        String fullName = getFullName(graduado.getUsuario());
+        String fullName = previousDataForPdfService.getFullName(graduado.getUsuario());
 
         model.put("fullName", fullName);
         model.put("graduado", graduado);
@@ -242,14 +205,6 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
         MailRequest request = createMailRequest(graduado.getEmailPersonal(), fullName, mailCase);
 
         emailService.sendEmail(request, model);
-    }
-
-    private String getFullName(Usuario usuario) {
-
-        return usuario.getPersona().getPrimerNombre()
-                + " " + usuario.getPersona().getSegundoNombre()
-                + " " + usuario.getPersona().getApellidoPaterno()
-                + " " + usuario.getPersona().getApellidoMaterno();
     }
 
     private MailRequest createMailRequest(String email, String fullName, String mailCase) {

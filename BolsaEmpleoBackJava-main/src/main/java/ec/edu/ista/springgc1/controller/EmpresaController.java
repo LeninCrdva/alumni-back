@@ -26,7 +26,7 @@ import ec.edu.ista.springgc1.model.dto.EmpresaDTO;
 import ec.edu.ista.springgc1.model.entity.Empresa;
 import ec.edu.ista.springgc1.service.impl.EmpresaServiceImpl;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/empresas")
 public class EmpresaController {

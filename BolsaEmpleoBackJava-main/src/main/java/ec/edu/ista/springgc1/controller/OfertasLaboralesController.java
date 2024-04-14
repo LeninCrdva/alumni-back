@@ -30,7 +30,7 @@ import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/ofertas-laborales")
 public class OfertasLaboralesController {
@@ -89,7 +89,7 @@ public class OfertasLaboralesController {
 
     @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
     @PutMapping("/cancelar-oferta/{id}")
-    ResponseEntity<OfertasLaboralesDTO> cancelarOferta(@PathVariable Long id, @RequestParam("estado") String estado) {
+    ResponseEntity<OfertasLaboralesDTO> actualizarEstadoOferta(@PathVariable Long id, @RequestParam("estado") String estado) {
         return ResponseEntity.ok(ofertasLaboralesService.actualizarEstadoOferta(id, estado));
     }
 

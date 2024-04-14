@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import ec.edu.ista.springgc1.model.entity.Question;
 import ec.edu.ista.springgc1.model.entity.Survey;
 import ec.edu.ista.springgc1.service.impl.SurveyServiceImp;
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/api/surveys")
 public class SurveyController {

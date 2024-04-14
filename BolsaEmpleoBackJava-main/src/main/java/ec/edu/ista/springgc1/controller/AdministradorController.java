@@ -24,7 +24,6 @@ import ec.edu.ista.springgc1.model.dto.AdminDTO;
 import ec.edu.ista.springgc1.model.entity.Administrador;
 import ec.edu.ista.springgc1.service.impl.AdministradorServiceImpl;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/administradores")
 public class AdministradorController {

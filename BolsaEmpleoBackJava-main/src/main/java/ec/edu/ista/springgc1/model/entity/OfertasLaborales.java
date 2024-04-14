@@ -70,7 +70,7 @@ public class OfertasLaborales {
 
 	@PrePersist
 	public void prePersist() {
-		this.estado = EstadoOferta.EN_CONVOCATORIA;
+		this.estado = EstadoOferta.EN_EVALUACION;
 
 		if ( this.fechaCierre == null ) {
 			this.fechaCierre = LocalDateTime.now().plusDays(3);

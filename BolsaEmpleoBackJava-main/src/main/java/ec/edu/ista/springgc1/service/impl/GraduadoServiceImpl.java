@@ -1,11 +1,16 @@
 package ec.edu.ista.springgc1.service.impl;
 
+
 import ec.edu.ista.springgc1.model.entity.*;
-import ec.edu.ista.springgc1.repository.*;
+import ec.edu.ista.springgc1.repository.CiudadRepository;
+import ec.edu.ista.springgc1.repository.GraduadoRepository;
+import ec.edu.ista.springgc1.repository.PostulacionRepository;
+import ec.edu.ista.springgc1.repository.UsuarioRepository;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -29,6 +34,9 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
     @Autowired
     private PostulacionRepository postulacionRepository;
+
+    @Autowired
+    private PreviousDataForPdfService previousDataForPdfService;
 
     @Autowired
     private S3Service s3Service;
@@ -67,7 +75,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudianteDTO.setEmailPersonal(estudiante.getEmailPersonal());
         estudianteDTO.setEstadoCivil(estudiante.getEstadoCivil());
         estudianteDTO.setRutaPdf(estudiante.getRutaPdf());
-        estudianteDTO.setUrlPdf(s3Service.getObjectUrl(estudiante.getRutaPdf()));
+        estudianteDTO.setUrlPdf(estudiante.getRutaPdf() == null ? null : s3Service.getObjectUrl(estudiante.getRutaPdf()));
 
         return estudianteDTO;
     }
@@ -77,6 +85,23 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         return graduadoRepository.findAll().stream()
                 .peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf())))
                 .map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    public PreviousDataForPdfDTO findByIdWithPdf(Long id){
+        return graduadoRepository.findById(id)
+                .map(estudiante -> {
+                    Usuario userFromGrad = estudiante.getUsuario();
+                    userFromGrad.setUrlImagen(s3Service.getObjectUrl(userFromGrad.getRutaImagen()));
+                    System.out.println("userFromGrad: " + userFromGrad);
+                    byte[] pdf;
+                    try {
+                        pdf = previousDataForPdfService.getPdf(estudiante);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return new PreviousDataForPdfDTO(estudiante, pdf);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("id", id));
     }
 
     public GraduadoDTO findByIdToDTO(Long id) {
@@ -97,33 +122,13 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         return mapToDTO(estudiante);
     }
 
-    /*public List<Graduado> findAllGraduadosNotIn(Long id) {
-        return graduadoRepository.findByUsuarioIdNot(id);
-    }*/
     public List<Graduado> findAllGraduadosNotIn(Long id) {
-        List<Graduado> graduados = graduadoRepository.findByUsuarioIdNot(id);
-        setUrlForGraduados(graduados);
-        return graduados;
-    }
-    private void setUrlForGraduados(List<Graduado> graduados) {
-        for (Graduado graduado : graduados) {
-            Usuario usuario = graduado.getUsuario();
-
-            if (usuario != null) {
-                String imageUrl = usuario.getRutaImagen();
-                if (imageUrl != null && !imageUrl.isEmpty()) {             
-                    String publicUrl = s3Service.getObjectUrl(imageUrl);
-                    usuario.setUrlImagen(publicUrl);
-                    graduado.setUsuario(usuario);
-                }
-            }
-
-            if (graduado.getRutaPdf() != null && !graduado.getRutaPdf().isEmpty()) {
-                graduado.setUrlPdf(s3Service.getObjectUrl(graduado.getRutaPdf()));
-            }
-        }
+        return setUrlForGraduados(graduadoRepository.findByUsuarioIdNot(id));
     }
 
+    private List<Graduado> setUrlForGraduados(List<Graduado> graduados) {
+        return graduados.stream().peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf()))).collect(Collectors.toList());
+    }
 
     public Graduado findByIdUsuario(long id_usuario) {
         return graduadoRepository.findByUsuarioId(id_usuario)

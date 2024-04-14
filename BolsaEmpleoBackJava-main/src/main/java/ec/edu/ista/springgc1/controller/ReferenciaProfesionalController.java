@@ -20,7 +20,7 @@ import ec.edu.ista.springgc1.model.entity.ReferenciaProfesional;
 import ec.edu.ista.springgc1.service.impl.ReferenciaProfesionalServiceImp;
 import org.springframework.web.bind.annotation.RequestBody;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/referencias-profesionales")
 public class ReferenciaProfesionalController {

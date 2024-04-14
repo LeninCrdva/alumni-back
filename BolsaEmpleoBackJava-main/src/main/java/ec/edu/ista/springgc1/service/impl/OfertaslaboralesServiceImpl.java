@@ -110,7 +110,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
     }
 
     @Override
-    public OfertasLaborales save(Object entity) {
+    public OfertasLaborales  save(Object entity) {
         OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
 
         createRequestAndSendEmailWithPDF(ofertaLaboral);
@@ -121,6 +121,10 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
     public OfertasLaboralesDTO update(Long id, OfertasLaboralesDTO updatedOfertaLaboralDTO) {
         OfertasLaborales existingOfertaLaboral = ofertasLaboralesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(id)));
+
+        if (existingOfertaLaboral.getEstado().equals(EstadoOferta.EN_EVALUACION)) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede actualizar una oferta laboral que está en proceso de evaluación");
+        }
 
         if (existingOfertaLaboral.getEstado().equals(EstadoOferta.CANCELADA)) {
             throw new AppException(HttpStatus.BAD_REQUEST, "No se puede actualizar una oferta laboral que ha sido cancelada");
