@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.service.impl;
 
 import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.repository.*;
+import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generatorpdf.PDFGeneratorService;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
@@ -26,16 +27,56 @@ public class PreviousDataForPdfService {
     private LogroRepository logroRepository;
 
     @Autowired
+    private PostulacionRepository postulacionRepository;
+
+    @Autowired
     private ReferenciaPersonalRepository referenciaPersonalRepository;
 
     @Autowired
     private ReferenciaProfesionalRepository referenciaProfesionalRepository;
 
     @Autowired
+    private S3Service s3Service;
+
+    @Autowired
     private TituloRepository tituloRepository;
 
     @Autowired
     private PDFGeneratorService pdfGeneratorService;
+
+    protected byte[] getPdf(Graduado graduado) throws IOException {
+        return pdfGeneratorService.generatePDF(getPreviousRequestToGraduate(graduado));
+    }
+
+    protected byte[] getPdf(OfertasLaborales oferta) throws IOException {
+        Map<Long, Map<String, Object>> data = getPreviousRequestToGraduates(oferta);
+
+        return !data.isEmpty() ? pdfGeneratorService.generatePDFOfLisMap(data) : new byte[0];
+    }
+
+    protected String getFullName(Usuario usuario) {
+
+        return usuario.getPersona().getPrimerNombre()
+                + " " + usuario.getPersona().getSegundoNombre()
+                + " " + usuario.getPersona().getApellidoPaterno()
+                + " " + usuario.getPersona().getApellidoMaterno();
+    }
+
+    protected Map<Long, Map<String, Object>> getPreviousRequestToGraduates(OfertasLaborales ofertas) {
+        Map<Long, Map<String, Object>> resultMap = new HashMap<>();
+
+        List<Postulacion> postulaciones = postulacionRepository.findAllByOfertaLaboralIdAccepted(ofertas.getId());
+
+        postulaciones.forEach(postulacion -> {
+            Usuario usuario = postulacion.getGraduado().getUsuario();
+            usuario.setUrlImagen(s3Service.getObjectUrl(postulacion.getGraduado().getUsuario().getRutaImagen()));
+            postulacion.getGraduado().setUsuario(usuario);
+
+            resultMap.put(postulacion.getGraduado().getId(), getPreviousRequestToGraduate(postulacion.getGraduado()));
+        });
+
+        return !resultMap.isEmpty() ? resultMap : new HashMap<>();
+    }
 
     protected Map<String, Object> getPreviousRequestToGraduate(Graduado graduado) {
         String fullName = getFullName(graduado.getUsuario());
@@ -57,17 +98,5 @@ public class PreviousDataForPdfService {
         model.put("titulos", titulos);
 
         return model;
-    }
-
-    protected byte[] getPdf(Graduado graduado) throws IOException {
-        return pdfGeneratorService.generatePDF(getPreviousRequestToGraduate(graduado));
-    }
-
-    protected String getFullName(Usuario usuario) {
-
-        return usuario.getPersona().getPrimerNombre()
-                + " " + usuario.getPersona().getSegundoNombre()
-                + " " + usuario.getPersona().getApellidoPaterno()
-                + " " + usuario.getPersona().getApellidoMaterno();
     }
 }

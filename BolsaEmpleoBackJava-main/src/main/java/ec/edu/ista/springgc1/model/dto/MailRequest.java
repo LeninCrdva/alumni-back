@@ -24,4 +24,11 @@ public class MailRequest {
 		this.subject = subject;
 		this.caseEmail = caseEmail;
 	}
+
+	public MailRequest(String to, String from, String subject, String caseEmail) {
+		this.to = to;
+		this.from = from;
+		this.subject = subject;
+		this.caseEmail = caseEmail;
+	}
 }

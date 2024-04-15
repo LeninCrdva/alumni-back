@@ -1,17 +1,21 @@
 package ec.edu.ista.springgc1.service.scheduled;
 
 import ec.edu.ista.springgc1.model.dto.MailRequest;
+import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
 import ec.edu.ista.springgc1.model.entity.Postulacion;
 import ec.edu.ista.springgc1.model.enums.EstadoOferta;
 import ec.edu.ista.springgc1.model.enums.EstadoPostulacion;
+import ec.edu.ista.springgc1.model.enums.ProcessingStatus;
+import ec.edu.ista.springgc1.model.request.OfferProcessingStatus;
 import ec.edu.ista.springgc1.repository.PostulacionRepository;
+import ec.edu.ista.springgc1.repository.IOfferProcessingStatusRepository;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
-import ec.edu.ista.springgc1.service.impl.PostulacionServiceImpl;
 import ec.edu.ista.springgc1.service.mail.EmailService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -30,54 +34,90 @@ public class ScheduledTaskExecutor {
 
     private final EmailService emailService;
 
-    public ScheduledTaskExecutor(OfertaslaboralesServiceImpl ofertaslaboralesService, PostulacionRepository postulacionRepository, EmailService emailService) {
+    private final IOfferProcessingStatusRepository offerProcessingStatusRepository;
+
+    public ScheduledTaskExecutor(OfertaslaboralesServiceImpl ofertaslaboralesService, PostulacionRepository postulacionRepository, EmailService emailService, IOfferProcessingStatusRepository offerProcessingStatusRepository) {
         this.ofertaslaboralesService = ofertaslaboralesService;
         this.postulacionRepository = postulacionRepository;
         this.emailService = emailService;
+        this.offerProcessingStatusRepository = offerProcessingStatusRepository;
     }
 
     @Scheduled(cron = "0 0 0 * * ?")
     public void executeTask() {
         System.out.println("Ejecutando tarea programada");
 
-        ofertaslaboralesService.findOfertasLaboralesWithOutEstadoFinalizado().forEach(oferta -> {
+        List<OfertasLaboralesDTO> ofertas = ofertaslaboralesService.findOfertasLaboralesWithOutEstadoFinalizado()
+                .stream()
+                .filter(oferta -> oferta.getFechaCierre().isBefore(LocalDateTime.now()))
+                .collect(Collectors.toList());
 
-            if (oferta.getFechaCierre().isBefore(LocalDateTime.now())) {
-                oferta.setEstado(EstadoOferta.EN_SELECCION);
+        List<OfferProcessingStatus> listOfferProcessingStatus = offerProcessingStatusRepository
+                .findAllById(ofertas
+                        .stream()
+                        .map(OfertasLaboralesDTO::getId)
+                        .collect(Collectors.toList())
+                );
 
-                if (oferta.getFechaCierre().plusDays(3).isBefore(LocalDateTime.now())) {
-                    oferta.setEstado(EstadoOferta.FINALIZADA);
+        ofertas
+                .forEach(oferta -> {
 
-                    List<Postulacion> postulacion =  postulacionRepository.findAllByOfertaLaboralId(oferta.getId()).stream().peek(g -> {
-                        if (g.getEstado().equals(EstadoPostulacion.APLICANDO)) {
-                            g.setEstado(EstadoPostulacion.RECHAZADO);
+                    OfferProcessingStatus offerProcessingStatus = listOfferProcessingStatus
+                            .stream()
+                            .filter(offer -> offer.getOfferId().equals(oferta.getId()))
+                            .findFirst()
+                            .orElse(new OfferProcessingStatus(oferta.getId(), "Offer closed, in selection"));
+
+                    if (oferta.getFechaCierre().plusDays(3).isBefore(LocalDateTime.now())) {
+                        oferta.setEstado(EstadoOferta.FINALIZADA);
+
+                        List<Postulacion> postulacion = postulacionRepository.findAllByOfertaLaboralId(oferta.getId()).stream().peek(g -> {
+                            if (g.getEstado().equals(EstadoPostulacion.APLICANDO)) {
+                                g.setEstado(EstadoPostulacion.RECHAZADO);
+                            }
+                        }).collect(Collectors.toList());
+
+                        postulacionRepository.saveAll(postulacion);
+
+                        offerProcessingStatus.setStatus(ProcessingStatus.PROCESSED);
+
+                        if (!postulacion.isEmpty()) {
+                            System.out.println("Enviando correos de rechazo a " + postulacion.size() + " postulantes");
+                            enviarCorreosRechazo(oferta, postulacion);
                         }
-                    }).collect(Collectors.toList());
 
-                    postulacionRepository.saveAll(postulacion);
+                    } else {
+                        oferta.setEstado(EstadoOferta.EN_SELECCION);
+                    }
 
+                    OfferProcessingStatus objectSaveOrUpdate =  offerProcessingStatusRepository.save(offerProcessingStatus);
 
-                    Map<String, Object> model = new HashMap<>();
-
-                    String[] emails = postulacion.stream().map(p -> p.getGraduado().getEmailPersonal()).toArray(String[]::new);
-
-                    String subject = "Postulación rechazada";
-
-                    String caseEmail = "reject-postulate";
-
-                    model.put("oferta", oferta);
-
-                    postulacionRepository.saveAll(postulacion);
-
-                    MailRequest mailRequest = new MailRequest(from, subject, caseEmail);
-
-                    emailService.sendEmail(mailRequest, model, emails);
-                }
-
-                ofertaslaboralesService.save(oferta);
-            }
-        });
+                    try {
+                        ofertaslaboralesService.save(oferta, objectSaveOrUpdate.getStatus());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
 
         System.out.println("Tarea programada finalizada");
+    }
+
+    private void enviarCorreosRechazo(OfertasLaboralesDTO oferta, List<Postulacion> postulaciones) {
+        Map<String, Object> model = new HashMap<>();
+        model.put("oferta", oferta);
+
+        String[] emails = postulaciones.stream()
+                .filter(postulacion -> postulacion.getEstado().equals(EstadoPostulacion.RECHAZADO))
+                .map(postulacion -> {
+                    return postulacion.getGraduado().getEmailPersonal();
+                })
+                .toArray(String[]::new);
+
+        String subject = "Postulación rechazada";
+        String caseEmail = "reject-postulate";
+
+        MailRequest mailRequest = new MailRequest(from, subject, caseEmail);
+
+        emailService.sendEmail(mailRequest, model, emails);
     }
 }

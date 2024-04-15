@@ -7,6 +7,7 @@ import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.model.enums.EstadoOferta;
 import ec.edu.ista.springgc1.model.enums.EstadoPostulacion;
 import ec.edu.ista.springgc1.repository.*;
+import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generatorpdf.PDFGeneratorService;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.mail.EmailService;
@@ -47,6 +48,9 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
     @Autowired
     private PreviousDataForPdfService previousDataForPdfService;
 
+    @Autowired
+    private S3Service s3Service;
+
     public Integer countPostulacionByFechaPostulacionIsStartingWithOrderBy(LocalDateTime fechaPostulacion) {
         return postulacionRepository.countPostulacionByFechaPostulacionIsStartingWith(fechaPostulacion);
     }
@@ -65,7 +69,13 @@ public class PostulacionServiceImpl extends GenericServiceImpl<Postulacion> impl
 
     public Postulacion savePostulacion(PostulacionDto postulacionDto) throws IOException {
         Postulacion postulacion = mapToEntity(postulacionDto);
-        Map<String, Object> model = previousDataForPdfService.getPreviousRequestToGraduate(postulacion.getGraduado());
+        Usuario usuario = postulacion.getGraduado().getUsuario();
+        usuario.setUrlImagen(s3Service.getObjectUrl(usuario.getRutaImagen()));
+
+        Graduado graduado = postulacion.getGraduado();
+        graduado.setUsuario(usuario);
+
+        Map<String, Object> model = previousDataForPdfService.getPreviousRequestToGraduate(graduado);
 
         if (((List<?>) model.get("titulos")).isEmpty()) {
             throw new AppException(HttpStatus.BAD_REQUEST, "No se puede postular sin tener al menos un título registrado.");

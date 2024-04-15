@@ -1,5 +1,6 @@
 package ec.edu.ista.springgc1.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Base64;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.model.dto.PreviousDataForPdfDTO;
 import ec.edu.ista.springgc1.service.generatorpdf.ImageOptimizer;
 import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,6 +74,13 @@ public class OfertasLaboralesController {
     @JsonView(View.Public.class)
     ResponseEntity<OfertasLaboralesDTO> findByIdDTO(@PathVariable Long id) {
         return ResponseEntity.ok(ofertasLaboralesService.findByIdToDTO(id));
+    }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("with-pdf/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<PreviousDataForPdfDTO> findByIWithPdf(@PathVariable Long id) throws IOException {
+        return ResponseEntity.ok(ofertasLaboralesService.findByIdWithPdf(id));
     }
 
     @PreAuthorize("hasAnyRole('EMPRESARIO')")

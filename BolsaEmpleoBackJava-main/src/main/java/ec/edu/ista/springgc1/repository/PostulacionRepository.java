@@ -25,4 +25,7 @@ public interface PostulacionRepository extends GenericRepository<Postulacion> {
 
     @Query("SELECT DATE_FORMAT(p.fechaPostulacion, '%Y-%m-%d'), count(p.fechaPostulacion) FROM Postulacion p GROUP BY DATE_FORMAT(p.fechaPostulacion, '%Y-%m-%d')")
     List<Tuple> countPostulacionesPorDia();
+
+    @Query("SELECT p FROM Postulacion p WHERE p.ofertaLaboral.id = :ofertaLaboralId AND p.estado = 'ACEPTADO'")
+    List<Postulacion> findAllByOfertaLaboralIdAccepted(Long ofertaLaboralId);
 }

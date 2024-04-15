@@ -1,5 +1,6 @@
 package ec.edu.ista.springgc1.service.impl;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -7,9 +8,11 @@ import javax.transaction.Transactional;
 
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.dto.MailRequest;
+import ec.edu.ista.springgc1.model.dto.PreviousDataForPdfDTO;
 import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.model.enums.EstadoOferta;
 import ec.edu.ista.springgc1.model.enums.EstadoPostulacion;
+import ec.edu.ista.springgc1.model.enums.ProcessingStatus;
 import ec.edu.ista.springgc1.repository.*;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generatorpdf.ImageOptimizer;
@@ -47,6 +50,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     @Autowired
     private PostulacionRepository postulacionRepository;
+
+    @Autowired
+    private PreviousDataForPdfService previousDataForPdfService;
 
     @Autowired
     private S3Service s3Service;
@@ -116,6 +122,15 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         createRequestAndSendEmailWithPDF(ofertaLaboral);
 
         return ofertaLaboral;
+    }
+
+    public void save(Object entity, ProcessingStatus status) throws IOException {
+        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
+
+        if (status == ProcessingStatus.PROCESSED) {
+            createRequestAndSendEmailWithPDF(ofertaLaboral);
+            findByIdWithPdf(ofertaLaboral.getId());
+        }
     }
 
     public OfertasLaboralesDTO update(Long id, OfertasLaboralesDTO updatedOfertaLaboralDTO) {
@@ -283,6 +298,41 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
                 .collect(Collectors.toList());
     }
 
+    public List<Graduado> findGraduadosRechazadosByOfertaId(Long ofertaId) {
+        List<Postulacion> postulantes = postulacionRepository.findAllByOfertaLaboralId(ofertaId);
+
+        return postulantes
+                .stream()
+                .filter(postulacion -> postulacion.getEstado().equals(EstadoPostulacion.RECHAZADO))
+                .map(Postulacion::getGraduado)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+                .stream()
+                .peek(g -> {
+                    if (g != null) {
+                        g.getUsuario()
+                                .setUrlImagen(s3Service.getObjectUrl(g.getUsuario().getRutaImagen()));
+                        g.setUrlPdf(s3Service.getObjectUrl(g.getRutaPdf()));
+                    }
+                })
+                .collect(Collectors.toList());
+    }
+
+    public PreviousDataForPdfDTO findByIdWithPdf(Long idOfertaLaboral) throws IOException {
+        OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.findById(idOfertaLaboral)
+                .orElseThrow(() -> new ResourceNotFoundException("OfertaLaboral", String.valueOf(idOfertaLaboral)));
+
+        byte[] pdf = previousDataForPdfService.getPdf(ofertaLaboral);
+
+        if (pdf.length == 0) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "No se puede generar el PDF de la oferta laboral: " + idOfertaLaboral + ", no hay graduados postulados");
+        }
+
+        createRequestAndSendEmailWithPDFToBusinessman(ofertaLaboral, pdf);
+
+        return new PreviousDataForPdfDTO(ofertaLaboral, pdf);
+    }
+
     public List<OfertasLaborales> findOfertasByNombreEmpresa(String nombreEmpresa) {
         return ofertasLaboralesRepository.findOfertasByNombreEmpresa(nombreEmpresa);
     }
@@ -318,6 +368,10 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         return new MailRequest(from, subject, mailCase);
     }
 
+    private MailRequest createMailRequest(String subject, String mailCase, String to) {
+        return new MailRequest(to, from, subject, mailCase);
+    }
+
     private void createRequestAndSendEmailWithPDF(OfertasLaborales oferta) {
         Map<String, Object> model = new HashMap<>();
         List<Graduado> graduado = graduadoRepository.findAll();
@@ -328,11 +382,26 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         model.put("fotoPortada", imageBytes);
 
         String subject = getMailSubject(oferta.getEstado().name());
-        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "offer-finished" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : "offer-selection";
+        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "list-postulates" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : "offer-selection";
 
         MailRequest request = createMailRequest(subject, mailCase);
 
         emailService.sendEmailWithPDF(request, model, emails);
+    }
+
+    private void createRequestAndSendEmailWithPDFToBusinessman(OfertasLaborales oferta, byte[] pdf) {
+        Map<String, Object> model = new HashMap<>();
+        byte[] imageBytes = StringUtils.hasText(oferta.getFotoPortada()) ? imageOptimizer.convertBase64ToBytes(oferta.getFotoPortada()) : new byte[0];
+
+        model.put("oferta", oferta);
+        model.put("fotoPortada", imageBytes);
+
+        String subject = getMailSubject(oferta.getEstado().name());
+        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "list-postulates" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : "offer-selection";
+
+        MailRequest request = createMailRequest(subject, mailCase, oferta.getEmpresa().getEmpresario().getEmail());
+
+        emailService.sendEmailWithPDFToBusinessman(request, model, pdf);
     }
 
     private String getMailSubject(String estado) {

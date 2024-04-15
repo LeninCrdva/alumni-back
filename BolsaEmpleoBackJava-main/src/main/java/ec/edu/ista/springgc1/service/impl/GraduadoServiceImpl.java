@@ -93,7 +93,6 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
                 .map(estudiante -> {
                     Usuario userFromGrad = estudiante.getUsuario();
                     userFromGrad.setUrlImagen(s3Service.getObjectUrl(userFromGrad.getRutaImagen()));
-                    System.out.println("userFromGrad: " + userFromGrad);
                     byte[] pdf;
                     try {
                         pdf = previousDataForPdfService.getPdf(estudiante);

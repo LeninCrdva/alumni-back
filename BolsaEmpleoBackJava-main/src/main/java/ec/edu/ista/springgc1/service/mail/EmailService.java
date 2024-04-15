@@ -106,6 +106,26 @@ public class EmailService {
         return response;
     }
 
+    public void sendEmailWithPDFToBusinessman(MailRequest request, Map<String, Object> model, byte[] pdfBytes) {
+        MailResponse response = new MailResponse();
+        MimeMessage message = sender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+
+            if (StringUtils.hasText(request.getCaseEmail()) && request.getCaseEmail().equals("list-postulates")) {
+                ByteArrayDataSource dataSource = new ByteArrayDataSource(pdfBytes, "application/pdf");
+                String docName = "curriculum_list.pdf";
+                helper.addAttachment(docName, dataSource);
+            }
+
+            getHtml(request, model, response, message, helper);
+        } catch (MessagingException | IOException e) {
+            response.setMessage("Fallo al enviar email: " + e.getMessage());
+            response.setStatus(Boolean.FALSE);
+        }
+    }
+
     public void sendEmailWithPDF(MailRequest request, Map<String, Object> model, String[] emails) {
         MailResponse response = new MailResponse();
         MimeMessage message = sender.createMimeMessage();
@@ -216,12 +236,18 @@ public class EmailService {
             case "new-offer":
                 t = "businessman/email-template-alert-offer";
                 break;
+            case "new-company":
+                t = "businessman/email-template-warning-register";
+                break;
             case "offer-finished":
             case "offer-canceled":
                 t = "businessman/email-template-alert-cancel-or-finish-offer";
                 break;
             case "reject-postulate":
                 t = "graduate/email-template-rejected-postulate";
+                break;
+            case "offer-selection":
+                t = "graduate/email-template-select-postulate";
                 break;
             default:
                 t = "graduate/email-template-contact-us";
