@@ -40,9 +40,11 @@ public class AuditEntry {
     @Column(name = "action_details")
     @JsonView(View.Public.class)
     private String actionDetails;
+    @Lob
     @Column(name = "old_value")
     @JsonView(View.Public.class)
     private String oldValue;
+    @Lob
     @Column(name = "new_value")
     @JsonView(View.Public.class)
     private String newValue;

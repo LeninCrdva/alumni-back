@@ -93,7 +93,7 @@ public class PersonaController {
         pFromDb.setPrimerNombre(p.getPrimerNombre());
         pFromDb.setSegundoNombre(p.getSegundoNombre());
         pFromDb.setTelefono(p.getTelefono());
-
+        pFromDb.setSexo(p.getSexo());
         return ResponseEntity.status(HttpStatus.CREATED).body(personaService.save(pFromDb));
     }
 
