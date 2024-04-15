@@ -21,7 +21,7 @@ public class Componentexml {
     private String tipo;
 
     @Lob
-    @Column(name = "xml_file", length = 10485760)
+    @Column(name = "xml_file", columnDefinition = "LONGTEXT")
     @JsonView({View.Public.class })
     private String xml_file;
 

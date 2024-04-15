@@ -44,8 +44,8 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
     @Override
     public Titulo mapToEntity(TituloDTO d) {
         Titulo t = new Titulo();
-        Graduado g = graduadoRepository.findById(d.getIdGraduado())
-                .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", d.getIdGraduado()));
+    	Graduado graduado = graduadoRepository.findByUsuarioPersonaCedulaContaining(d.getCedula())
+				.orElseThrow(() -> new ResourceNotFoundException("cedula", t.getGraduado()));
         Carrera c = carrerarepository.findByNombre(d.getNombreCarrera())
                 .orElseThrow(() -> new ResourceNotFoundException("carrera:", d.getNombreCarrera()));
         t.setFechaEmision(d.getFechaEmision());
@@ -56,7 +56,7 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
         t.setTipo(d.getTipo());
         t.setNumRegistro(d.getNumRegistro());
         t.setCarrera(c);
-        t.setGraduado(g);
+        t.setGraduado(graduado);
 
         return t;
     }
@@ -65,7 +65,7 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
     public TituloDTO mapToDTO(Titulo e) {
         TituloDTO d = new TituloDTO();
         d.setId(e.getId());
-        d.setIdGraduado(e.getGraduado().getId());
+        d.setCedula(e.getGraduado().getUsuario().getPersona().getCedula());
 
         d.setFechaEmision(e.getFechaEmision());
         d.setFechaRegistro(e.getFechaRegistro());
@@ -100,8 +100,8 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
         Titulo tituloFromDb = titulorepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("id", id));
 
-        Graduado graduado = graduadoRepository.findById(e.getIdGraduado())
-                .orElseThrow(() -> new ResourceNotFoundException("id_graduado:", e.getIdGraduado()));
+        Graduado graduado = graduadoRepository.findByUsuarioPersonaCedulaContaining(e.getCedula())
+				.orElseThrow(() -> new ResourceNotFoundException("cedula",tituloFromDb.getGraduado()));
         Carrera carrera = carrerarepository.findByNombre(e.getNombreCarrera())
                 .orElseThrow(() -> new ResourceNotFoundException("carrera:", e.getNombreCarrera()));
 

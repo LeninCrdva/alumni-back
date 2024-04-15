@@ -11,8 +11,8 @@ public class TituloDTO implements Serializable {
 
     private Long id;
 
-    @NotNull
-    private Long idGraduado;
+
+    private String cedula;
 
     @NotNull
     private String tipo;
