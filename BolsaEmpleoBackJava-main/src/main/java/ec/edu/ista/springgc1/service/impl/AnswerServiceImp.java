@@ -224,6 +224,7 @@ public class AnswerServiceImp {
 	                QuestionWithAnswersStatsDTO questionDTO = new QuestionWithAnswersStatsDTO();
 	                questionDTO.setQuestionId(question.getId());
 	                questionDTO.setQuestionText(question.getText());
+					questionDTO.setTypeQuestion(question.getType().name());
 
 	                if (question.getType() == QuestionType.ABIERTA) {
 	                    // Para preguntas abiertas, obtenemos las respuestas y el número de respuestas

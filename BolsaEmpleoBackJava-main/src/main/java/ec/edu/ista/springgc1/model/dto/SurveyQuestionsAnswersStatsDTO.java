@@ -22,5 +22,6 @@ public class SurveyQuestionsAnswersStatsDTO implements Serializable {
     private long totalGraduados;
     @JsonView(View.Public.class)
     private int graduadosRespondidos;
-   
+    @JsonView(View.Public.class)
+    private String careerName;
 }

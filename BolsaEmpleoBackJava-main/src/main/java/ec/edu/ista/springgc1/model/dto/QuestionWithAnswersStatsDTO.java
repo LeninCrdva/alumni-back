@@ -25,6 +25,8 @@ public class QuestionWithAnswersStatsDTO implements Serializable {
     private Long totalGraduadosforcarrer; //total por carrera
     @JsonView(View.Public.class) 
     private Integer graduadosRespondidosforcarrer; //respndidos graduados de carrera
+    @JsonView(View.Public.class)
+    private String typeQuestion; //tipo de pregunta
 
     // Constructor vacío
     public QuestionWithAnswersStatsDTO() {
