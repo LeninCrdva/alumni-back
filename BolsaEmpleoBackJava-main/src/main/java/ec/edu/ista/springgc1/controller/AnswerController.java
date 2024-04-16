@@ -37,26 +37,27 @@ import ec.edu.ista.springgc1.service.impl.AnswerServiceImp;
 @RestController
 @RequestMapping("/api/answer")
 public class AnswerController {
-	
-	 @Autowired
-	    private AnswerServiceImp answerService;
-	  @Autowired
-	    private GraduadoRepository graduadoRepository;
-	 @Autowired
-	    private AnswerRepository answerRepository;
-	  @Autowired
-	    private SurveyRepository surveyRepository;
-	 
-	   private int graduadosRespondidos;
-	// Endpoint para guardar una respuesta
-	  @PreAuthorize("hasRole('GRADUADO')")
+
+    @Autowired
+    private AnswerServiceImp answerService;
+    @Autowired
+    private GraduadoRepository graduadoRepository;
+    @Autowired
+    private AnswerRepository answerRepository;
+    @Autowired
+    private SurveyRepository surveyRepository;
+
+    private int graduadosRespondidos;
+
+    // Endpoint para guardar una respuesta
+    @PreAuthorize("hasRole('GRADUADO')")
     @PostMapping("/save")
     public ResponseEntity<Answer> saveAnswer(@RequestBody AnswerSearchDTO answerDTO) {
         Answer savedAnswer = answerService.saveAnswer(answerDTO);
         return new ResponseEntity<>(savedAnswer, HttpStatus.CREATED);
     }
-	  
-	  @PreAuthorize("hasRole('ADMINISTRADOR')")
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/survey/{surveyId}/questions-answers")
     public ResponseEntity<Map<String, Object>> getQuestionsWithAnswersBySurveyId(@PathVariable Long surveyId) {
         Optional<Survey> optionalSurvey = surveyRepository.findById(surveyId);
@@ -81,9 +82,9 @@ public class AnswerController {
                 questionWithAnswersList.add(questionWithAnswers);
             }
 
-            Map<String, Object> response = new LinkedHashMap<>(); 
+            Map<String, Object> response = new LinkedHashMap<>();
             response.put("surveyId", surveyId);
-            response.put("surveyTitle", survey.getTitle()); 
+            response.put("surveyTitle", survey.getTitle());
             response.put("surveyDescription", survey.getDescription());
             response.put("questionsWithAnswers", questionWithAnswersList);
 
@@ -93,22 +94,23 @@ public class AnswerController {
         }
     }
 
-	    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR','RESPONSABLE_CARRERA')")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR','RESPONSABLE_CARRERA')")
     @GetMapping("/all-surveys-questions-answers")
     public ResponseEntity<List<SurveyQuestionsAnswersDTO>> getAllSurveysWithQuestionsAndAnswers() {
         List<SurveyQuestionsAnswersDTO> surveyQuestionsAnswersList = answerService.loadAllSurveysWithQuestionsAndAnswers();
         return ResponseEntity.ok(surveyQuestionsAnswersList);
     }
-	    //Ya con muestra de conteo 
-	    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
-	    @GetMapping("/all-surveys-questions-answers-stats")
-	    public ResponseEntity<List<SurveyQuestionsAnswersStatsDTO>> getAllSurveysWithQuestionsAnswersAndStats() {
-	        List<SurveyQuestionsAnswersStatsDTO> surveyQuestionsAnswersStatsList = answerService.loadAllSurveysWithQuestionsAnswersAndStats();
-	        return ResponseEntity.ok(surveyQuestionsAnswersStatsList);
-	    }
 
-    
-	    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
+    //Ya con muestra de conteo
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
+    @GetMapping("/all-surveys-questions-answers-stats")
+    public ResponseEntity<List<SurveyQuestionsAnswersStatsDTO>> getAllSurveysWithQuestionsAnswersAndStats() {
+        List<SurveyQuestionsAnswersStatsDTO> surveyQuestionsAnswersStatsList = answerService.loadAllSurveysWithQuestionsAnswersAndStats();
+        return ResponseEntity.ok(surveyQuestionsAnswersStatsList);
+    }
+
+
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/survey-questions-answers-by-career-coments")
     public ResponseEntity<Map<String, Map<String, List<String>>>> getSurveyQuestionsAnswersByCareercoment() {
         List<Survey> allSurveys = surveyRepository.findAll();
@@ -141,6 +143,7 @@ public class AnswerController {
 
         return ResponseEntity.ok(surveyByCareerMap);
     }
+
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/survey-questions-answers-by-career")
     public ResponseEntity<Map<String, Map<String, List<QuestionWithAnswersDTO>>>> getSurveyQuestionsAnswersByCareer() {
@@ -154,9 +157,9 @@ public class AnswerController {
 
             for (Question question : questions) {
                 List<String> questionAnswers = answers.stream()
-                    .filter(answer -> answer.getSurvey().getId().equals(survey.getId()) && answer.getAnswers().containsKey(question.getId()))
-                    .map(answer -> answer.getAnswers().get(question.getId()))
-                    .collect(Collectors.toList());
+                        .filter(answer -> answer.getSurvey().getId().equals(survey.getId()) && answer.getAnswers().containsKey(question.getId()))
+                        .map(answer -> answer.getAnswers().get(question.getId()))
+                        .collect(Collectors.toList());
 
                 QuestionWithAnswersDTO questionDTO = new QuestionWithAnswersDTO();
                 questionDTO.setQuestionId(question.getId());
@@ -189,6 +192,7 @@ public class AnswerController {
         List<GraduadoWithUnansweredSurveysDTO> result = answerService.getGraduadosWithUnansweredSurveys();
         return ResponseEntity.ok(result);
     }
+
     //Metodo para reporte por carrera
     private Map<String, Long> countResponsesByOption2(List<Answer> validAnswers, Question question) {
         Map<String, Long> responsesByOption = new HashMap<>();
@@ -206,15 +210,15 @@ public class AnswerController {
     }
 
     //Segundo metodo
-    
+
     private List<Answer> getValidAnswersForQuestion2(Long questionId, List<Answer> answers) {
         return answers.stream()
                 .filter(answer -> answer.getAnswers() != null && answer.getAnswers().containsKey(questionId))
                 .collect(Collectors.toList());
     }
-    
-  //
- // @PreAuthorize("hasRole('ADMINISTRADOR')")
+
+    //
+    // @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/survey-questions-answers-by-career-reportcontitulo")
     public ResponseEntity<Map<String, Map<String, List<QuestionWithAnswersStatsDTO>>>> getSurveyQuestionsAnswersByCareer2(
@@ -258,7 +262,7 @@ public class AnswerController {
 
             for (Answer answer : answers) {
                 String careerName = answer.getCarrera().getNombre();
-                
+
                 // Filtrar por nombre de carrera si se proporciona
                 if (carreraNombre == null || carreraNombre.isEmpty() || careerName.equalsIgnoreCase(carreraNombre)) {
                     if (!surveyByCareerMap.containsKey(careerName)) {
@@ -276,9 +280,10 @@ public class AnswerController {
 
         return ResponseEntity.ok(surveyByCareerMap);
     }
-   
+
     private List<Answer> cachedAnswers;
- // @PreAuthorize("hasRole('ADMINISTRADOR')")
+
+    // @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/survey-questions-answers-by-career-report")
     public ResponseEntity<Map<String, Map<String, List<QuestionWithAnswersStatsDTO>>>> getSurveyQuestionsAnswersByCareer(
@@ -379,7 +384,6 @@ public class AnswerController {
         return ResponseEntity.ok(surveyByCareerMap);
     }
 
-   
 
     private int getNumGraduadosRespondidosByCareer(String carreraNombre, List<Answer> answers) {
         // Utilizar un conjunto para contar graduados únicos que respondieron
@@ -390,8 +394,8 @@ public class AnswerController {
 
         return graduadoIdsRespondidos.size();
     }
-    
-    
+
+
     //Graduados
     @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR','RESPONSABLE_CARRERA')")
     @GetMapping("/respondidas")

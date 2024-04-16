@@ -6,6 +6,7 @@ import java.util.Optional;
 import ec.edu.ista.springgc1.model.dto.MailRequest;
 import ec.edu.ista.springgc1.service.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -18,6 +19,9 @@ import ec.edu.ista.springgc1.service.impl.SurveyServiceImp;
 @RestController
 @RequestMapping("/api/surveys")
 public class SurveyController {
+
+    @Value("${spring.mail.username}")
+    private String from;
 
     @Autowired
     private SurveyServiceImp surveyService;
@@ -70,7 +74,7 @@ public class SurveyController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/withQuestionsAndOptions")
     public ResponseEntity<?> getAllSurveysWithQuestionsAndOptions() {
         try {
@@ -123,15 +127,15 @@ public class SurveyController {
     }
 
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @PutMapping("/{surveyId}/updateState")
     public ResponseEntity<Survey> updateSurveyState(@PathVariable Long surveyId, @RequestParam Boolean newEstado) {
         try {
             Survey updatedSurvey = surveyService.updateSurveyState(surveyId, newEstado);
 
-            MailRequest request = new MailRequest();
+            MailRequest request = new MailRequest(from, "Cambio de estado de encuesta", newEstado ? "survey-activated" : "survey-desactivated");
 
-            emailService.sendEmail(request, updatedSurvey, newEstado ? "survey-activated" : "survey-deactivated");
+            emailService.sendEmail(request, updatedSurvey, newEstado ? "survey-activated" : "survey-desactivated");
 
             return ResponseEntity.ok(updatedSurvey);
         } catch (IllegalArgumentException e) {

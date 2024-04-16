@@ -85,7 +85,7 @@ public class EmailService {
         }
     }
 
-    public void sendEmail(MailRequest request, Survey survey, String state){
+    public void sendEmail(MailRequest request, Survey survey, String state) {
         Map<String, Object> model = new HashMap<>();
 
         model.put("survey", survey);
@@ -198,7 +198,7 @@ public class EmailService {
         return response;
     }
 
-    public void validateRequest(Usuario usuario){
+    public void validateRequest(Usuario usuario) {
 
         List<RecoveryToken> recoveryToken = tokenService.findByUsuarioId(usuario.getId());
 
@@ -206,7 +206,7 @@ public class EmailService {
                 .filter(token -> token.getExpiration().compareTo(new Date()) > 0)
                 .findAny()
                 .ifPresent(token -> {
-                    throw new AppException(HttpStatus.CONFLICT,"El usuario ya contiene un token de recuperación activo");
+                    throw new AppException(HttpStatus.CONFLICT, "El usuario ya contiene un token de recuperación activo");
                 });
     }
 
@@ -277,6 +277,10 @@ public class EmailService {
                 break;
             case "offer-selection":
                 t = "graduate/email-template-select-postulate";
+                break;
+            case "survey-desactivated":
+            case "survey-activated":
+                t = "graduate/email-template-alert-survey";
                 break;
             default:
                 t = "graduate/email-template-contact-us";

@@ -1,7 +1,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Java Techie Mail</title>
     <style>
 
@@ -35,19 +35,24 @@
                             <img src="https://i.postimg.cc/BvQwndkk/reload.png" alt="reset-icon" width="100px"/>
                         </div>
                         <div class="center-text">
-                            <h2><strong>¡Se ha publicado una nueva encuesta!</strong></h2>
+                            <div th:if="${#strings.equals(state, 'survey-activated')}">
+                                <h2><strong>¡Se ha publicado una nueva encuesta!</strong></h2>
+                            </div>
+                            <div th:if="${#strings.equals(state, 'survey-deactivated')}">
+                                <h2><strong>¡Ha finalizado una encuesta!</strong></h2>
+                            </div>
                             <br>
                             <p>Saludos cordiales,</p>
                             <br>
                             <p>Estimado/a integrante del sistema,</p>
                             <br>
-                            <div th:if="${#strings.equals(${state}, 'survey-activated')}">
-                                <p>Se ha publicado una nueva encuesta en el sistema Alumni EST titulada <strong th:text="${survey.title}"></strong>.</p>
-                                <br>
+                            <div th:if="${#strings.equals(state, 'survey-activated')}">
+                                <p>Se ha publicado una nueva encuesta en el sistema Alumni EST titulada <strong
+                                        th:text="${survey.title}"></strong>.</p>
                             </div>
-                            <div th:if="${#strings.equals(${state}, 'survey-desactivated')}">
-                                <p>La encuesta titulada <strong th:text="${survey.title}"></strong> ha finalizado el período de aceptación de respuestas.</p>
-                                <br>
+                            <div th:if="${#strings.equals(state, 'survey-deactivated')}">
+                                <p>La encuesta titulada <strong th:text="${survey.title}"></strong> ha finalizado el
+                                    período de aceptación de respuestas.</p>
                                 <p>Agradecemos su participación en caso de haber cumplido con esta actividad.</p>
                             </div>
                             <br>
@@ -61,8 +66,12 @@
                         <br>
                         <hr>
                         <div class="center-icon space-icon">
-                            <a href="https://www.facebook.com/TecAzuay"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png" alt="face-ico" width="30px"></a>
-                            <a href="https://www.instagram.com/tecdelazuay/?hl=es-la"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Instagram-Icon.png/1200px-Instagram-Icon.png" alt="insta-ico" width="30px"></a>
+                            <a href="https://www.facebook.com/TecAzuay"><img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/2021_Facebook_icon.svg/2048px-2021_Facebook_icon.svg.png"
+                                    alt="face-ico" width="30px"></a>
+                            <a href="https://www.instagram.com/tecdelazuay/?hl=es-la"><img
+                                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Instagram-Icon.png/1200px-Instagram-Icon.png"
+                                    alt="insta-ico" width="30px"></a>
                         </div>
                         </body>
                         <footer>
@@ -78,7 +87,8 @@
                         </div>
                     </td>
                 </tr>
-            </table> <br> <br>
+            </table>
+            <br> <br>
         </td>
     </tr>
 </table>

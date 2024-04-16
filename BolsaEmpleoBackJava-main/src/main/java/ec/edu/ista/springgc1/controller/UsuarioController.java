@@ -60,7 +60,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @PutMapping("/state-update/{id}")
     public ResponseEntity<?> updateState(@PathVariable Long id, @RequestParam Boolean state) {
         try {
