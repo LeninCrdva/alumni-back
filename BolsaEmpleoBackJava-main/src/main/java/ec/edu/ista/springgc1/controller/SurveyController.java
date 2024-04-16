@@ -60,7 +60,7 @@ public class SurveyController {
     }
 
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @PostMapping("/{surveyId}/questions")
     public ResponseEntity<Question> addQuestionToSurvey(@PathVariable Long surveyId, @RequestBody Question question) {
         Question savedQuestion = surveyService.addQuestionToSurvey(surveyId, question);
@@ -84,7 +84,7 @@ public class SurveyController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @PutMapping("/{surveyId}")
     public ResponseEntity<Survey> updateSurvey(@PathVariable Long surveyId, @RequestBody Survey updatedSurvey) {
         Optional<Survey> existingSurveyOptional = surveyService.findSurveyById(surveyId);
