@@ -2,26 +2,33 @@ package ec.edu.ista.springgc1.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ec.edu.ista.springgc1.model.dto.AnswerSearchDTO;
 import ec.edu.ista.springgc1.model.dto.GraduadoWithUnansweredSurveysDTO;
 import ec.edu.ista.springgc1.model.dto.QuestionWithAnswersDTO;
+import ec.edu.ista.springgc1.model.dto.QuestionWithAnswersStatsDTO;
 import ec.edu.ista.springgc1.model.dto.SurveyQuestionsAnswersDTO;
+import ec.edu.ista.springgc1.model.dto.SurveyQuestionsAnswersStatsDTO;
 import ec.edu.ista.springgc1.model.entity.Answer;
 import ec.edu.ista.springgc1.model.entity.Carrera;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.Question;
 import ec.edu.ista.springgc1.model.entity.Survey;
 import ec.edu.ista.springgc1.model.entity.Usuario;
+import ec.edu.ista.springgc1.model.enums.QuestionType;
 import ec.edu.ista.springgc1.repository.AnswerRepository;
 import ec.edu.ista.springgc1.repository.CarreraRepository;
 import ec.edu.ista.springgc1.repository.GraduadoRepository;
@@ -195,6 +202,92 @@ public class AnswerServiceImp {
 	        List<Answer> answers = answerRepository.findBySurveyIdAndGraduadoId(survey.getId(), graduado.getId());
 	        return !answers.isEmpty();
 	    }
-	   
+	    //Resultados 
+	    public List<SurveyQuestionsAnswersStatsDTO> loadAllSurveysWithQuestionsAnswersAndStats() {
+	        List<Survey> allSurveys = surveyRepository.findAll();
+	        List<SurveyQuestionsAnswersStatsDTO> surveyQuestionsAnswersStatsList = new ArrayList<>();
+
+	        for (Survey survey : allSurveys) {
+	            SurveyQuestionsAnswersStatsDTO surveyDTO = new SurveyQuestionsAnswersStatsDTO();
+	            surveyDTO.setSurveyId(survey.getId());
+	            surveyDTO.setSurveyTitle(survey.getTitle());
+	            surveyDTO.setSurveyDescription(survey.getDescription());
+
+	            List<QuestionWithAnswersStatsDTO> questionsWithAnswers = new ArrayList<>();
+	            List<Question> questions = survey.getQuestions();
+	            List<Answer> answers = answerRepository.findBySurveyId(survey.getId());
+
+	            for (Question question : questions) {
+	                List<Answer> validAnswers = getValidAnswersForQuestion(question.getId(), answers);
+
+	                QuestionWithAnswersStatsDTO questionDTO = new QuestionWithAnswersStatsDTO();
+	                questionDTO.setQuestionId(question.getId());
+	                questionDTO.setQuestionText(question.getText());
+
+	                if (question.getType() == QuestionType.ABIERTA) {
+	                    // Para preguntas abiertas, obtenemos las respuestas y el número de respuestas
+	                    List<String> questionAnswers = validAnswers.stream()
+	                            .map(answer -> answer.getAnswers().get(question.getId()))
+	                            .filter(Objects::nonNull) // Filtrar respuestas no nulas
+	                            .collect(Collectors.toList());
+	                    
+	                    questionDTO.setQuestionAnswers(questionAnswers);
+	                    questionDTO.setNumResponses(questionAnswers.size());
+	                } else {
+	                    // Para preguntas con opciones, calculamos estadísticas por opción
+	                    Map<String, Long> responsesByOption = countResponsesByOption(validAnswers, question);
+	                    questionDTO.setResponsesByOption(responsesByOption);
+	                }
+
+	                questionsWithAnswers.add(questionDTO);
+	            }
+
+	            surveyDTO.setQuestionsWithAnswers(questionsWithAnswers);
+	            surveyDTO.setTotalGraduados(graduadoRepository.countAll());
+	            surveyDTO.setGraduadosRespondidos(getNumGraduadosQueRespondieron(survey));
+
+	            surveyQuestionsAnswersStatsList.add(surveyDTO);
+	        }
+
+	        return surveyQuestionsAnswersStatsList;
+	    }
+
+private List<Answer> getValidAnswersForQuestion(Long questionId, List<Answer> answers) {
+    return answers.stream()
+            .filter(answer -> answer.getAnswers() != null && answer.getAnswers().containsKey(questionId))
+            .collect(Collectors.toList());
+}
+
+private Map<String, Long> countResponsesByOption(List<Answer> validAnswers, Question question) {
+    Map<String, Long> responsesByOption = new HashMap<>();
+
+    for (Answer answer : validAnswers) {
+        if (answer.getAnswers() != null) {
+            String answerValue = answer.getAnswers().get(question.getId());
+            if (answerValue != null) {
+                responsesByOption.merge(answerValue, 1L, Long::sum);
+            }
+        }
+    }
+
+    return responsesByOption;
+}
+
+public int getNumGraduadosQueRespondieron(Survey survey) {
+    Set<Long> graduadoIdsQueRespondieron = new HashSet<>();
+    List<Answer> answers = answerRepository.findBySurveyId(survey.getId());
+
+    for (Answer answer : answers) {
+        if (answer.getGraduado() != null) {
+            graduadoIdsQueRespondieron.add(answer.getGraduado().getId());
+        }
+    }
+
+    return graduadoIdsQueRespondieron.size();
+}
+//Carreras reportes 
+
+
+   
 	   
 }

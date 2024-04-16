@@ -1,11 +1,15 @@
 package ec.edu.ista.springgc1.controller;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +21,16 @@ import org.springframework.web.bind.annotation.*;
 import ec.edu.ista.springgc1.model.dto.AnswerSearchDTO;
 import ec.edu.ista.springgc1.model.dto.GraduadoWithUnansweredSurveysDTO;
 import ec.edu.ista.springgc1.model.dto.QuestionWithAnswersDTO;
+import ec.edu.ista.springgc1.model.dto.QuestionWithAnswersStatsDTO;
 import ec.edu.ista.springgc1.model.dto.SurveyQuestionsAnswersDTO;
+import ec.edu.ista.springgc1.model.dto.SurveyQuestionsAnswersStatsDTO;
 import ec.edu.ista.springgc1.model.entity.Answer;
+import ec.edu.ista.springgc1.model.entity.Carrera;
 import ec.edu.ista.springgc1.model.entity.Question;
 import ec.edu.ista.springgc1.model.entity.Survey;
+import ec.edu.ista.springgc1.model.enums.QuestionType;
 import ec.edu.ista.springgc1.repository.AnswerRepository;
+import ec.edu.ista.springgc1.repository.GraduadoRepository;
 import ec.edu.ista.springgc1.repository.SurveyRepository;
 import ec.edu.ista.springgc1.service.impl.AnswerServiceImp;
 
@@ -31,11 +40,15 @@ public class AnswerController {
 	
 	 @Autowired
 	    private AnswerServiceImp answerService;
+	  @Autowired
+	    private GraduadoRepository graduadoRepository;
 	 @Autowired
 	    private AnswerRepository answerRepository;
 	  @Autowired
 	    private SurveyRepository surveyRepository;
-	 // Endpoint para guardar una respuesta
+	 
+	   private int graduadosRespondidos;
+	// Endpoint para guardar una respuesta
 	  @PreAuthorize("hasRole('GRADUADO')")
     @PostMapping("/save")
     public ResponseEntity<Answer> saveAnswer(@RequestBody AnswerSearchDTO answerDTO) {
@@ -80,14 +93,22 @@ public class AnswerController {
         }
     }
 
-	    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
+	    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR','RESPONSABLE_CARRERA')")
     @GetMapping("/all-surveys-questions-answers")
     public ResponseEntity<List<SurveyQuestionsAnswersDTO>> getAllSurveysWithQuestionsAndAnswers() {
         List<SurveyQuestionsAnswersDTO> surveyQuestionsAnswersList = answerService.loadAllSurveysWithQuestionsAndAnswers();
         return ResponseEntity.ok(surveyQuestionsAnswersList);
     }
+	    //Ya con muestra de conteo 
+	    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
+	    @GetMapping("/all-surveys-questions-answers-stats")
+	    public ResponseEntity<List<SurveyQuestionsAnswersStatsDTO>> getAllSurveysWithQuestionsAnswersAndStats() {
+	        List<SurveyQuestionsAnswersStatsDTO> surveyQuestionsAnswersStatsList = answerService.loadAllSurveysWithQuestionsAnswersAndStats();
+	        return ResponseEntity.ok(surveyQuestionsAnswersStatsList);
+	    }
+
     
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+	    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/survey-questions-answers-by-career-coments")
     public ResponseEntity<Map<String, Map<String, List<String>>>> getSurveyQuestionsAnswersByCareercoment() {
         List<Survey> allSurveys = surveyRepository.findAll();
@@ -120,7 +141,7 @@ public class AnswerController {
 
         return ResponseEntity.ok(surveyByCareerMap);
     }
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/survey-questions-answers-by-career")
     public ResponseEntity<Map<String, Map<String, List<QuestionWithAnswersDTO>>>> getSurveyQuestionsAnswersByCareer() {
         List<Survey> allSurveys = surveyRepository.findAll();
@@ -162,13 +183,212 @@ public class AnswerController {
         return ResponseEntity.ok(surveyByCareerMap);
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/unanswered-surveys")
     public ResponseEntity<List<GraduadoWithUnansweredSurveysDTO>> getGraduadosWithUnansweredSurveys() {
         List<GraduadoWithUnansweredSurveysDTO> result = answerService.getGraduadosWithUnansweredSurveys();
         return ResponseEntity.ok(result);
     }
+    //Metodo para reporte por carrera
+    private Map<String, Long> countResponsesByOption2(List<Answer> validAnswers, Question question) {
+        Map<String, Long> responsesByOption = new HashMap<>();
 
-  
+        for (Answer answer : validAnswers) {
+            if (answer.getAnswers() != null) {
+                String answerValue = answer.getAnswers().get(question.getId());
+                if (answerValue != null) {
+                    responsesByOption.merge(answerValue, 1L, Long::sum);
+                }
+            }
+        }
+
+        return responsesByOption;
+    }
+
+    //Segundo metodo
+    
+    private List<Answer> getValidAnswersForQuestion2(Long questionId, List<Answer> answers) {
+        return answers.stream()
+                .filter(answer -> answer.getAnswers() != null && answer.getAnswers().containsKey(questionId))
+                .collect(Collectors.toList());
+    }
+    
+  //
+ // @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
+    @GetMapping("/survey-questions-answers-by-career-reportcontitulo")
+    public ResponseEntity<Map<String, Map<String, List<QuestionWithAnswersStatsDTO>>>> getSurveyQuestionsAnswersByCareer2(
+            @RequestParam(required = false) String carreraNombre) {
+
+        List<Survey> allSurveys = surveyRepository.findAll();
+        Map<String, Map<String, List<QuestionWithAnswersStatsDTO>>> surveyByCareerMap = new HashMap<>();
+
+        for (Survey survey : allSurveys) {
+            List<QuestionWithAnswersStatsDTO> questionsWithAnswers = new ArrayList<>();
+            List<Question> questions = survey.getQuestions();
+            List<Answer> answers = answerRepository.findBySurveyId(survey.getId());
+
+            for (Question question : questions) {
+                List<Answer> validAnswers = getValidAnswersForQuestion2(question.getId(), answers);
+
+                if (!validAnswers.isEmpty()) {
+                    QuestionWithAnswersStatsDTO questionDTO = new QuestionWithAnswersStatsDTO();
+                    questionDTO.setQuestionId(question.getId());
+                    questionDTO.setQuestionText(question.getText());
+
+                    if (question.getType() == QuestionType.ABIERTA) {
+                        // Filtrar respuestas abiertas
+                        List<String> questionAnswers = validAnswers.stream()
+                                .filter(answer -> answer.getAnswers().containsKey(question.getId()))
+                                .map(answer -> answer.getAnswers().get(question.getId()))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList());
+
+                        questionDTO.setQuestionAnswers(questionAnswers);
+                        questionDTO.setNumResponses(questionAnswers.size());
+                    } else {
+                        // Calcular estadísticas por opción para preguntas de opciones
+                        Map<String, Long> responsesByOption = countResponsesByOption2(validAnswers, question);
+                        questionDTO.setResponsesByOption(responsesByOption);
+                    }
+
+                    questionsWithAnswers.add(questionDTO);
+                }
+            }
+
+            for (Answer answer : answers) {
+                String careerName = answer.getCarrera().getNombre();
+                
+                // Filtrar por nombre de carrera si se proporciona
+                if (carreraNombre == null || carreraNombre.isEmpty() || careerName.equalsIgnoreCase(carreraNombre)) {
+                    if (!surveyByCareerMap.containsKey(careerName)) {
+                        surveyByCareerMap.put(careerName, new HashMap<>());
+                    }
+
+                    if (!surveyByCareerMap.get(careerName).containsKey(survey.getTitle())) {
+                        surveyByCareerMap.get(careerName).put(survey.getTitle(), new ArrayList<>());
+                    }
+
+                    surveyByCareerMap.get(careerName).get(survey.getTitle()).addAll(questionsWithAnswers);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(surveyByCareerMap);
+    }
+   
+    private List<Answer> cachedAnswers;
+ // @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
+    @GetMapping("/survey-questions-answers-by-career-report")
+    public ResponseEntity<Map<String, Map<String, List<QuestionWithAnswersStatsDTO>>>> getSurveyQuestionsAnswersByCareer(
+            @RequestParam(required = false) String carreraNombre) {
+
+        List<Survey> allSurveys = surveyRepository.findAll();
+        Map<String, Map<String, List<QuestionWithAnswersStatsDTO>>> surveyByCareerMap = new HashMap<>();
+
+        // Obtener el total de graduados por carrera (si se proporciona un nombre de carrera)
+        Map<String, Long> totalGraduadosByCareer = new HashMap<>();
+        if (carreraNombre != null && !carreraNombre.isEmpty()) {
+            long totalGraduados = graduadoRepository.countAll();
+            totalGraduadosByCareer.put(carreraNombre, totalGraduados);
+        }
+
+        // Obtener la lista de respuestas una vez al principio del método y almacenarla en la variable cachedAnswers
+        cachedAnswers = answerRepository.findAll(); // Aquí puedes cambiar la lógica según tu repositorio
+
+        for (Survey survey : allSurveys) {
+            List<QuestionWithAnswersStatsDTO> questionsWithAnswers = new ArrayList<>();
+            List<Question> questions = survey.getQuestions();
+
+            for (Question question : questions) {
+                List<Answer> validAnswers = getValidAnswersForQuestion2(question.getId(), cachedAnswers);
+
+                if (!validAnswers.isEmpty()) {
+                    QuestionWithAnswersStatsDTO questionDTO = new QuestionWithAnswersStatsDTO();
+                    questionDTO.setQuestionId(question.getId());
+                    questionDTO.setQuestionText(question.getText());
+
+                    if (question.getType() == QuestionType.ABIERTA) {
+                        // Filtrar respuestas abiertas
+                        List<String> questionAnswers = validAnswers.stream()
+                                .filter(answer -> answer.getAnswers().containsKey(question.getId()))
+                                .map(answer -> answer.getAnswers().get(question.getId()))
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toList());
+
+                        questionDTO.setQuestionAnswers(questionAnswers);
+                        questionDTO.setNumResponses(questionAnswers.size());
+                    } else {
+                        // Calcular estadísticas por opción para preguntas de opciones
+                        Map<String, Long> responsesByOption = countResponsesByOption2(validAnswers, question);
+                        questionDTO.setResponsesByOption(responsesByOption);
+                    }
+
+                    questionsWithAnswers.add(questionDTO);
+                }
+            }
+
+            for (Answer answer : cachedAnswers) {
+                String careerName = answer.getCarrera().getNombre();
+
+                // Filtrar por nombre de carrera si se proporciona
+                if (carreraNombre == null || carreraNombre.isEmpty() || careerName.equalsIgnoreCase(carreraNombre)) {
+                    // Obtener el título de la encuesta
+                    String surveyTitle = survey.getTitle();
+
+                    // Si no existe la clave de la carrera en el mapa principal, inicialízala
+                    surveyByCareerMap.putIfAbsent(careerName, new HashMap<>());
+
+                    // Obtener el total de graduados y graduados respondidos por carrera
+                    long totalGraduados = totalGraduadosByCareer.getOrDefault(careerName, 0L);
+                    int graduadosRespondidos = getNumGraduadosRespondidosByCareer(carreraNombre, cachedAnswers);
+
+                    // Obtener el mapa interno de encuestas y preguntas por título de encuesta
+                    Map<String, List<QuestionWithAnswersStatsDTO>> surveyMap = surveyByCareerMap.get(careerName);
+
+                    // Si no existe la clave del título de la encuesta en el mapa interno, inicialízala
+                    surveyMap.putIfAbsent(surveyTitle, new ArrayList<>());
+
+                    // Agregar las preguntas con respuestas al mapa interno bajo el título de la encuesta
+                    surveyMap.get(surveyTitle).addAll(questionsWithAnswers);
+                }
+            }
+        }
+
+        // Actualizar cada objeto QuestionWithAnswersStatsDTO con los totales por carrera
+        for (Map.Entry<String, Map<String, List<QuestionWithAnswersStatsDTO>>> entry : surveyByCareerMap.entrySet()) {
+            String careerName = entry.getKey();
+            Map<String, List<QuestionWithAnswersStatsDTO>> surveyMap = entry.getValue();
+
+            for (Map.Entry<String, List<QuestionWithAnswersStatsDTO>> innerEntry : surveyMap.entrySet()) {
+                List<QuestionWithAnswersStatsDTO> questionsStats = innerEntry.getValue();
+
+                // Obtener el total de graduados y graduados respondidos por carrera
+                long totalGraduados = totalGraduadosByCareer.getOrDefault(careerName, 0L);
+                int graduadosRespondidos = getNumGraduadosRespondidosByCareer(carreraNombre, cachedAnswers);
+
+                // Actualizar cada objeto QuestionWithAnswersStatsDTO con los totales por carrera
+                for (QuestionWithAnswersStatsDTO questionStats : questionsStats) {
+                    questionStats.setTotalGraduadosforcarrer(totalGraduados);
+                    questionStats.setGraduadosRespondidosforcarrer(graduadosRespondidos);
+                }
+            }
+        }
+
+        return ResponseEntity.ok(surveyByCareerMap);
+    }
+
+   
+
+    private int getNumGraduadosRespondidosByCareer(String carreraNombre, List<Answer> answers) {
+        // Utilizar un conjunto para contar graduados únicos que respondieron
+        Set<Long> graduadoIdsRespondidos = answers.stream()
+                .filter(answer -> answer.getCarrera() != null && answer.getCarrera().getNombre().equalsIgnoreCase(carreraNombre))
+                .map(answer -> answer.getGraduado().getId())
+                .collect(Collectors.toSet());
+
+        return graduadoIdsRespondidos.size();
+    }
 
 }

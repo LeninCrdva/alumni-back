@@ -22,4 +22,10 @@ public interface AnswerRepository extends GenericRepository<Answer>{
 	 
 	 @Query(value = "SELECT * FROM answer WHERE survey_id = :surveyId AND graduado_id = :graduadoId", nativeQuery = true)
 	    List<Answer> findBySurveyIdAndGraduadoId(@Param("surveyId") Long surveyId, @Param("graduadoId") Long graduadoId);
+	 
+	  @Query(value = "SELECT COUNT(DISTINCT graduado_id) FROM answer WHERE id_carrera = :carreraNombre", nativeQuery = true)
+	    long countTotalGraduadosByCarrera(@Param("carreraNombre") String carreraNombre);
+	  
+	  @Query(value = "SELECT COUNT(DISTINCT graduado_id) FROM answer WHERE id_carrera = :carreraNombre AND graduado_id IN (SELECT id FROM graduado WHERE responded = true)", nativeQuery = true)
+	    int countGraduadosRespondidosByCarrera(@Param("carreraNombre") String carreraNombre);
 }

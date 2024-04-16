@@ -43,4 +43,7 @@ public interface GraduadoRepository extends GenericRepository<Graduado> {
 
     @Query("SELECT g FROM Graduado g WHERE g.usuario.id <> :idUsuario")
     List<Graduado> findByUsuarioIdNot(@Param("idUsuario") long idUsuario);
+    
+    @Query("SELECT COUNT(g) FROM Graduado g")
+    long countAll();
 }
