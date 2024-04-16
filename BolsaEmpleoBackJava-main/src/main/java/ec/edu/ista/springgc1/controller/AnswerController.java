@@ -390,5 +390,18 @@ public class AnswerController {
 
         return graduadoIdsRespondidos.size();
     }
+    
+    
+    //Graduados
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR','RESPONSABLE_CARRERA')")
+    @GetMapping("/respondidas")
+    public ResponseEntity<List<Map<String, Object>>> getEncuestasRespondidasPorGraduado(@RequestParam(required = false) String correoGraduado) {
+        try {
+            List<Map<String, Object>> encuestasRespondidas = answerService.getEncuestasRespondidasPorGraduado(correoGraduado);
+            return ResponseEntity.ok(encuestasRespondidas);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 
 }

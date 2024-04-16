@@ -1,6 +1,7 @@
 package ec.edu.ista.springgc1.service.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -285,9 +286,65 @@ public int getNumGraduadosQueRespondieron(Survey survey) {
 
     return graduadoIdsQueRespondieron.size();
 }
-//Carreras reportes 
+//Seguimiento graduados
+public List<Map<String, Object>> getEncuestasRespondidasPorGraduado(String correoGraduado) {
+    List<Map<String, Object>> encuestasRespondidas = new ArrayList<>();
 
+    if (correoGraduado == null || correoGraduado.isEmpty()) {
+        // Si no se proporciona el correoGraduado, recuperar todas las respuestas
+        List<Answer> respuestas = answerRepository.findAll();
 
-   
+        // Agrupar las respuestas por encuesta
+        Map<Long, List<Answer>> encuestasMap = new HashMap<>();
+        for (Answer respuesta : respuestas) {
+            Long encuestaId = respuesta.getSurvey().getId();
+            if (!encuestasMap.containsKey(encuestaId)) {
+                encuestasMap.put(encuestaId, new ArrayList<>());
+            }
+            encuestasMap.get(encuestaId).add(respuesta);
+        }
+
+        // Construir la lista de encuestas respondidas
+        for (Long encuestaId : encuestasMap.keySet()) {
+            Map<String, Object> encuestaInfo = new HashMap<>();
+            encuestaInfo.put("tituloEncuesta", encuestasMap.get(encuestaId).get(0).getSurvey().getTitle());
+            
+            // Obtener los correos de los graduados que han respondido
+            List<String> correosGraduados = new ArrayList<>();
+            for (Answer respuesta : encuestasMap.get(encuestaId)) {
+                correosGraduados.add(respuesta.getGraduado().getEmailPersonal());
+            }
+            encuestaInfo.put("correosGraduados", correosGraduados);
+
+            encuestasRespondidas.add(encuestaInfo);
+        }
+    } else {
+        // Si se proporciona un correoGraduado, recuperar las respuestas asociadas a ese graduado
+        Graduado graduado = graduadoRepository.findByEmailPersonal(correoGraduado)
+                .orElseThrow(() -> new IllegalArgumentException("Graduado no encontrado con el correo: " + correoGraduado));
+        
+        List<Answer> respuestasGraduado = answerRepository.findByGraduadoCorreo(correoGraduado);
+
+        // Agrupar las respuestas por encuesta
+        Map<Long, List<Answer>> encuestasMap = new HashMap<>();
+        for (Answer respuesta : respuestasGraduado) {
+            Long encuestaId = respuesta.getSurvey().getId();
+            if (!encuestasMap.containsKey(encuestaId)) {
+                encuestasMap.put(encuestaId, new ArrayList<>());
+            }
+            encuestasMap.get(encuestaId).add(respuesta);
+        }
+
+        // Construir la lista de encuestas respondidas por el graduado específico
+        for (Long encuestaId : encuestasMap.keySet()) {
+            Map<String, Object> encuestaInfo = new HashMap<>();
+            encuestaInfo.put("tituloEncuesta", encuestasMap.get(encuestaId).get(0).getSurvey().getTitle());
+            encuestaInfo.put("correosGraduados", Collections.singletonList(correoGraduado));
+            encuestasRespondidas.add(encuestaInfo);
+        }
+    }
+
+    return encuestasRespondidas;
+}
 	   
 }

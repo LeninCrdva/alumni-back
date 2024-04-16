@@ -28,4 +28,8 @@ public interface AnswerRepository extends GenericRepository<Answer>{
 	  
 	  @Query(value = "SELECT COUNT(DISTINCT graduado_id) FROM answer WHERE id_carrera = :carreraNombre AND graduado_id IN (SELECT id FROM graduado WHERE responded = true)", nativeQuery = true)
 	    int countGraduadosRespondidosByCarrera(@Param("carreraNombre") String carreraNombre);
+	  
+	  @Query("SELECT a FROM Answer a WHERE a.graduado.emailPersonal = :correoGraduado")
+	    List<Answer> findByGraduadoCorreo(@Param("correoGraduado") String correoGraduado);
+
 }
