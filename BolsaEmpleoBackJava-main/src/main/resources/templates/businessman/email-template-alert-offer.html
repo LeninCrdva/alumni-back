@@ -58,6 +58,12 @@
                                 <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
                             </div>
 
+                            <div th:if="${#strings.equals(${state}, 'EN_SELECCION')}">
+                                <p>Sin embargo, esta oferta necesita ser aprobada por algún administrador para que esta oferta sea publicada a los demás.</p>
+                                <br>
+                                <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
+                            </div>
+
                             <br>
                             <p>Este mensaje es totalmente automático, por favor, no responder.</p>
                             <br>

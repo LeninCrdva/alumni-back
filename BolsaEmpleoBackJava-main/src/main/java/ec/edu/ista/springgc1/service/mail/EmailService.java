@@ -3,6 +3,7 @@ package ec.edu.ista.springgc1.service.mail;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.mail.MessagingException;
@@ -11,6 +12,7 @@ import javax.mail.util.ByteArrayDataSource;
 
 import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.model.entity.Graduado;
+import ec.edu.ista.springgc1.model.entity.Survey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -73,6 +75,32 @@ public class EmailService {
 
     public void sendEmail(MailRequest request, Map<String, Object> model, String[] emails) {
         MimeMessage message = sender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
+                    StandardCharsets.UTF_8.name());
+
+            getHtml(request, model, emails, message, helper);
+        } catch (MessagingException | IOException e) {
+            System.out.println(("Fallo al enviar email: " + e.getMessage()));
+        }
+    }
+
+    public void sendEmail(MailRequest request, Survey survey, String state){
+        Map<String, Object> model = new HashMap<>();
+
+        model.put("survey", survey);
+        model.put("state", state);
+
+        MimeMessage message = sender.createMimeMessage();
+
+        List<Graduado> graduados = graduadoService.findAllGraduados();
+
+        model.put("graduados", graduados.stream().map(Graduado::getEmailPersonal).toArray(String[]::new));
+
+        String[] emails = graduados.stream()
+                .map(Graduado::getEmailPersonal)
+                .toArray(String[]::new);
+
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED,
                     StandardCharsets.UTF_8.name());
@@ -233,6 +261,7 @@ public class EmailService {
             case "cv-graduate":
                 t = "businessman/email-template-alert-postulate";
                 break;
+            case "offer-revision":
             case "new-offer":
                 t = "businessman/email-template-alert-offer";
                 break;

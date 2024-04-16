@@ -3,6 +3,8 @@ package ec.edu.ista.springgc1.controller;
 import java.util.List;
 import java.util.Optional;
 
+import ec.edu.ista.springgc1.model.dto.MailRequest;
+import ec.edu.ista.springgc1.service.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,9 @@ public class SurveyController {
 
     @Autowired
     private SurveyServiceImp surveyService;
+
+    @Autowired
+    private EmailService emailService;
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PostMapping
@@ -42,7 +47,7 @@ public class SurveyController {
             surveyService.deleteSurveyById(surveyId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (IllegalArgumentException e) {
-           
+
             String errorMessage = "No se puede eliminar la encuesta porque tiene respuestas asociadas.";
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
@@ -64,7 +69,7 @@ public class SurveyController {
         surveyService.deleteSurveyAndRelated(surveyId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-    
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @GetMapping("/withQuestionsAndOptions")
     public ResponseEntity<?> getAllSurveysWithQuestionsAndOptions() {
@@ -74,7 +79,7 @@ public class SurveyController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al recuperar las encuestas: " + e.getMessage());
         }
     }
-    
+
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{surveyId}")
     public ResponseEntity<Survey> updateSurvey(@PathVariable Long surveyId, @RequestBody Survey updatedSurvey) {
@@ -94,18 +99,18 @@ public class SurveyController {
                         .findFirst();
 
                 if (existingQuestionOptional.isPresent()) {
-                   
+
                     Question existingQuestion = existingQuestionOptional.get();
                     existingQuestion.setText(updatedQuestion.getText());
                     existingQuestion.setType(updatedQuestion.getType());
                     existingQuestion.setOptions(updatedQuestion.getOptions());
                 } else {
-                    updatedQuestion.setSurvey(existingSurvey); 
+                    updatedQuestion.setSurvey(existingSurvey);
                     existingQuestions.add(updatedQuestion);
                 }
             }
 
-           
+
             try {
                 Survey savedSurvey = surveyService.updateSurvey(existingSurvey);
                 return ResponseEntity.ok(savedSurvey);
@@ -116,17 +121,22 @@ public class SurveyController {
             return ResponseEntity.notFound().build(); // La encuesta no se encontró
         }
     }
-    
-    
+
+
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @PutMapping("/{surveyId}/updateState")
     public ResponseEntity<Survey> updateSurveyState(@PathVariable Long surveyId, @RequestParam Boolean newEstado) {
         try {
             Survey updatedSurvey = surveyService.updateSurveyState(surveyId, newEstado);
+
+            MailRequest request = new MailRequest();
+
+            emailService.sendEmail(request, updatedSurvey, newEstado ? "survey-activated" : "survey-deactivated");
+
             return ResponseEntity.ok(updatedSurvey);
         } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(null); 
+            return ResponseEntity.badRequest().body(null);
         }
     }
-  
+
 }

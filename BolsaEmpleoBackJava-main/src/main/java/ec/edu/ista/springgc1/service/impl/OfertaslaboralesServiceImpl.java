@@ -37,6 +37,9 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
     private String from;
 
     @Autowired
+    private AdministradorRepository administradorRepository;
+
+    @Autowired
     private OfertaslaboralesRepository ofertasLaboralesRepository;
 
     @Autowired
@@ -116,7 +119,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
     }
 
     @Override
-    public OfertasLaborales  save(Object entity) {
+    public OfertasLaborales save(Object entity) {
         OfertasLaborales ofertaLaboral = ofertasLaboralesRepository.save(mapToEntity((OfertasLaboralesDTO) entity));
 
         createRequestAndSendEmailWithPDF(ofertaLaboral);
@@ -374,15 +377,24 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     private void createRequestAndSendEmailWithPDF(OfertasLaborales oferta) {
         Map<String, Object> model = new HashMap<>();
-        List<Graduado> graduado = graduadoRepository.findAll();
-        String[] emails = graduado.stream().map(Graduado::getEmailPersonal).toArray(String[]::new);
+        String[] emails;
+
+        if (oferta.getEstado().equals(EstadoOferta.EN_SELECCION)) {
+            List<Administrador> administradores = administradorRepository.findAll();
+            emails = administradores.stream().map(Administrador::getEmail).toArray(String[]::new);
+        } else {
+            List<Graduado> graduado = graduadoRepository.findAll();
+            emails = graduado.stream().map(Graduado::getEmailPersonal).toArray(String[]::new);
+        }
+
         byte[] imageBytes = StringUtils.hasText(oferta.getFotoPortada()) ? imageOptimizer.convertBase64ToBytes(oferta.getFotoPortada()) : new byte[0];
 
         model.put("oferta", oferta);
         model.put("fotoPortada", imageBytes);
+        model.put("estado", oferta.getEstado().name());
 
         String subject = getMailSubject(oferta.getEstado().name());
-        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "list-postulates" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : "offer-selection";
+        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "list-postulates" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : oferta.getEstado().equals(EstadoOferta.EN_SELECCION) ? "offer-selection" : "offer-revision";
 
         MailRequest request = createMailRequest(subject, mailCase);
 
