@@ -19,6 +19,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -79,12 +80,17 @@ public class AuthController {
         EmpresaDTO empresaDTO = signupRequestBody.getEmpresaDTO();
         GraduadoDTO graduadoDTO = signupRequestBody.getGraduadoDTO();
         EmpresarioDTO empresarioDTO = signupRequestBody.getEmpresarioDTO();
+        UsuarioDTO userDTO;
 
         if (usuarioService.existsByUsername(usuarioDTO.getNombreUsuario())) {
             throw new AppException(HttpStatus.BAD_REQUEST, "Ya se encuentra registrado el nombre de usuario");
         }
 
-        UsuarioDTO userDTO = usuarioService.registerUserAndPerson(personaServiceImp.getPersona(usuarioDTO), usuarioDTO);
+        if (!ObjectUtils.isEmpty(empresaDTO)) {
+             userDTO = usuarioService.registerUserAndPerson(personaServiceImp.getPersona(usuarioDTO), usuarioDTO, empresaDTO);
+        } else {
+            userDTO = usuarioService.registerUserAndPerson(personaServiceImp.getPersona(usuarioDTO), usuarioDTO);
+        }
 
         usuarioService.controlCase(usuarioService.findByUsername(userDTO.getNombreUsuario()), empresarioDTO, empresaDTO, graduadoDTO);
 

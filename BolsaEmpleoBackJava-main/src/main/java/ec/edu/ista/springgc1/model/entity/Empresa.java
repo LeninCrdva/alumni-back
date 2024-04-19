@@ -70,4 +70,10 @@ public class Empresa {
 
     @JsonView(View.Public.class)
     private boolean estado;
+
+    private String rutaPdfRuc;
+
+    @JsonView(View.Public.class)
+    @Transient
+    private String urlPdfRuc;
 }

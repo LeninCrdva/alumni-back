@@ -282,6 +282,15 @@ public class EmailService {
             case "survey-activated":
                 t = "graduate/email-template-alert-survey";
                 break;
+            case "alert-businessman-account":
+                t = "businessman/email-template-activated-desactivated-account";
+                break;
+            case "alert-company":
+                t = "businessman/email-template-activated-desactivated-company";
+                break;
+            case "register-businessman":
+                t = "businessman/email-template-alert-new-businessman";
+                break;
             default:
                 t = "graduate/email-template-contact-us";
                 break;

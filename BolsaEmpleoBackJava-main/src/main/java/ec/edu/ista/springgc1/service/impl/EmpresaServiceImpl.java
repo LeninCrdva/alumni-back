@@ -1,16 +1,19 @@
 package ec.edu.ista.springgc1.service.impl;
 
 
+import ec.edu.ista.springgc1.model.dto.MailRequest;
+import ec.edu.ista.springgc1.model.dto.MailResponse;
+import ec.edu.ista.springgc1.model.dto.UsuarioDTO;
+import ec.edu.ista.springgc1.model.entity.*;
+import ec.edu.ista.springgc1.service.bucket.S3Service;
+import ec.edu.ista.springgc1.service.mail.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.EmpresaDTO;
-import ec.edu.ista.springgc1.model.entity.Ciudad;
-import ec.edu.ista.springgc1.model.entity.Empresa;
-import ec.edu.ista.springgc1.model.entity.Empresario;
-import ec.edu.ista.springgc1.model.entity.SectorEmpresarial;
 import ec.edu.ista.springgc1.repository.CiudadRepository;
 import ec.edu.ista.springgc1.repository.EmpresaRepository;
 import ec.edu.ista.springgc1.repository.EmpresarioRepository;
@@ -18,7 +21,9 @@ import ec.edu.ista.springgc1.repository.SectorEmpresarialRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,13 +31,20 @@ import javax.persistence.EntityExistsException;
 
 @Service
 public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements Mapper<Empresa, EmpresaDTO> {
+
+    @Value("${spring.mail.username}")
+    private String from;
+    @Autowired
+    private CiudadRepository ciudadrepository;
+    @Autowired
+    private EmailService emailService;
     private boolean comprueba = false;
     @Autowired
     private EmpresaRepository empresarepository;
     @Autowired
     private EmpresarioRepository empresariorepository;
     @Autowired
-    private CiudadRepository ciudadrepository;
+    private S3Service s3Service;
     @Autowired
     private SectorEmpresarialRepository sectorrepository;
 
@@ -59,6 +71,9 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         em.setTipoEmpresa(d.getTipoEmpresa());
         em.setUbicacion(d.getUbicacion());
         em.setEstado(d.isEstado());
+        em.setRutaPdfRuc(d.getRutaPdfRuc());
+        em.setUrlPdfRuc(d.getRutaPdfRuc().isEmpty() ? "" : s3Service.getObjectUrl(d.getRutaPdfRuc()));
+
         return em;
     }
 
@@ -78,7 +93,10 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         em1.setSectorEmpresarial(e.getSectorEmpresarial());
         em1.setUbicacion(e.getUbicacion());
         em1.setEstado(e.isEstado());
-		return em1;
+        em1.setRutaPdfRuc(e.getRutaPdfRuc());
+        em1.setUrlPdfRuc(e.getRutaPdfRuc().isEmpty() ? "" : s3Service.getObjectUrl(e.getRutaPdfRuc()));
+
+        return em1;
     }
 
     @Override
@@ -87,6 +105,13 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
                 .stream()
                 .map(c -> mapToDTO(c))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public Empresa findById(long id) {
+        return empresarepository.findById(id)
+                .map(c -> mapToEntity(mapToDTO(c)))
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa", String.valueOf(id)));
     }
 
     @Override
@@ -126,9 +151,24 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         Ciudad ciudad = ciudadrepository.findByNombre(updatedEmpresaDTO.getCiudad().getNombre())
                 .orElseThrow(() -> new ResourceNotFoundException("Ciudad", updatedEmpresaDTO.getCiudad().getNombre()));
         existingEmpresa.setCiudad(ciudad);
+
+        setModelAndMailRequest(existingEmpresa.getEmpresario(), updatedEmpresaDTO);
+
         return mapToDTO(empresarepository.save(existingEmpresa));
     }
 
+    private MailResponse setModelAndMailRequest(Empresario empresario, EmpresaDTO empresa){
+        Map<String, Object> model = new HashMap<>();
+        String fullName = getFullName(empresario.getUsuario());
+        String to = empresario.getEmail();
+
+        MailRequest request = new MailRequest(fullName, to, "noreply@tecazuay.edu.ec", "Notificación de cambio de estado de su empresa registrada", "alert-company");
+
+        model.put("empresa", empresa);
+        model.put("fullName", fullName);
+
+        return emailService.sendEmail(request, model);
+    }
 
     public void delete(Long id) {
         empresarepository.deleteById(id);
@@ -139,13 +179,20 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         return empresas.stream().map(this::mapToDTO).collect(Collectors.toSet());
     }
 
-	public Set<EmpresaDTO> findEmpresasSinOfertaLaboral() {
-		List<Empresa> empresasSinOferta = empresarepository.findEmpresasSinOfertas();
-		return empresasSinOferta.stream().map(this::mapToDTO).collect(Collectors.toSet());
-	}
+    public Set<EmpresaDTO> findEmpresasSinOfertaLaboral() {
+        List<Empresa> empresasSinOferta = empresarepository.findEmpresasSinOfertas();
+        return empresasSinOferta.stream().map(this::mapToDTO).collect(Collectors.toSet());
+    }
 
     @Transactional
     public boolean existByRuc(String ruc) {
         return empresarepository.existsByRuc(ruc);
+    }
+
+    private String getFullName(Usuario usuario) {
+        return usuario.getPersona().getPrimerNombre()
+                + " " + usuario.getPersona().getSegundoNombre()
+                + " " + usuario.getPersona().getApellidoPaterno()
+                + " " + usuario.getPersona().getApellidoMaterno();
     }
 }

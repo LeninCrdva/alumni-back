@@ -14,6 +14,10 @@
             color: black;
         }
 
+        ol {
+            list-style-type: none;
+        }
+
     </style>
 </head>
 
@@ -27,45 +31,21 @@
 
                         <body>
                         <div class="center-icon">
-                            <img src='https://i.postimg.cc/Gh2JjCKg/alerta.png' alt='postulate-icon' width="100px"/>
+                            <img src='https://i.postimg.cc/wxX383CS/informacion.png'
+                                 alt='approved-icon' width="100px"/>
                         </div>
                         <div class="center-text">
-                            <h2><strong>¡Atención!</strong></h2>
+                            <h2><strong>¡Atención, se ha registrado un nuevo empresario!</strong>
+                            </h2>
                             <br>
-                            <p>Estimado usuario del sistema</p>
+                            <p>Estimado administrador, se ha detectado el registor de un representante de <strong
+                                    th:text="${empresa.nombre}"></strong> llamado <strong th:text="${fullName}"></strong></p>
                             <br>
-
-                            <p th:if="${oferta.cargo}">Se ha detectado la publicación de una oferta laboral con cargo de <strong th:text="${oferta.cargo}"></strong>
-                                publicada el día
-                                <strong th:text="${#temporals.day(oferta.fechaPublicacion)}"></strong> de
-                                <strong th:text="${#temporals.monthName(oferta.fechaPublicacion)}"></strong> del año
-                                <strong th:text="${#temporals.year(oferta.fechaPublicacion)}"></strong> a las
-                                <strong th:text="${#temporals.format(oferta.fechaPublicacion, 'HH:mm')}"></strong>
-                                . Por favor, revise la plataforma para más detalles.
-                            </p>
-                            <p th:unless="${oferta.cargo}">Se ha detectado la publicación de una oferta laboral
-                                publicada el día
-                                <strong th:text="${#temporals.day(oferta.fechaPublicacion)}"></strong> de
-                                <strong th:text="${#temporals.monthName(oferta.fechaPublicacion)}"></strong> del año
-                                <strong th:text="${#temporals.year(oferta.fechaPublicacion)}"></strong> a las
-                                <strong th:text="${#temporals.format(oferta.fechaPublicacion, 'HH:mm')}"></strong>
-                                . Por favor, revise la plataforma para más detalles.
-                            </p>
-                            <br>
-                            <div th:if="${oferta.fotoPortada}">
-                                <p>Se ha adjuntado una imagen para la publicación de la oferta por elección del empresario.</p>
-                                <br>
-                                <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
+                            <div>
+                                <p>Por favor realice la revisión del perfil para permitir el ingreso al empresario a nuestro sistema.</p>
                             </div>
-
-                            <div th:if="${#strings.equals(state, 'EN_SELECCION')}">
-                                <p>Sin embargo, esta oferta necesita ser aprobada por algún administrador para que esta oferta sea publicada a los demás.</p>
-                                <br>
-                                <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
-                            </div>
-
                             <br>
-                            <p>Este mensaje es totalmente automático, por favor, no responder.</p>
+                            <p>Gracias por su atención.</p>
                             <br>
                             <p>¡Gracias por confiar en nosotros!</p>
                             <p>El equipo de la ISTA.</p>

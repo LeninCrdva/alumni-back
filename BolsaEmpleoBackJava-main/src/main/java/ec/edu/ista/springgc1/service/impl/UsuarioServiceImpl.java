@@ -4,13 +4,16 @@ import ec.edu.ista.springgc1.exception.AppException;
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.*;
 import ec.edu.ista.springgc1.model.entity.*;
+import ec.edu.ista.springgc1.repository.AdministradorRepository;
 import ec.edu.ista.springgc1.repository.PersonaRepository;
 import ec.edu.ista.springgc1.repository.RolRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
+import ec.edu.ista.springgc1.service.mail.EmailService;
 import ec.edu.ista.springgc1.service.map.Mapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,11 +22,23 @@ import org.springframework.transaction.annotation.Transactional;
 import com.amazonaws.services.kms.model.NotFoundException;
 import org.springframework.util.ObjectUtils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements Mapper<Usuario, UsuarioDTO> {
+
+    @Value("${spring.mail.username}")
+    private String from;
+
+    @Autowired
+    private AdministradorRepository adminRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private PersonaRepository personaRepository;
@@ -160,6 +175,9 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("User NOT FOUND", id));
         usuario.setEstado(state);
         usuarioRepository.save(usuario);
+
+        setModelAndMailRequest(usuario);
+
         return true;
     }
 
@@ -194,6 +212,11 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     @Transactional
     public UsuarioDTO registerUserAndPerson(Persona persona, RegistroDTO usuarioDTO) {
 
+        return extractAndSave(persona, usuarioDTO);
+    }
+
+    @Transactional
+    public UsuarioDTO extractAndSave(Persona persona, RegistroDTO usuarioDTO) {
         UsuarioDTO user = new UsuarioDTO();
         user.setNombreUsuario(usuarioDTO.getNombreUsuario());
         user.setCedula(persona.getCedula());
@@ -204,6 +227,17 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         user.setUrlImagen(usuarioDTO.getUrlImagen());
 
         save(user);
+
+        return user;
+    }
+
+    @Transactional
+    public UsuarioDTO registerUserAndPerson(Persona persona, RegistroDTO usuarioDTO, EmpresaDTO empresa) {
+
+        UsuarioDTO user = extractAndSave(persona, usuarioDTO);
+
+        setModelAndEmailRegister(user, empresa, persona);
+
         return user;
     }
 
@@ -238,5 +272,50 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
             empresaDTO.setEmpresario(empresarioDTO.getUsuario());
             empresaService.save(empresaDTO);
         }
+    }
+
+    private void setModelAndMailRequest(Usuario user){
+        Map<String, Object> model = new HashMap<>();
+
+        Set<EmpresaDTO> empresas = empresaService.findByNombreUsuario(user.getNombreUsuario());
+
+        String to = usuarioRepository.findEmailByNombreUsuario(user.getNombreUsuario());
+
+        String fullName= getFullName(user.getPersona());
+
+        MailRequest request = new MailRequest(fullName, to, from, "Notificación de cambio de estado de su cuenta", "alert-businessman-account");
+
+        model.put("empresas", empresas);
+        model.put("usuario", user);
+        model.put("fullName", fullName);
+
+        emailService.sendEmail(request, model);
+    }
+
+    private void setModelAndEmailRegister(UsuarioDTO usuario, EmpresaDTO empresa, Persona persona){
+        Map<String, Object> model = new HashMap<>();
+
+        MailRequest request = new MailRequest(from, "Notificación de registro de nuevo empresario", "register-businessman");
+        String[] emails = getEmailAdministrators();
+
+        model.put("empresa", empresa);
+        model.put("usuario", usuario);
+        model.put("fullName", getFullName(persona));
+
+        emailService.sendEmail(request, model, emails);
+    }
+
+    private String getFullName(Persona persona) {
+
+        return persona.getPrimerNombre()
+                + " " + persona.getSegundoNombre()
+                + " " + persona.getApellidoPaterno()
+                + " " + persona.getApellidoMaterno();
+    }
+
+    private String[] getEmailAdministrators(){
+        return adminRepository.findAll().stream()
+                .map(Administrador::getEmail)
+                .toArray(String[]::new);
     }
 }

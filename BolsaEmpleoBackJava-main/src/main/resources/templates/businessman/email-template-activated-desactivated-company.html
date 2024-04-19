@@ -27,45 +27,31 @@
 
                         <body>
                         <div class="center-icon">
-                            <img src='https://i.postimg.cc/Gh2JjCKg/alerta.png' alt='postulate-icon' width="100px"/>
+                            <img th:if="${empresa.estado}" src='https://i.postimg.cc/wxkDT75f/checked-1.png'
+                                 alt='approved-icon' width="100px"/>
+                            <img th:if="${!empresa.estado}" src='https://i.postimg.cc/HkthHpZb/marca-x.png'
+                                 alt='rejected-icon' width="100px"/>
                         </div>
                         <div class="center-text">
-                            <h2><strong>¡Atención!</strong></h2>
+                            <h2 th:if="${empresa.estado}"><strong>¡Felicidades, se ha aprobado la publicacion de
+                                ofertas!</strong></h2>
+                            <h2 th:if="${!empresa.estado}"><strong>¡Lastimosamente, se ha desactivado la publicacion de
+                                ofertas!</strong></h2>
                             <br>
-                            <p>Estimado usuario del sistema</p>
+                            <p>Estimado <strong th:text="${fullName}"></strong>, representante de <strong
+                                    th:text="${empresa.nombre}"></strong> con el RUC: <strong
+                                    th:text="${empresa.ruc}"></strong></p>
                             <br>
-
-                            <p th:if="${oferta.cargo}">Se ha detectado la publicación de una oferta laboral con cargo de <strong th:text="${oferta.cargo}"></strong>
-                                publicada el día
-                                <strong th:text="${#temporals.day(oferta.fechaPublicacion)}"></strong> de
-                                <strong th:text="${#temporals.monthName(oferta.fechaPublicacion)}"></strong> del año
-                                <strong th:text="${#temporals.year(oferta.fechaPublicacion)}"></strong> a las
-                                <strong th:text="${#temporals.format(oferta.fechaPublicacion, 'HH:mm')}"></strong>
-                                . Por favor, revise la plataforma para más detalles.
-                            </p>
-                            <p th:unless="${oferta.cargo}">Se ha detectado la publicación de una oferta laboral
-                                publicada el día
-                                <strong th:text="${#temporals.day(oferta.fechaPublicacion)}"></strong> de
-                                <strong th:text="${#temporals.monthName(oferta.fechaPublicacion)}"></strong> del año
-                                <strong th:text="${#temporals.year(oferta.fechaPublicacion)}"></strong> a las
-                                <strong th:text="${#temporals.format(oferta.fechaPublicacion, 'HH:mm')}"></strong>
-                                . Por favor, revise la plataforma para más detalles.
-                            </p>
+                            <p th:if="${empresa.estado}">Nos complace informar que se ha llevado a cabo la revisión y
+                                activación de la funcionalidad de creación de ofertas
+                                laborales.</p>
+                            <p th:if="${!empresa.estado}">Lamentablemente la empresa <strong
+                                    th:text="${empresa.nombre}"></strong> ha sido desactivada y no puede publicar más
+                                ofertas con esta empresa.</p>
                             <br>
-                            <div th:if="${oferta.fotoPortada}">
-                                <p>Se ha adjuntado una imagen para la publicación de la oferta por elección del empresario.</p>
-                                <br>
-                                <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
-                            </div>
-
-                            <div th:if="${#strings.equals(state, 'EN_SELECCION')}">
-                                <p>Sin embargo, esta oferta necesita ser aprobada por algún administrador para que esta oferta sea publicada a los demás.</p>
-                                <br>
-                                <strong><p>Para más información, revisar las ofertas laborales en el sistema alumni o en la imagen adjuntada.</p></strong>
-                            </div>
-
+                            <p>Gracias por su atención. Para cualquier consulta o asistencia adicional, no dude en ponerse en contacto con nosotros.</p>
                             <br>
-                            <p>Este mensaje es totalmente automático, por favor, no responder.</p>
+                            <p>Este mensaje es totalmente automático.</p>
                             <br>
                             <p>¡Gracias por confiar en nosotros!</p>
                             <p>El equipo de la ISTA.</p>
