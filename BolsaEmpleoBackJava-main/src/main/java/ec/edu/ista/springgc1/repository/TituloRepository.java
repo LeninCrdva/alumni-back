@@ -32,7 +32,8 @@ public interface TituloRepository extends GenericRepository<Titulo>{
      @Query("SELECT t FROM Titulo t WHERE t.graduado = :graduado")
      List<Titulo> findAllByGraduado(@Param("graduado") Graduado graduado);
      
-     
+     @Query("SELECT t.graduado FROM Titulo t WHERE UPPER(t.carrera.nombre) = UPPER(:nombreCarrera)")
+     List<Graduado> findAllGraduadosByNombreCarrera(@Param("nombreCarrera") String nombreCarrera);
      
      
     
