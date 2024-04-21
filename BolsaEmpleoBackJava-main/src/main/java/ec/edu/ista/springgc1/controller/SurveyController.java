@@ -36,7 +36,7 @@ public class SurveyController {
         return new ResponseEntity<>(savedSurvey, HttpStatus.OK);
     }
 
-    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
     @GetMapping("/{surveyId}")
     public ResponseEntity<Survey> findSurveyById(@PathVariable Long surveyId) {
         Optional<Survey> survey = surveyService.findSurveyById(surveyId);
