@@ -21,11 +21,14 @@ public interface TituloRepository extends GenericRepository<Titulo>{
     @Query("SELECT DISTINCT t.graduado FROM Titulo t WHERE UPPER(t.carrera.nombre) = UPPER(:nombreCarrera)")
     List<Graduado> findDistinctGraduadosByNombreCarrera(@Param("nombreCarrera") String nombreCarrera);
     
+    
     @Query("SELECT t.carrera.nombre, g.usuario.persona.sexo, COUNT(g) " +
             "FROM Titulo t " +
             "JOIN t.graduado g " +
             "GROUP BY t.carrera.nombre, g.usuario.persona.sexo")
      List<Object[]> contarGraduadosPorSexoPorCarrera();
+     
+     //Prueba
      @Query("SELECT t FROM Titulo t WHERE t.graduado = :graduado")
      List<Titulo> findAllByGraduado(@Param("graduado") Graduado graduado);
      
