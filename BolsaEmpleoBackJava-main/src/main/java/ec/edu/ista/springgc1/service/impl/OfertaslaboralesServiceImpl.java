@@ -65,6 +65,12 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
 
     @Autowired
     private ImageOptimizer imageOptimizer;
+    
+    @Autowired
+    private TituloRepository tituloRepository;
+    
+    @Autowired
+    private CarreraRepository carreraRepository;
 
     @Override
     public OfertasLaborales mapToEntity(OfertasLaboralesDTO dto) {
@@ -429,4 +435,118 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
             return "Oferta laboral en selección";
         }
     }
+    //Reportes
+    
+
+public List<Map<String, Object>> obtenerReportePostulacionesYAceptadosPorOfertaYCargo() {
+    // Obtener todas las ofertas laborales
+    List<OfertasLaborales> todasLasOfertas = ofertasLaboralesRepository.findAll();
+
+    // Lista para almacenar el reporte en formato de mapa
+    List<Map<String, Object>> reporte = new ArrayList<>();
+
+    // Procesar cada oferta laboral para generar el reporte
+    for (OfertasLaborales oferta : todasLasOfertas) {
+        String cargoOferta = oferta.getCargo();
+
+        // Obtener las postulaciones aceptadas para esta oferta laboral
+        List<Postulacion> postulacionesAceptadas = postulacionRepository.findAllByOfertaLaboralId(oferta.getId())
+                .stream()
+                .filter(postulacion -> postulacion.getEstado() == EstadoPostulacion.ACEPTADO)
+                .collect(Collectors.toList());
+
+        // Obtener los graduados con postulaciones activas para esta oferta laboral
+        List<Graduado> graduadosPostulantesActivos = findGraduadosConPostulacionActivaByOfertaId(oferta.getId());
+
+        // Contar el número de postulantes aceptados y activos para esta oferta laboral y cargo
+        int cantidadPostulantesAceptados = postulacionesAceptadas.size();
+        int cantidadPostulantesActivos = graduadosPostulantesActivos.size();
+
+        // Crear un mapa para almacenar la información del reporte
+        Map<String, Object> lineaReporte = new HashMap<>();
+        lineaReporte.put("ofertaLaboralId", oferta.getId());
+        lineaReporte.put("cargo", cargoOferta);
+        lineaReporte.put("postulantesAceptados", cantidadPostulantesAceptados);
+        lineaReporte.put("postulantesActivos", cantidadPostulantesActivos);
+
+        
+        reporte.add(lineaReporte);
+    }
+
+    return reporte;
+    }
+    //Reporte por empresa
+public List<Map<String, Object>> contarPostulacionesActivasYSeleccionadasPorEmpresa() {
+    List<Empresa> empresasActivas = empresarepository.findAllByEstadoTrue();
+
+    return empresasActivas.stream().map(empresa -> {
+        Long idEmpresa = empresa.getId();
+        String nombreEmpresa = empresa.getNombre();
+
+        // Obtener postulaciones activas por empresa
+        List<Postulacion> postulacionesActivas = empresarepository.findAllByOfertaLaboralEmpresaId(idEmpresa)
+                .stream()
+                .filter(postulacion -> postulacion.getEstado() == EstadoPostulacion.APLICANDO)
+                .collect(Collectors.toList());
+
+        int cantidadPostulacionesActivas = postulacionesActivas.size();
+
+        // Obtener postulaciones seleccionadas por empresa
+        List<Postulacion> postulacionesSeleccionadas = empresarepository.findAllByOfertaLaboralEmpresaId(idEmpresa)
+                .stream()
+                .filter(postulacion -> postulacion.getEstado() == EstadoPostulacion.ACEPTADO)
+                .collect(Collectors.toList());
+
+        int cantidadPostulacionesSeleccionadas = postulacionesSeleccionadas.size();
+
+        Map<String, Object> reporteEmpresa = new HashMap<>();
+        reporteEmpresa.put("nombreEmpresa", nombreEmpresa);
+        reporteEmpresa.put("cantidadPostulacionesActivas", cantidadPostulacionesActivas);
+        reporteEmpresa.put("cantidadPostulacionesSeleccionadas", cantidadPostulacionesSeleccionadas);
+
+        return reporteEmpresa;
+    }).collect(Collectors.toList());
+}
+
+	//Reporte por carrera 
+	public List<Map<String, Object>> contarPostulantesActivosYSeleccionadosPorCarrera() {
+		List<Carrera> carreras = carreraRepository.findAll();
+
+		List<Map<String, Object>> resultados = new ArrayList<>();
+
+		for (Carrera carrera : carreras) {
+			String nombreCarrera = carrera.getNombre();
+
+			List<Graduado> graduados = tituloRepository.findDistinctGraduadosByNombreCarrera(nombreCarrera);
+
+			int postulantesActivos = 0;
+			int postulantesSeleccionados = 0;
+
+			for (Graduado graduado : graduados) {
+				Long graduadoId = graduado.getId();
+
+				// Contar postulaciones activas por graduado y carrera
+				List<Postulacion> postulacionesActivas = postulacionRepository
+						.findDistinctByGraduadoIdAndCarreraAndEstado(graduadoId, nombreCarrera, EstadoPostulacion.APLICANDO);
+				postulantesActivos += postulacionesActivas.size();
+
+				// Contar postulaciones seleccionadas por graduado y carrera
+				int postulacionesSeleccionadas = postulacionRepository.countDistinctByGraduadoIdAndCarreraAndEstado(graduadoId,
+						nombreCarrera, EstadoPostulacion.ACEPTADO);
+				postulantesSeleccionados += postulacionesSeleccionadas;
+			}
+
+			// Crear mapa para esta carrera con los resultados
+			Map<String, Object> resultadoCarrera = new HashMap<>();
+			resultadoCarrera.put("nombreCarrera", nombreCarrera);
+			resultadoCarrera.put("postulantesActivos", postulantesActivos);
+			resultadoCarrera.put("postulantesSeleccionados", postulantesSeleccionados);
+
+			// Agregar resultado al listado final
+			resultados.add(resultadoCarrera);
+		}
+
+		return resultados;
+	}
+
 }

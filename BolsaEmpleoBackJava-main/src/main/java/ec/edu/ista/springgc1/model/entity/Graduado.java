@@ -14,6 +14,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -25,6 +26,7 @@ import org.springframework.lang.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
@@ -69,4 +71,8 @@ public class Graduado {
 	@JsonView(View.Public.class)
 	@Transient
 	private String urlPdf;
+	
+	@OneToMany(mappedBy = "graduado")
+	@JsonIgnore
+	private List<Titulo> titulos;
 }

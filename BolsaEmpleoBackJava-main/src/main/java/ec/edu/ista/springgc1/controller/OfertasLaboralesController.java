@@ -24,9 +24,12 @@ import com.amazonaws.services.sns.model.ResourceNotFoundException;
 
 import ec.edu.ista.springgc1.model.dto.OfertasLaboralesDTO;
 import ec.edu.ista.springgc1.model.entity.Contratacion;
+import ec.edu.ista.springgc1.model.entity.Empresa;
 import ec.edu.ista.springgc1.model.entity.Graduado;
 import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
+import ec.edu.ista.springgc1.model.entity.Postulacion;
 import ec.edu.ista.springgc1.repository.ContratacionRepository;
+import ec.edu.ista.springgc1.repository.EmpresaRepository;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.service.impl.OfertaslaboralesServiceImpl;
 import org.springframework.http.HttpHeaders;
@@ -39,6 +42,8 @@ public class OfertasLaboralesController {
 
     @Autowired
     ContratacionRepository contratacionRepository;
+    @Autowired
+    private EmpresaRepository empresarepository;
 
     @Autowired
     private OfertaslaboralesServiceImpl ofertasLaboralesService;
@@ -247,4 +252,32 @@ public class OfertasLaboralesController {
 
         return new ResponseEntity<>(fotoBytes, headers, HttpStatus.OK);
     }
+    //Reportes
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/reporte-postulaciones-aceptados")
+    @JsonView(View.Public.class)
+    public ResponseEntity<List<Map<String, Object>>> obtenerReportePostulacionesYAceptados() {
+        List<Map<String, Object>> reporte = ofertasLaboralesService.obtenerReportePostulacionesYAceptadosPorOfertaYCargo();
+
+        return ResponseEntity.ok(reporte);
+    }
+    
+   // @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/reporte-postulaciones-activas-por-empresa")
+    @JsonView(View.Public.class)
+    public ResponseEntity<List<Map<String, Object>>> obtenerReportePostulacionesActivasPorEmpresa() {
+        List<Map<String, Object>> reporte = ofertasLaboralesService.contarPostulacionesActivasYSeleccionadasPorEmpresa();
+        return ResponseEntity.ok(reporte);
+    }
+    
+  //  @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/reporte-postulantes-activos-y-seleccionados-por-carrera")
+    @JsonView(View.Public.class)
+    public ResponseEntity<List<Map<String, Object>>> generarReportePostulantesPorCarrera() {
+        List<Map<String, Object>> resultados = ofertasLaboralesService.contarPostulantesActivosYSeleccionadosPorCarrera();
+        return ResponseEntity.ok(resultados);
+    }
+   
+    
+
 }

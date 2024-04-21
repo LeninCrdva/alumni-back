@@ -2,6 +2,7 @@ package ec.edu.ista.springgc1.repository;
 
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import ec.edu.ista.springgc1.model.entity.Empresa;
+import ec.edu.ista.springgc1.model.entity.Postulacion;
 import ec.edu.ista.springgc1.repository.generic.GenericRepository;
 
 public interface EmpresaRepository extends GenericRepository<Empresa> {
@@ -23,4 +25,10 @@ public interface EmpresaRepository extends GenericRepository<Empresa> {
     List<Empresa> findEmpresasSinOfertas();
 
     boolean existsByRuc(String ruc);
+    
+    @Query("SELECT p FROM Postulacion p JOIN p.ofertaLaboral o " +
+            "WHERE o.empresa.id = :empresaId")
+     List<Postulacion> findAllByOfertaLaboralEmpresaId(@Param("empresaId") Long empresaId);
+    
+    List<Empresa> findAllByEstadoTrue();
 }
