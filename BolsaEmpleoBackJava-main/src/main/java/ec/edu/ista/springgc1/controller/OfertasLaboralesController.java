@@ -262,7 +262,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(reporte);
     }
     
-   // @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @GetMapping("/reporte-postulaciones-activas-por-empresa")
     @JsonView(View.Public.class)
     public ResponseEntity<List<Map<String, Object>>> obtenerReportePostulacionesActivasPorEmpresa() {
@@ -270,7 +270,7 @@ public class OfertasLaboralesController {
         return ResponseEntity.ok(reporte);
     }
     
-  //  @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @GetMapping("/reporte-postulantes-activos-y-seleccionados-por-carrera")
     @JsonView(View.Public.class)
     public ResponseEntity<List<Map<String, Object>>> generarReportePostulantesPorCarrera() {
