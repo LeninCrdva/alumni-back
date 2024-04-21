@@ -131,7 +131,8 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         
         graduados.forEach(graduado -> {
         	String rutaPdf=graduado.getRutaPdf();
-
+             graduado.getUsuario().setClave(null);
+           
             if (rutaPdf != null && !rutaPdf.isEmpty()) {
                 
                 String urlPdf = s3Service.getObjectUrl(rutaPdf); 
