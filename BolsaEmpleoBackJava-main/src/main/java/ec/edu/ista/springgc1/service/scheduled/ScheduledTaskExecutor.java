@@ -43,7 +43,7 @@ public class ScheduledTaskExecutor {
         this.offerProcessingStatusRepository = offerProcessingStatusRepository;
     }
 
-    @Scheduled(cron = "0 0/2 * * * ?")
+    @Scheduled(cron = "0 0 0 * * ?")
     public void executeTask() {
         System.out.println("Ejecutando tarea programada");
 
