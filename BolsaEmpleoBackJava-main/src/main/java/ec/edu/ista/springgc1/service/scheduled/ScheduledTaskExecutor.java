@@ -43,7 +43,7 @@ public class ScheduledTaskExecutor {
         this.offerProcessingStatusRepository = offerProcessingStatusRepository;
     }
 
-    @Scheduled(cron = "0 0 0 * * ?")
+    @Scheduled(cron = "0 0/2 * * * ?")
     public void executeTask() {
         System.out.println("Ejecutando tarea programada");
 
@@ -71,19 +71,20 @@ public class ScheduledTaskExecutor {
                     if (oferta.getFechaCierre().plusDays(3).isBefore(LocalDateTime.now())) {
                         oferta.setEstado(EstadoOferta.FINALIZADA);
 
-                        List<Postulacion> postulacion = postulacionRepository.findAllByOfertaLaboralId(oferta.getId()).stream().peek(g -> {
-                            if (g.getEstado().equals(EstadoPostulacion.APLICANDO)) {
-                                g.setEstado(EstadoPostulacion.RECHAZADO);
-                            }
-                        }).collect(Collectors.toList());
+                        List<Postulacion> postulaciones = postulacionRepository.findAllByOfertaLaboralId(oferta.getId())
+                                .stream()
+                                .filter(postulacion -> postulacion.getEstado().equals(EstadoPostulacion.APLICANDO))
+                                .peek(postulacion -> postulacion.setEstado(EstadoPostulacion.RECHAZADO))
+                                .collect(Collectors.toList());
 
-                        postulacionRepository.saveAll(postulacion);
+                        postulacionRepository.saveAll(postulaciones);
 
                         offerProcessingStatus.setStatus(ProcessingStatus.PROCESSED);
+                        offerProcessingStatus.setMessage("Offer closed");
 
-                        if (!postulacion.isEmpty()) {
-                            System.out.println("Enviando correos de rechazo a " + postulacion.size() + " postulantes");
-                            enviarCorreosRechazo(oferta, postulacion);
+                        if (!postulaciones.isEmpty()) {
+                            System.out.println("Enviando correos de rechazo a " + postulaciones.size() + " postulantes");
+                            enviarCorreosRechazo(oferta, postulaciones);
                         }
 
                     } else {

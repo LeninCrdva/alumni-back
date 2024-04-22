@@ -385,7 +385,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         Map<String, Object> model = new HashMap<>();
         String[] emails;
 
-        if (oferta.getEstado().equals(EstadoOferta.EN_SELECCION)) {
+        if (oferta.getEstado().equals(EstadoOferta.EN_EVALUACION)) {
             List<Administrador> administradores = administradorRepository.findAll();
             emails = administradores.stream().map(Administrador::getEmail).toArray(String[]::new);
         } else {
@@ -400,7 +400,7 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
         model.put("estado", oferta.getEstado().name());
 
         String subject = getMailSubject(oferta.getEstado().name());
-        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "list-postulates" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : oferta.getEstado().equals(EstadoOferta.EN_SELECCION) ? "offer-selection" : "offer-revision";
+        String mailCase = oferta.getEstado().equals(EstadoOferta.EN_CONVOCATORIA) ? "new-offer" : oferta.getEstado().equals(EstadoOferta.CANCELADA) ? "offer-canceled" : oferta.getEstado().equals(EstadoOferta.FINALIZADA) ? "offer-finished" : oferta.getEstado().equals(EstadoOferta.REACTIVADA) ? "offer-reactivated" : oferta.getEstado().equals(EstadoOferta.EN_SELECCION) ? "offer-selection" : "offer-revision";
 
         MailRequest request = createMailRequest(subject, mailCase);
 
@@ -431,8 +431,10 @@ public class OfertaslaboralesServiceImpl extends GenericServiceImpl<OfertasLabor
             return "Oferta laboral finalizada";
         } else if (estado.equals(EstadoOferta.REACTIVADA.name())) {
             return "Oferta laboral reactivada";
-        } else {
+        } else if (estado.equals(EstadoOferta.EN_SELECCION.name())) {
             return "Oferta laboral en selección";
+        } else {
+            return "Oferta laboral en revisión";
         }
     }
     //Reportes
