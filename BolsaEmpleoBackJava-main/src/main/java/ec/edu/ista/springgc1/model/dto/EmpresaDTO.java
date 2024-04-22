@@ -54,6 +54,7 @@ public class EmpresaDTO implements Serializable {
     @JsonView(View.Public.class)
     private boolean estado;
 
+    @JsonView(View.Public.class)
     private String rutaPdfRuc;
 
     @JsonView(View.Public.class)

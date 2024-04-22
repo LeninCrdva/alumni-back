@@ -170,6 +170,14 @@ public class EmpresaServiceImpl extends GenericServiceImpl<Empresa> implements M
         return emailService.sendEmail(request, model);
     }
 
+    @Transactional
+    public EmpresaDTO updatePdfRuc(Long id, String rutaPdfRuc) {
+        Empresa empresa = empresarepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Empresa", String.valueOf(id)));
+        empresa.setRutaPdfRuc(rutaPdfRuc);
+        return mapToDTO(empresarepository.save(empresa));
+    }
+
     public void delete(Long id) {
         empresarepository.deleteById(id);
     }

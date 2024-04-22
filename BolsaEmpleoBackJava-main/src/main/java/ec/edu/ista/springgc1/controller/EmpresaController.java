@@ -97,6 +97,14 @@ public class EmpresaController {
         return ResponseEntity.ok(empresas);
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
+    @PutMapping("/pdf-ruc/{id}/{rutaPdfRuc}")
+    @JsonView(View.Public.class)
+    public ResponseEntity<?> updatePdfRuc(@PathVariable Long id, @PathVariable String rutaPdfRuc) {
+        EmpresaDTO updatedEmpresa = empresaService.updatePdfRuc(id, rutaPdfRuc);
+        return ResponseEntity.ok(updatedEmpresa);
+    }
+
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/sin-oferta-laboral")
     @JsonView(View.Public.class)
