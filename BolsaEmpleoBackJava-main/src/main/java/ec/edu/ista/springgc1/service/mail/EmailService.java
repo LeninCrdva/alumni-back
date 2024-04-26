@@ -291,6 +291,9 @@ public class EmailService {
             case "register-businessman":
                 t = "businessman/email-template-alert-new-businessman";
                 break;
+            case "register-account":
+                t = "account/email-template-register-account";
+                break;
             default:
                 t = "graduate/email-template-contact-us";
                 break;

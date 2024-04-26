@@ -244,13 +244,15 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
     @Transactional
     public void controlCase(Usuario usuario, EmpresarioDTO empresarioDTO, EmpresaDTO empresaDTO, GraduadoDTO graduadoDTO) {
         String role = usuario.getRol().getNombre();
+        Graduado grad = null;
+        Empresario empresario = null;
         switch (role) {
             case "GRADUADO":
                 graduadoDTO.setUsuario(usuario.getNombreUsuario());
-                graduadoService.save(graduadoDTO);
+                grad = graduadoService.save(graduadoDTO);
                 break;
             case "EMPRESARIO":
-                Empresario empresario = saveEmpresario(usuario, empresarioDTO);
+                empresario = saveEmpresario(usuario, empresarioDTO);
                 if (!ObjectUtils.isEmpty(empresario) && empresaDTO.getEmpresario() != null) {
                     saveEmpresa(empresarioDTO, empresaDTO);
                 }
@@ -260,6 +262,15 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
             default:
                 throw new AppException(HttpStatus.BAD_REQUEST, "El rol ingresado no es válido");
         }
+
+        String email = "";
+        if (!ObjectUtils.isEmpty(grad)) {
+            email = grad.getEmailPersonal();
+        } else if (!ObjectUtils.isEmpty(empresario)){
+            email = empresario.getEmail();
+        }
+
+        setModelAndEmailRegister(usuario, email);
     }
 
     public Empresario saveEmpresario(Usuario usuario, EmpresarioDTO empresarioDTO) {
@@ -288,6 +299,17 @@ public class UsuarioServiceImpl extends GenericServiceImpl<Usuario> implements M
         model.put("empresas", empresas);
         model.put("usuario", user);
         model.put("fullName", fullName);
+
+        emailService.sendEmail(request, model);
+    }
+
+    private void setModelAndEmailRegister(Usuario usuario, String email){
+        Map<String, Object> model = new HashMap<>();
+
+        MailRequest request = new MailRequest(email, from, "¡Cuenta registrada!", "register-account");
+
+        model.put("usuario", usuario);
+        model.put("fullName", getFullName(usuario.getPersona()));
 
         emailService.sendEmail(request, model);
     }

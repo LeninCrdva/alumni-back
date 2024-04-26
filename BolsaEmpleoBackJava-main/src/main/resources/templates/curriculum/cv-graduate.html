@@ -37,7 +37,7 @@
                 <h6 th:text="${graduado.ciudad.nombre} + ', ' + ${graduado.ciudad.provincia.nombre}"></h6>
             </div>
             <div class="ms-5 col-md-4">
-                <img class="image" th:src="@{'https://demosprint.s3.amazonaws.com/'} + ${graduado.usuario.rutaImagen}"
+                <img class="image" th:src="@{${graduado.usuario.urlImagen}}"
                      alt="foto-usuario">
             </div>
         </div>
