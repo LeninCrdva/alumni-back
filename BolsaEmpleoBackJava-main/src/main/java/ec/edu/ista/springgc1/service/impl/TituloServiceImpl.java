@@ -160,4 +160,8 @@ public class TituloServiceImpl extends GenericServiceImpl<Titulo> implements Map
 
         return conteoPorCarrera;
     }
+
+    public List<Object[]> findGraduadosByCarreraTitulo() {
+        return titulorepository.findGraduadosByCarreraTitulo();
+    }
 }

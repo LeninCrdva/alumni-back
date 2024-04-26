@@ -34,8 +34,10 @@ public interface TituloRepository extends GenericRepository<Titulo>{
      
      @Query("SELECT t.graduado FROM Titulo t WHERE UPPER(t.carrera.nombre) = UPPER(:nombreCarrera)")
      List<Graduado> findAllGraduadosByNombreCarrera(@Param("nombreCarrera") String nombreCarrera);
-     
-     
+
+    @Query("SELECT c.nombre, t.nombreTitulo, g.emailPersonal, p.primerNombre, p.segundoNombre, p.apellidoPaterno, p.apellidoMaterno, p.cedula " +
+            "FROM Graduado g JOIN g.usuario u JOIN u.persona p JOIN g.titulos t JOIN t.carrera c")
+    List<Object[]> findGraduadosByCarreraTitulo();
     
 
 }

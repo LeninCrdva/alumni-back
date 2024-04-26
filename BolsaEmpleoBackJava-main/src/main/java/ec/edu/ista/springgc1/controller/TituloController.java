@@ -61,6 +61,12 @@ public class TituloController {
         return ResponseEntity.ok(Collections.singletonMap("total:", tituloService.count()));
     }
 
+    @PreAuthorize("hasAnyRole('RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/graduados/carrera")
+    public ResponseEntity<List<?>> findGraduadosByCarreraTitulo() {
+        return ResponseEntity.ok(tituloService.findGraduadosByCarreraTitulo());
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody TituloDTO e) {
