@@ -3,6 +3,7 @@ package ec.edu.ista.springgc1.security;
 import ec.edu.ista.springgc1.security.jwt.JwtAuthenticationEntryPoint;
 import ec.edu.ista.springgc1.security.jwt.JwtAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,8 +26,11 @@ import java.util.Collections;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity
 public class WebSecurityConfig {
+
+    @Value("${client.url}")
+    private String clientUrl;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -64,10 +68,9 @@ public class WebSecurityConfig {
 
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
+        System.out.println("clientUrl: " + clientUrl);
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-       // corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); //Here you can add more origins if needed
-        //http://alumnisericefornted123.s3-website.us-east-2.amazonaws.com/
-        corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://alumnisericefornted123.s3-website.us-east-2.amazonaws.com/", "http://localhost:8080"));
+        corsConfiguration.setAllowedOrigins(Arrays.asList(clientUrl));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         corsConfiguration.setAllowedHeaders(Collections.singletonList("*"));
         corsConfiguration.setAllowCredentials(true);

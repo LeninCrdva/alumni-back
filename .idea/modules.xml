@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/alumni-back.iml" filepath="$PROJECT_DIR$/alumni-back.iml" />
+      <module fileurl="file://$PROJECT_DIR$/springgc1.iml" filepath="$PROJECT_DIR$/springgc1.iml" />
     </modules>
   </component>
 </project>
