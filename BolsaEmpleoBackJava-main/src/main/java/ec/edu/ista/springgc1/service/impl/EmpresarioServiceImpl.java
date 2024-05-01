@@ -13,21 +13,22 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.EmpresarioDTO;
-import ec.edu.ista.springgc1.model.dto.SuperAdminDTO;
 import ec.edu.ista.springgc1.model.entity.Empresario;
 import ec.edu.ista.springgc1.model.entity.Usuario;
 import ec.edu.ista.springgc1.repository.EmpresarioRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implements Mapper<Empresario, EmpresarioDTO> {
+
     @Autowired
     private EmpresarioRepository empresariorepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
-
 
     @Override
     public Empresario mapToEntity(EmpresarioDTO empresarioDTO) {
@@ -70,7 +71,7 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
     }
 
     public EmpresarioDTO findByIdToDTO(Long id) {
-        Empresario empresario = empresariorepository.findById(id)
+        Empresario empresario = empresariorepository.findByUsuarioId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("id", id));
 
         return mapToDTO(empresario);
@@ -122,4 +123,10 @@ public class EmpresarioServiceImpl extends GenericServiceImpl<Empresario> implem
     public Empresario findByEmail(String email) {
         return empresariorepository.findByEmail(email).orElse(new Empresario());
     }
+
+    @Transactional
+    public boolean existByEmail(String email) {
+        return empresariorepository.existsByEmailIgnoreCase(email);
+    }
+
 }

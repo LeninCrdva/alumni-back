@@ -24,7 +24,7 @@ import ec.edu.ista.springgc1.service.impl.LogroServiceImpl;
 
 @RestController
 @RequestMapping("logro")
-@CrossOrigin(origins = "http://localhost:4200")
+
 public class LogroController {
 	
 	@Autowired

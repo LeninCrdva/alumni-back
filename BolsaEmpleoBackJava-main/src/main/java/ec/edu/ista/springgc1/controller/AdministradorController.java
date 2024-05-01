@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +24,6 @@ import ec.edu.ista.springgc1.model.dto.AdminDTO;
 import ec.edu.ista.springgc1.model.entity.Administrador;
 import ec.edu.ista.springgc1.service.impl.AdministradorServiceImpl;
 
-@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/administradores")
 public class AdministradorController {
@@ -32,20 +33,30 @@ public class AdministradorController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(adminService.findAll());
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.findById(id));
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/usuario/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(adminService.findByUsuario(id));
+    }
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @GetMapping("exists/email/{email}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(adminService.existsByEmail(email));
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR') or isAnonymous()") // <--Chane this, it's not possible to create an admin if you are not logged in...
@@ -78,6 +89,7 @@ public class AdministradorController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/todos")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Administrador>> findAllAdministradores() {
         return ResponseEntity.ok(adminService.findAllAdministradores());
     }

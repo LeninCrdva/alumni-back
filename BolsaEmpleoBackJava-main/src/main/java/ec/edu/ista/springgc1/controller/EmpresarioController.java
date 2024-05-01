@@ -5,6 +5,8 @@ import java.util.List;
 import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,7 @@ import ec.edu.ista.springgc1.model.dto.EmpresarioDTO;
 import ec.edu.ista.springgc1.model.entity.Empresario;
 import ec.edu.ista.springgc1.service.impl.EmpresarioServiceImpl;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/empresarios")
 public class EmpresarioController {
@@ -33,20 +35,37 @@ public class EmpresarioController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(emprendimientoService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(emprendimientoService.findById(id));
     }
 
+    @GetMapping("exists/email/{email}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByEmail(@PathVariable String email) {
+        System.out.println("Email: " + email);
+        return ResponseEntity.ok(emprendimientoService.existByEmail(email));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/usuario/{usuario}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByUserUsername(@PathVariable String usuario) {
         return ResponseEntity.ok(emprendimientoService.findByUsuario(usuario));
+    }
+
+    @PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/user-data/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findByUserUserId(@PathVariable Long id) {
+        return ResponseEntity.ok(emprendimientoService.findByIdToDTO(id));
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO') or isAnonymous()") // <--Change this, it's not possible to create an admin if you are not logged in...

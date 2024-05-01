@@ -14,8 +14,7 @@ public interface AdministradorRepository extends GenericRepository<Administrador
 
     Optional<Administrador> findByUsuarioId(long id_usuario);
 
-    //Added for the service - Evento
-    Optional<Administrador> findByUsuarioPersonaCedulaContaining(String cedula);
-
     Optional<Administrador> findByEmail(String email);
+
+    boolean existsByEmailIgnoreCase(String email);
 }

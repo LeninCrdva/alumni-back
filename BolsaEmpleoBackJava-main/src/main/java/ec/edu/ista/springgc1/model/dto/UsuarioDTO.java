@@ -1,38 +1,41 @@
 package ec.edu.ista.springgc1.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import lombok.Data;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-import ec.edu.ista.springgc1.model.entity.Persona;
-import ec.edu.ista.springgc1.model.entity.UsuarioTipo;
-
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Data
 public class UsuarioDTO implements Serializable {
 
+    @JsonView(View.Public.class)
     private Long id;
 
+    @JsonView(View.Public.class)
     @NotEmpty
     private String nombreUsuario;
 
     @NotNull
     private String clave;
 
+    @JsonView(View.Public.class)
     @NotNull
     private String cedula;
-	
+
+    @JsonView(View.Public.class)
     @NotEmpty
     private String rol;
 
+    @JsonView(View.Public.class)
     @NotNull
     private boolean estado;
 
-    private String ruta_imagen;
+    private String rutaImagen;
 
-    private String url_imagen;
+    @JsonView(View.Public.class)
+    private String urlImagen;
 }

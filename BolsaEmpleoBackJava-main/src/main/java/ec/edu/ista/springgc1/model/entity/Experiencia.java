@@ -26,11 +26,11 @@ public class Experiencia {
 	private String duracion;
 
 	@ColumnTransformer(write = "UPPER(?)")
-	private String institucionNombre;
+	private String nombreInstitucion;
 
 	@ColumnTransformer(write = "UPPER(?)")
 	private String actividad;
 
 	@ColumnTransformer(write = "UPPER(?)")
-	private String area_trabajo;
+	private String areaTrabajo;
 }

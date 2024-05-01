@@ -13,6 +13,8 @@ import javax.persistence.Id;
 
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.hibernate.annotations.ColumnTransformer;
 
 import lombok.Data;
@@ -27,6 +29,7 @@ public class Carrera {
     private Long id;
 
     @ColumnTransformer(write = "UPPER(?)")
+    @JsonView(View.Public.class)
     private String nombre;
 
     @ColumnTransformer(write = "UPPER(?)")

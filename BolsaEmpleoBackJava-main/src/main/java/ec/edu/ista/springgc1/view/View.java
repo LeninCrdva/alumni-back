@@ -4,6 +4,6 @@ public interface View {
 	public class Base {}
 	
 	public class Public extends Base {}
-	
-	public class City extends Public {}
+
+	public class Postulacion extends Base {}
 }

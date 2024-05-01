@@ -2,9 +2,12 @@ package ec.edu.ista.springgc1.controller;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,13 +20,15 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import ec.edu.ista.springgc1.model.dto.TituloDTO;
+import ec.edu.ista.springgc1.model.entity.Persona;
 import ec.edu.ista.springgc1.model.entity.Titulo;
 import ec.edu.ista.springgc1.service.impl.TituloServiceImpl;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/titulos")
 public class TituloController {
@@ -39,6 +44,7 @@ public class TituloController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(tituloService.findById(id));
     }
@@ -55,6 +61,12 @@ public class TituloController {
         return ResponseEntity.ok(Collections.singletonMap("total:", tituloService.count()));
     }
 
+    @PreAuthorize("hasAnyRole('RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
+    @GetMapping("/graduados/carrera")
+    public ResponseEntity<List<?>> findGraduadosByCarreraTitulo() {
+        return ResponseEntity.ok(tituloService.findGraduadosByCarreraTitulo());
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'ADMINISTRADOR')")
     @PostMapping
     ResponseEntity<?> create(@Valid @RequestBody TituloDTO e) {
@@ -68,14 +80,14 @@ public class TituloController {
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody TituloDTO e) {
         TituloDTO tituloFromDb = tituloService.findByIdToDTO(id);
 
-        tituloFromDb.setFecha_emision(e.getFecha_emision());
-        tituloFromDb.setFecha_registro(e.getFecha_registro());
-        tituloFromDb.setIdgraduado(e.getIdgraduado());
+        tituloFromDb.setFechaEmision(e.getFechaEmision());
+        tituloFromDb.setFechaRegistro(e.getFechaRegistro());
+        tituloFromDb.setCedula(e.getCedula());
         tituloFromDb.setInstitucion(e.getInstitucion());
-        tituloFromDb.setNivel(e.getInstitucion());
-        tituloFromDb.setNombre_titulo(e.getNombre_titulo());
-        tituloFromDb.setNombrecarrera(e.getNombrecarrera());
-        tituloFromDb.setNum_registro(e.getNum_registro());
+        tituloFromDb.setNivel(e.getNivel());
+        tituloFromDb.setNombreTitulo(e.getNombreTitulo());
+        tituloFromDb.setNombreCarrera(e.getNombreCarrera());
+        tituloFromDb.setNumRegistro(e.getNumRegistro());
         tituloFromDb.setTipo(e.getTipo());
 
         // Utiliza el método update del servicio para actualizar la instancia existente
@@ -91,5 +103,20 @@ public class TituloController {
        
     	tituloService.delete(tituloFromDb.getId());
         return ResponseEntity.noContent().build();
+    }
+    
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-por-sexo")
+    public ResponseEntity<Map<Persona.Sex, Integer>> obtenerGraduadosPorSexo(
+            @RequestParam("nombreCarrera") String nombreCarrera) {
+        Map<Persona.Sex, Integer> conteoPorSexo = tituloService.contarGraduadosPorSexo(nombreCarrera);
+        return ResponseEntity.ok(conteoPorSexo);
+    }
+    
+    @PreAuthorize("hasAnyRole('GRADUADO', 'ADMINISTRADOR')")
+    @GetMapping("/graduados-por-sexo-por-carrera-automatic")
+    public ResponseEntity<Map<String, Map<Persona.Sex, Long>>> obtenerGraduadosPorSexoPorCarrera() {
+        Map<String, Map<Persona.Sex, Long>> conteoPorCarrera = tituloService.contarGraduadosPorSexoPorCarrera();
+        return ResponseEntity.ok(conteoPorCarrera);
     }
 }

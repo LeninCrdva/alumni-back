@@ -1,19 +1,17 @@
 package ec.edu.ista.springgc1.service.impl;
 
+
 import ec.edu.ista.springgc1.model.entity.*;
 import ec.edu.ista.springgc1.repository.CiudadRepository;
 import ec.edu.ista.springgc1.repository.GraduadoRepository;
-import ec.edu.ista.springgc1.repository.OfertaslaboralesRepository;
+import ec.edu.ista.springgc1.repository.PostulacionRepository;
 import ec.edu.ista.springgc1.repository.UsuarioRepository;
 import ec.edu.ista.springgc1.service.bucket.S3Service;
 import ec.edu.ista.springgc1.service.generic.impl.GenericServiceImpl;
 import ec.edu.ista.springgc1.service.map.Mapper;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,11 +19,14 @@ import org.springframework.stereotype.Service;
 
 import ec.edu.ista.springgc1.exception.ResourceNotFoundException;
 import ec.edu.ista.springgc1.model.dto.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements Mapper<Graduado, GraduadoDTO> {
+
     @Autowired
     private GraduadoRepository graduadoRepository;
+
     @Autowired
     private UsuarioRepository usuarioRepository;
 
@@ -33,7 +34,10 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     private CiudadRepository ciudadRepository;
 
     @Autowired
-    private OfertaslaboralesRepository ofertasRepository;
+    private PostulacionRepository postulacionRepository;
+
+    @Autowired
+    private PreviousDataForPdfService previousDataForPdfService;
 
     @Autowired
     private S3Service s3Service;
@@ -51,22 +55,15 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudiante.setId(estudianteDTO.getId());
         estudiante.setUsuario(usuario);
         estudiante.setCiudad(ciudad);
-        estudiante.setAño_graduacion(estudianteDTO.getAño_graduacion());
-        estudiante.setEmailPersonal(estudianteDTO.getEmail_personal());
-        estudiante.setEstadocivil(estudianteDTO.getEstadocivil());
-        estudiante.setRuta_pdf(estudianteDTO.getRuta_pdf());
-        estudiante.setUrl_pdf(
-                estudianteDTO.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudianteDTO.getRuta_pdf()));
-
-        List<OfertasLaborales> ofertas = new ArrayList<>();
-        if (estudianteDTO.getIdOferta() != null) {
-            ofertas = ofertasRepository.findOfertasByIdIn(estudianteDTO.getIdOferta());
-            estudiante.setOfertas(ofertas);
-        }
+        estudiante.setAnioGraduacion(estudianteDTO.getAnioGraduacion());
+        estudiante.setEmailPersonal(estudianteDTO.getEmailPersonal());
+        estudiante.setEstadoCivil(estudianteDTO.getEstadoCivil());
+        estudiante.setRutaPdf(estudianteDTO.getRutaPdf());
+        estudiante.setUrlPdf(
+                estudianteDTO.getRutaPdf() == null ? null : s3Service.getObjectUrl(estudianteDTO.getRutaPdf()));
 
         return estudiante;
     }
-
 
     @Override
     public GraduadoDTO mapToDTO(Graduado estudiante) {
@@ -75,20 +72,11 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         estudianteDTO.setId(estudiante.getId());
         estudianteDTO.setUsuario(estudiante.getUsuario().getNombreUsuario());
         estudianteDTO.setCiudad(estudiante.getCiudad().getNombre());
-        estudianteDTO.setAño_graduacion(estudiante.getAño_graduacion());
-        estudianteDTO.setEmail_personal(estudiante.getEmailPersonal());
-        estudianteDTO.setEstadocivil(estudiante.getEstadocivil());
-        estudianteDTO.setRuta_pdf(estudiante.getRuta_pdf());
-        estudianteDTO.setUrl_pdf(estudiante.getUrl_pdf());
-        List<Long> idOfertas = new ArrayList<>();
-        if (estudiante.getOfertas() != null) {
-            for (OfertasLaborales oferta : estudiante.getOfertas()) {
-                if (oferta.getId() != null) {
-                    idOfertas.add(oferta.getId());
-                }
-            }
-        }
-        estudianteDTO.setIdOferta(idOfertas);
+        estudianteDTO.setAnioGraduacion(estudiante.getAnioGraduacion());
+        estudianteDTO.setEmailPersonal(estudiante.getEmailPersonal());
+        estudianteDTO.setEstadoCivil(estudiante.getEstadoCivil());
+        estudianteDTO.setRutaPdf(estudiante.getRutaPdf());
+        estudianteDTO.setUrlPdf(estudiante.getRutaPdf() == null ? null : s3Service.getObjectUrl(estudiante.getRutaPdf()));
 
         return estudianteDTO;
     }
@@ -96,8 +84,24 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     @Override
     public List findAll() {
         return graduadoRepository.findAll().stream()
-                .peek(e -> e.setUrl_pdf(e.getRuta_pdf() == null ? null : s3Service.getObjectUrl(e.getRuta_pdf())))
-                .map(e -> mapToDTO(e)).collect(Collectors.toList());
+                .peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf())))
+                .map(this::mapToDTO).collect(Collectors.toList());
+    }
+
+    public PreviousDataForPdfDTO findByIdWithPdf(Long id) {
+        return graduadoRepository.findById(id)
+                .map(estudiante -> {
+                    Usuario userFromGrad = estudiante.getUsuario();
+                    userFromGrad.setUrlImagen(s3Service.getObjectUrl(userFromGrad.getRutaImagen()));
+                    byte[] pdf;
+                    try {
+                        pdf = previousDataForPdfService.getPdf(estudiante);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                    return new PreviousDataForPdfDTO(estudiante, pdf);
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("id", id));
     }
 
     public GraduadoDTO findByIdToDTO(Long id) {
@@ -110,10 +114,58 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     public GraduadoDTO findByUsuario(long id_usuario) {
 
         Graduado estudiante = graduadoRepository.findByUsuarioId(id_usuario)
-                .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
-        estudiante
-                .setUrl_pdf(estudiante.getRuta_pdf() == null ? null : s3Service.getObjectUrl(estudiante.getRuta_pdf()));
+                .map(e -> {
+                    e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf()));
+                    return e;
+                }).orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
+
         return mapToDTO(estudiante);
+    }
+
+  /*  public List<Graduado> findAllGraduadosNotIn(Long id) {
+        return setUrlForGraduados(graduadoRepository.findByUsuarioIdNot(id));
+    }*/
+    public List<Graduado> findAllGraduadosNotIn(Long id) {
+        List<Graduado> graduados = graduadoRepository.findByUsuarioIdNot(id);
+
+        
+        graduados.forEach(graduado -> {
+        	String rutaPdf=graduado.getRutaPdf();
+             graduado.getUsuario().setClave(null);
+           
+            if (rutaPdf != null && !rutaPdf.isEmpty()) {
+                
+                String urlPdf = s3Service.getObjectUrl(rutaPdf); 
+                graduado.setUrlPdf(urlPdf); 
+            }
+            String rutaImagen = graduado.getUsuario().getRutaImagen();
+            if (rutaImagen != null && !rutaImagen.isEmpty()) {
+              
+                String urlImagen = s3Service.getObjectUrl(rutaImagen); 
+                graduado.getUsuario().setUrlImagen(urlImagen); 
+            }
+        });
+
+        return graduados;
+    }
+
+    private List<Graduado> setUrlForGraduados(List<Graduado> graduados) {
+        return graduados.stream().peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf()))).collect(Collectors.toList());
+    }
+
+    public Graduado findByIdUsuario(long id_usuario) {
+        return graduadoRepository.findByUsuarioId(id_usuario)
+                .map(e -> {
+                    e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf()));
+                    return e;
+                })
+                .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
+    }
+
+    public GraduadoDTO findDTOByUserId(long id_usuario) {
+        Graduado graduado = graduadoRepository.findByUsuarioId(id_usuario)
+                .orElseThrow(() -> new ResourceNotFoundException("id_usuario", id_usuario));
+        return mapToDTO(graduado);
     }
 
     public Graduado findByUsuarioPersonaCedulaContaining(String cedula) {
@@ -122,14 +174,34 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     }
 
     public List<OfertasLaborales> findByUsuarioNombreUsuario(String username) {
-        Graduado graduado = graduadoRepository.findByUsuarioNombreUsuario(username)
-                .orElseThrow(() -> new ResourceNotFoundException("usuario", username));
+        List<Postulacion> postulacion = postulacionRepository.findAllByGraduadoUsuarioNombreUsuario(username);
 
-        List<OfertasLaborales> ofertas = graduado.getOfertas();
-
-        return ofertas;
+        return postulacion.stream()
+                .map(Postulacion::getOfertaLaboral)
+                .collect(Collectors.toList());
     }
 
+    public boolean existsByEmailPersonalIgnoreCase(String email) {
+        return graduadoRepository.existsByEmailPersonalIgnoreCase(email);
+    }
+
+    @Transactional
+    public GraduadoDTO updateBasicData(Long id, GraduadoDTO estudianteDTO) {
+        Graduado graduadoFromDb = graduadoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Graduado", id));
+
+        graduadoFromDb.setUsuario(usuarioRepository.findBynombreUsuario(estudianteDTO.getUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario", estudianteDTO.getUsuario())));
+
+        graduadoFromDb.setAnioGraduacion(estudianteDTO.getAnioGraduacion());
+        graduadoFromDb.setCiudad(ciudadRepository.findByNombre(estudianteDTO.getCiudad())
+                .orElseThrow(() -> new ResourceNotFoundException("Ciudad", estudianteDTO.getCiudad())));
+
+        graduadoFromDb.setEmailPersonal(estudianteDTO.getEmailPersonal());
+        graduadoFromDb.setEstadoCivil(estudianteDTO.getEstadoCivil());
+
+        return mapToDTO(graduadoRepository.save(graduadoFromDb));
+    }
 
     @Override
     public Graduado save(Object entity) {
@@ -143,52 +215,16 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
         graduadoFromDb.setUsuario(usuarioRepository.findBynombreUsuario(estudianteDTO.getUsuario())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario", estudianteDTO.getUsuario())));
 
-        graduadoFromDb.setAño_graduacion(estudianteDTO.getAño_graduacion());
+        graduadoFromDb.setAnioGraduacion(estudianteDTO.getAnioGraduacion());
         graduadoFromDb.setCiudad(ciudadRepository.findByNombre(estudianteDTO.getCiudad())
                 .orElseThrow(() -> new ResourceNotFoundException("Ciudad", estudianteDTO.getCiudad())));
 
-        graduadoFromDb.setEmailPersonal(estudianteDTO.getEmail_personal());
-        graduadoFromDb.setEstadocivil(estudianteDTO.getEstadocivil());
-        graduadoFromDb.setRuta_pdf(estudianteDTO.getRuta_pdf());
-        graduadoFromDb.setUrl_pdf(estudianteDTO.getUrl_pdf());
-
-        List<OfertasLaborales> existingOfertas = graduadoFromDb.getOfertas();
-
-        List<OfertasLaborales> nuevasOfertas = ofertasRepository.findOfertasByIdIn(estudianteDTO.getIdOferta());
-
-        graduadoFromDb.setOfertas(nuevasOfertas);
-
-        for (OfertasLaborales oferta : existingOfertas) {
-            oferta.getGraduados().remove(graduadoFromDb);
-        }
-
-        for (OfertasLaborales nuevaOferta : nuevasOfertas) {
-            nuevaOferta.getGraduados().add(graduadoFromDb);
-        }
+        graduadoFromDb.setEmailPersonal(estudianteDTO.getEmailPersonal());
+        graduadoFromDb.setEstadoCivil(estudianteDTO.getEstadoCivil());
+        graduadoFromDb.setRutaPdf(estudianteDTO.getRutaPdf());
+        graduadoFromDb.setUrlPdf(estudianteDTO.getUrlPdf());
 
         return mapToDTO(graduadoRepository.save(graduadoFromDb));
-    }
-
-    public GraduadoDTO updatePostulacion(Long idGraduado, Long ofertas) {
-        Graduado estudiante = graduadoRepository.findById(idGraduado)
-                .orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
-
-        GraduadoDTO graduadoFromDb = mapToDTO(estudiante);
-
-        graduadoFromDb.getIdOferta().add(ofertas);
-
-        return graduadoFromDb;
-    }
-
-    public GraduadoDTO cancelPostulacion(Long idGraduado, Long ofertas) {
-        Graduado estudiante = graduadoRepository.findById(idGraduado)
-                .orElseThrow(() -> new ResourceNotFoundException("id", idGraduado));
-
-        GraduadoDTO graduadoFromDb = mapToDTO(estudiante);
-
-        graduadoFromDb.getIdOferta().remove(ofertas);
-
-        return graduadoFromDb;
     }
 
     public Graduado findByEmail(String email) {
@@ -206,12 +242,12 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
 
     public List<Graduado> findAllGraduados() {
         return graduadoRepository.findAll().stream()
-                .peek(e -> e.setUrl_pdf(e.getRuta_pdf() == null ? null : s3Service.getObjectUrl(e.getRuta_pdf())))
+                .peek(e -> e.setUrlPdf(e.getRutaPdf() == null ? null : s3Service.getObjectUrl(e.getRutaPdf())))
                 .collect(Collectors.toList());
     }
 
     public Map<String, Object> countBySex() {
-        Map<String, Object> countSex = new HashMap<>();
+        Map<String, Object> countSex = new LinkedHashMap<>();
 
         countSex.put("masculino", graduadoRepository.countAllByUsuarioPersonaSexo(Persona.Sex.MASCULINO));
         countSex.put("femenino", graduadoRepository.countAllByUsuarioPersonaSexo(Persona.Sex.FEMENINO));
@@ -223,6 +259,7 @@ public class GraduadoServiceImpl extends GenericServiceImpl<Graduado> implements
     public List<Graduado> findGraduadosWithOfertas() {
         return graduadoRepository.findAllGraduadosWithOfertas();
     }
+
     public List<Graduado> findGraduadosSinExperiencia() {
         return graduadoRepository.findAllGraduadosSinExperiencia();
     }

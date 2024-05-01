@@ -23,7 +23,6 @@ import ec.edu.ista.springgc1.model.entity.Capacitacion;
 import ec.edu.ista.springgc1.service.impl.CapacitacionServiceImpl;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
 @RequestMapping("capacitacion")
 public class CapacitacionController {
 
@@ -61,7 +60,6 @@ public class CapacitacionController {
 	public ResponseEntity<?> updateTraining(@PathVariable("id") Long id,
 			@Valid @RequestBody CapacitacionDTO capacitacion) {
 		CapacitacionDTO capacitacionDb = capacitacionService.findTrainingByIdToDTO(id);
-		System.out.println("This is the ID: " + capacitacionDb.getId());
 		
 		capacitacionDb.setInstitucion(capacitacion.getInstitucion());
 		capacitacionDb.setTipoCertificado(capacitacion.getTipoCertificado());

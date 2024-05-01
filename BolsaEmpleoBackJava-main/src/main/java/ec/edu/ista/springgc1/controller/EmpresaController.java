@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.validation.Valid;
 
+import ec.edu.ista.springgc1.view.View;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ import ec.edu.ista.springgc1.model.dto.EmpresaDTO;
 import ec.edu.ista.springgc1.model.entity.Empresa;
 import ec.edu.ista.springgc1.service.impl.EmpresaServiceImpl;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/empresas")
 public class EmpresaController {
@@ -34,14 +35,28 @@ public class EmpresaController {
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(empresaService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(empresaService.findById(id));
+    }
+
+    @GetMapping("exists/nombre/{nombre}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(empresaService.existsBynombre(nombre));
+    }
+
+    @GetMapping("exists/ruc/{ruc}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByRuc(@PathVariable String ruc) {
+        return ResponseEntity.ok(empresaService.existByRuc(ruc));
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
@@ -76,13 +91,23 @@ public class EmpresaController {
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
     @GetMapping("/by-usuario/{nombreUsuario}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByNombreUsuario(@PathVariable String nombreUsuario) {
         Set<EmpresaDTO> empresas = empresaService.findByNombreUsuario(nombreUsuario);
         return ResponseEntity.ok(empresas);
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO')")
+    @PutMapping("/pdf-ruc/{id}/{rutaPdfRuc}")
+    @JsonView(View.Public.class)
+    public ResponseEntity<?> updatePdfRuc(@PathVariable Long id, @PathVariable String rutaPdfRuc) {
+        EmpresaDTO updatedEmpresa = empresaService.updatePdfRuc(id, rutaPdfRuc);
+        return ResponseEntity.ok(updatedEmpresa);
+    }
+
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/sin-oferta-laboral")
+    @JsonView(View.Public.class)
     public Set<EmpresaDTO> obtenerEmpresasSinOfertaLaboral() {
         return empresaService.findEmpresasSinOfertaLaboral();
     }

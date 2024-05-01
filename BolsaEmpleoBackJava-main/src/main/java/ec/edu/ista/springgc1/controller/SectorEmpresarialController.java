@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/sectoresEmpresariales")
 public class SectorEmpresarialController {
@@ -21,7 +21,7 @@ public class SectorEmpresarialController {
     @Autowired
     private SectorEmpresarialServiceImpl empresarialService;
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PreAuthorize("permitAll()")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(empresarialService.findAll());

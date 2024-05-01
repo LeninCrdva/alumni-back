@@ -1,5 +1,6 @@
 package ec.edu.ista.springgc1.controller;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -30,47 +31,73 @@ import ec.edu.ista.springgc1.model.entity.OfertasLaborales;
 import ec.edu.ista.springgc1.service.impl.GraduadoServiceImpl;
 import ec.edu.ista.springgc1.view.View;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/graduados")
 public class GraduadoController {
 
-	@Autowired
+    @Autowired
     private GraduadoServiceImpl estudianteService;
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(estudianteService.findAll());
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findById(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findById(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/with-pdf/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findWithPdfById(@PathVariable Long id) {
+        return ResponseEntity.ok(estudianteService.findByIdWithPdf(id));
+    }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @GetMapping("/otros-graduados/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findOtrosGraduados(@PathVariable Long id) {
+        return ResponseEntity.ok(estudianteService.findAllGraduadosNotIn(id));
+    }
+
+    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/resumen/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByIdResumen(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findByIdToDTO(id));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/usuario/{id}")
+    @JsonView(View.Public.class)
     ResponseEntity<?> findByUserId(@PathVariable Long id) {
         return ResponseEntity.ok(estudianteService.findByUsuario(id));
     }
 
+    @PreAuthorize("hasAnyRole('ADMINISTRADOR')")
+    @GetMapping("/user-id/{id}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> findToDTOByUserId(@PathVariable long id) {
+        return ResponseEntity.ok(estudianteService.findDTOByUserId(id));
+    }
+
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/user/{username}")
-    @JsonView(View.City.class) 
-    ResponseEntity<List<OfertasLaborales>> findByUserName(@PathVariable("username") String username){
+    @JsonView(View.Public.class)
+    ResponseEntity<List<OfertasLaborales>> findByUserName(@PathVariable("username") String username) {
         return ResponseEntity.ok(estudianteService.findByUsuarioNombreUsuario(username));
     }
 
     @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
     @GetMapping("/total")
+    @JsonView(View.Public.class)
     ResponseEntity<?> countEstudiantes() {
         return ResponseEntity.ok(Collections.singletonMap("total:", estudianteService.count()));
     }
@@ -86,35 +113,7 @@ public class GraduadoController {
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
-    	return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
-    }
-
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
-    @PutMapping("postulaciones/{id}")
-    public ResponseEntity<?> savePostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
-        GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
-
-        Set<Long> existingIds = new HashSet<>(gradDTO.getIdOferta());
-        
-        existingIds.addAll(estudianteDTO.getIdOferta());
-
-        gradDTO.setIdOferta(new ArrayList<>(existingIds));
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
-    }
-
-    @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
-    @PutMapping("cancel-postulaciones/{id}")
-    public ResponseEntity<?> cancelPostulaciones(@PathVariable Long id, @RequestBody GraduadoDTO estudianteDTO) {
-        GraduadoDTO gradDTO = estudianteService.findByIdToDTO(id);
-
-        Set<Long> existingIds = new HashSet<>(gradDTO.getIdOferta());
-
-        existingIds.removeAll(estudianteDTO.getIdOferta());
-
-        gradDTO.setIdOferta(new ArrayList<>(existingIds));
-
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.save(gradDTO));
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.update(id, estudianteDTO));
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'GRADUADO')")
@@ -127,31 +126,48 @@ public class GraduadoController {
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/without-oferta")
+    @JsonView(View.Public.class)
     ResponseEntity<List<?>> listWithOut() {
         return ResponseEntity.ok(estudianteService.findGRaduadoWithOutOfertas());
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'EMPRESARIO', 'GRADUADO')")
     @GetMapping("/all")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduados() {
         return ResponseEntity.ok(estudianteService.findAllGraduados());
     }
 
     @PreAuthorize("hasRole('ADMINISTRADOR')")
     @GetMapping("/count-sex")
-    public ResponseEntity<?> countSex(){
+    @JsonView(View.Public.class)
+    public ResponseEntity<?> countSex() {
         return ResponseEntity.ok(estudianteService.countBySex());
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/with-oferta")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduadosConOfertas() {
         return ResponseEntity.ok(estudianteService.findGraduadosWithOfertas());
     }
 
     @PreAuthorize("hasAnyRole('ADMINISTRADOR', 'RESPONSABLE_CARRERA')")
     @GetMapping("/sin-experiencia")
+    @JsonView(View.Public.class)
     ResponseEntity<List<Graduado>> findAllGraduadosSinExperiencia() {
         return ResponseEntity.ok(estudianteService.findGraduadosSinExperiencia());
+    }
+
+    @GetMapping("/exists/email/{email}")
+    @JsonView(View.Public.class)
+    ResponseEntity<?> existsByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(estudianteService.existsByEmailPersonalIgnoreCase(email));
+    }
+
+    @PreAuthorize("hasRole('ADMINISTRADOR')")
+    @PutMapping("/without-title/{id}")
+    public ResponseEntity<?> controlCase(@PathVariable Long id, @Valid @RequestBody GraduadoDTO estudianteDTO) {
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(estudianteService.updateBasicData(id, estudianteDTO));
     }
 }

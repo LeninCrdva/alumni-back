@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-@CrossOrigin(origins = "http://localhost:4200")
+
+
 @RestController
 @RequestMapping("/ciudades")
 public class CiudadController {
@@ -20,7 +21,7 @@ public class CiudadController {
     @Autowired
     private CiudadServiceImpl ciudadService;
 
-    @PreAuthorize("hasAnyRole('GRADUADO', 'RESPONSABLE_CARRERA', 'EMPRESARIO', 'ADMINISTRADOR')")
+    @PreAuthorize("permitAll()")
     @GetMapping
     ResponseEntity<List<?>> list() {
         return ResponseEntity.ok(ciudadService.findAll());

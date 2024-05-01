@@ -1,5 +1,7 @@
 package ec.edu.ista.springgc1.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.view.View;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -23,6 +25,7 @@ public class Rol {
     @NotEmpty
     @Column(nullable = false, length = 20)
     @ColumnTransformer(write = "UPPER(?)")
+    @JsonView(View.Public.class)
     private String nombre;
 
     @NotEmpty

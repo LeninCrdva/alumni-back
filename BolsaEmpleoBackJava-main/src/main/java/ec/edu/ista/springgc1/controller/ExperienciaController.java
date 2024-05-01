@@ -25,7 +25,7 @@ import ec.edu.ista.springgc1.model.dto.ExperienciaDTO;
 import ec.edu.ista.springgc1.model.entity.Experiencia;
 import ec.edu.ista.springgc1.service.impl.ExperienciaServiceImp;
 
-@CrossOrigin(origins = "http://localhost:4200")
+
 @RestController
 @RequestMapping("/experiencias")
 public class ExperienciaController {
@@ -59,7 +59,7 @@ public class ExperienciaController {
 		currentExperiencie.setActividad(experienciaDTO.getActividad());
 		currentExperiencie.setCargo(experienciaDTO.getCargo());
 		currentExperiencie.setDuracion(experienciaDTO.getDuracion());
-		currentExperiencie.setArea_trabajo(experienciaDTO.getArea_trabajo());
+		currentExperiencie.setAreaTrabajo(experienciaDTO.getAreaTrabajo());
 
 		return ResponseEntity.status(HttpStatus.OK).body(experienciaServiceImp.save(currentExperiencie));
 	}
@@ -72,7 +72,8 @@ public class ExperienciaController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PreAuthorize("hasRole('ADMINISTRADOR')")
+	//@PreAuthorize("hasRole('ADMINISTRADOR')")
+	@PreAuthorize("hasAnyRole('EMPRESARIO', 'ADMINISTRADOR')")
 	@GetMapping("/graduados-con-experiencia")
 	ResponseEntity<?> getGraduadosConExperiencia() {
 		List<Graduado> graduadosConExperiencia = experienciaServiceImp.findGraduadosConExperiencia();

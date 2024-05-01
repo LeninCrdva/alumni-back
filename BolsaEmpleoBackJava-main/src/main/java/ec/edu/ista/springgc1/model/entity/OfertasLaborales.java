@@ -1,75 +1,79 @@
 package ec.edu.ista.springgc1.model.entity;
 
-import java.time.LocalDate;
-import java.util.List;
+import java.time.LocalDateTime;
+import javax.persistence.*;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-
+import com.fasterxml.jackson.annotation.JsonView;
+import ec.edu.ista.springgc1.model.enums.EstadoOferta;
+import ec.edu.ista.springgc1.view.View;
 import org.hibernate.annotations.ColumnTransformer;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.lang.Nullable;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.JsonView;
-
-import ec.edu.ista.springgc1.view.View;
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "ofertaslaborales")
 public class OfertasLaborales {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "oferta_id")
-	@JsonView(View.Base.class)
+	@JsonView({View.Postulacion.class, View.Public.class})
 	private Long id;
-	
-	@JsonView(View.Base.class)
+
+	@JsonView({View.Postulacion.class, View.Public.class})
 	private double salario;
-	
-	@JsonView(View.Base.class)
+
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fecha_cierre;
-	
-	@Column(name = "fechaPublicacion")
-	@JsonView(View.Base.class)
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private LocalDateTime fechaCierre;
+
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fechaPublicacion;
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private LocalDateTime fechaPublicacion;
 	
 	@ColumnTransformer(write = "UPPER(?)")
-	@JsonView(View.Base.class)
+	@JsonView({View.Postulacion.class, View.Public.class})
 	private String cargo;
 	
-	@JsonView(View.Base.class)
 	@ColumnTransformer(write = "UPPER(?)")
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private String tiempo;
+
+	@ColumnTransformer(write = "UPPER(?)")
+	@JsonView({View.Postulacion.class, View.Public.class})
 	private String experiencia;
-	
-	@JsonView(View.Base.class)
+
 	@DateTimeFormat(pattern = "YYYY-MM-dd HH:mm:ss")
-	private LocalDate fecha_apertura;
-	
-	@JsonView(View.Base.class)
-	private String area_conocimiento;
-	
-	@JsonView(View.Base.class)
-	private Boolean estado;
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private LocalDateTime fechaApertura;
+
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private String areaConocimiento;
+
+	@Enumerated(EnumType.STRING)
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private EstadoOferta estado;
 	
 	@ManyToOne
 	@JoinColumn(name = "id_empresa", referencedColumnName = "id_empresa")
-	@JsonView(View.Base.class)
+	@JsonView({View.Postulacion.class, View.Public.class})
 	private Empresa empresa;
+	
+	@Column(name = "tipo")
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private String tipo;
 
-	@Nullable
-	@ManyToMany(fetch = FetchType.LAZY, mappedBy = "ofertas")
-	@JsonManagedReference
-	private List<Graduado> graduados;
+	@Column(name = "foto_portada", columnDefinition = "LONGBLOB")
+	@JsonView({View.Postulacion.class, View.Public.class})
+	private String fotoPortada;
+
+	@PrePersist
+	public void prePersist() {
+		this.estado = EstadoOferta.EN_EVALUACION;
+
+		if ( this.fechaCierre == null ) {
+			this.fechaCierre = LocalDateTime.now().plusDays(3);
+		}
+	}
 }

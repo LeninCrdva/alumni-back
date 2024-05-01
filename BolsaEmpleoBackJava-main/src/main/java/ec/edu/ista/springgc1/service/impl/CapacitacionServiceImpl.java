@@ -33,9 +33,9 @@ public class CapacitacionServiceImpl extends GenericServiceImpl<Capacitacion> im
 		capacitacion.setGraduado(graduado);
 		capacitacion.setNombre(capaciDTO.getNombre());
 		capacitacion.setInstitucion(capaciDTO.getInstitucion());
-		capacitacion.setTipo_certificado(capaciDTO.getTipoCertificado());
-		capacitacion.setFecha_fin(capaciDTO.getFechaFin());
-		capacitacion.setFecha_inicio(capaciDTO.getFechaInicio());
+		capacitacion.setTipoCertificado(capaciDTO.getTipoCertificado());
+		capacitacion.setFechaFin(capaciDTO.getFechaFin());
+		capacitacion.setFechaInicio(capaciDTO.getFechaInicio());
 		capacitacion.setHoras(capaciDTO.getNumHoras());
 		capacitacion.setId(capaciDTO.getId());
 		
@@ -48,11 +48,11 @@ public class CapacitacionServiceImpl extends GenericServiceImpl<Capacitacion> im
 		capaciDTO.setId(capacitacion.getId());
 		capaciDTO.setInstitucion(capacitacion.getInstitucion());
 		capaciDTO.setNombre(capacitacion.getNombre());
-		capaciDTO.setTipoCertificado(capacitacion.getTipo_certificado());
+		capaciDTO.setTipoCertificado(capacitacion.getTipoCertificado());
 		capaciDTO.setCedula(capacitacion.getGraduado().getUsuario().getPersona().getCedula());
 		capaciDTO.setNumHoras(capacitacion.getHoras());
-		capaciDTO.setFechaFin(capacitacion.getFecha_fin());
-		capaciDTO.setFechaInicio(capacitacion.getFecha_inicio());
+		capaciDTO.setFechaFin(capacitacion.getFechaFin());
+		capaciDTO.setFechaInicio(capacitacion.getFechaInicio());
 		return capaciDTO;
 	}
 	
