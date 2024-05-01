@@ -1,13 +1,8 @@
 # springgc1
 
 # IDE: INTELIJIDEA
-para una mejor visuliacion se recomienda usar intellijidea, pues es un potente ide que ayuda a desarrollar mejor
+Se recomienda utilizar Intellij para abrir este proyecto.
 
-# tiene coneccion a una base de datos cloud
-se recomienda, visulizar la documentacion en swgger en el ambiente web
-- http://springgc1-env.eba-mf2fnuvf.us-east-1.elasticbeanstalk.com/swagger-ui/index.html#/
-
-# si lo probara locamente, se recomienda usar 
-- jdk:1.8
-- lombok
-- al ejecuctar localmente, prodra ver la documentacion en el siguiente enalce: http://localhost:8080/swagger-ui/index.html
+# Cuenta con Swagger
+Puede contar con la ayuda de swagger para la depuración de enpoints con Swagger, sin embargo, las rutas se encuentran protegidas por medio de la autorización, por lo que no podrá probar todas las rutas, sin embargo, si desea probar otras rutas, se recomienda utilizar Postman o Insomnia y en el apartado del Header pegar el token que se genera al utilizar la endpoint de iniciar sesión.
+http://localhost:8080/swagger-ui/index.html
