@@ -63,4 +63,7 @@ public class Titulo {
     @JoinColumn(name = "id_carrera", referencedColumnName = "id_carrera")
     @JsonView(View.Public.class)
     private Carrera carrera;
+    @ColumnTransformer(write = "UPPER(?)")
+    @JsonView(View.Public.class)
+    private String otro;
 }

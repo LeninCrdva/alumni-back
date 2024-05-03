@@ -25,6 +25,8 @@ public class TituloDTO implements Serializable {
 
     @NotNull
     private String nombreTitulo;
+    
+    private String otro;
 
     @NotNull
 	@DateTimeFormat(pattern = "YYYY-MM-dd")
