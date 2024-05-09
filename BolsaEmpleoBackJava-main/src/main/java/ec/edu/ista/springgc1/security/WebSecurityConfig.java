@@ -65,7 +65,7 @@ public class WebSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-       // corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200")); //Here you can add more origins if needed
+       // corsConfiguration.setAllowedOrigins(Arrays.asList("*")); //Here yo can add more origins if needed
         //http://alumnisericefornted123.s3-website.us-east-2.amazonaws.com/
         corsConfiguration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "http://alumnisericefornted123.s3-website.us-east-2.amazonaws.com/", "http://localhost:8080"));
         corsConfiguration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
